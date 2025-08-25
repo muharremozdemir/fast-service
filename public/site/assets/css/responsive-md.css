@@ -1,0 +1,18 @@
+@media (min-width: 768px) {
+    .welcome-container {
+        margin-bottom: 24px;
+    }
+    .room-number-container .room-number-text {
+        font-size: 14px;
+    }
+    .category-row {
+        --bs-gutter-y: 24px;
+        --bs-gutter-x: 24px;
+    }
+    .main-category-links {
+        justify-content: center;
+    }
+    .sub-category-links {
+        justify-content: center;
+    }
+}
