@@ -12,10 +12,7 @@ class CategorySeeder extends Seeder
 {
     public function run(): void
     {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        Category::truncate();
-        Product::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        
 
         $parents = [
             ['name' => 'Oda Servisi',        'sort_order' => 1],
