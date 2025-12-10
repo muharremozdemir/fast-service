@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>FastService</title>
+    <title>FastService - Sepetim</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,14 +53,14 @@
             </div>
             <div class="col-6">
                 <div class="logo h-100 d-flex align-items-center justify-content-center">
-                    <a href="index.html">
+                    <a href="{{ route('site.home') }}">
                         <img class="logo-img" src="{{ asset('site/assets/img/logo.svg') }}" alt="Logo">
                     </a>
                 </div>
             </div>
             <div class="col-3">
                 <div class="header-right d-flex align-items-center justify-content-end">
-                    <button class="btn btn-light btn-fastservice">
+                    <a href="{{ route('site.cart') }}" class="btn btn-light btn-fastservice">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clip-path="url(#clip0_13_890)">
                                 <path d="M15.142 2.718C14.9545 2.49296 14.7197 2.31197 14.4544 2.18788C14.189 2.06379 13.8996 1.99964 13.6067 2H2.828L2.8 1.766C2.7427 1.27961 2.50892 0.831155 2.14299 0.505652C1.77706 0.180149 1.30442 0.000227862 0.814667 0L0.666667 0C0.489856 0 0.320286 0.0702379 0.195262 0.195262C0.0702379 0.320286 0 0.489856 0 0.666667C0 0.843478 0.0702379 1.01305 0.195262 1.13807C0.320286 1.2631 0.489856 1.33333 0.666667 1.33333H0.814667C0.977956 1.33335 1.13556 1.3933 1.25758 1.50181C1.3796 1.61032 1.45756 1.75983 1.47667 1.922L2.394 9.722C2.48923 10.5332 2.87899 11.2812 3.48927 11.824C4.09956 12.3668 4.8879 12.6667 5.70467 12.6667H12.6667C12.8435 12.6667 13.013 12.5964 13.1381 12.4714C13.2631 12.3464 13.3333 12.1768 13.3333 12C13.3333 11.8232 13.2631 11.6536 13.1381 11.5286C13.013 11.4036 12.8435 11.3333 12.6667 11.3333H5.70467C5.29204 11.3322 4.88987 11.2034 4.55329 10.9647C4.21671 10.726 3.96221 10.389 3.82467 10H11.7713C12.5529 10 13.3096 9.72549 13.9092 9.22429C14.5089 8.7231 14.9134 8.02713 15.052 7.258L15.5753 4.35533C15.6276 4.06734 15.6158 3.77138 15.5409 3.48843C15.4661 3.20547 15.3299 2.94245 15.142 2.718ZM14.2667 4.11867L13.7427 7.02133C13.6594 7.48333 13.4163 7.90133 13.0559 8.20213C12.6955 8.50294 12.2408 8.66738 11.7713 8.66667H3.61267L2.98533 3.33333H13.6067C13.7046 3.33275 13.8015 3.35375 13.8904 3.39484C13.9793 3.43593 14.058 3.4961 14.121 3.57107C14.184 3.64605 14.2297 3.73398 14.2549 3.82862C14.2801 3.92327 14.2841 4.0223 14.2667 4.11867Z" fill="black"/>
@@ -73,8 +73,8 @@
                                 </clipPath>
                             </defs>
                         </svg>
-                        <span>0</span>
-                    </button>
+                        <span id="cart-count">{{ $cartItems->sum('quantity') }}</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -91,7 +91,7 @@
             </div>
             <div class="col">
                 <div class="h-100 d-flex align-items-center justify-content-end">
-                    <button class="btn cart-header-button">
+                    <button class="btn cart-header-button" id="clear-cart-btn">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clip-path="url(#clip0_15_1617)">
                                 <path d="M11.3333 3.99998H14.6666V5.33331H13.3333V14C13.3333 14.3682 13.0348 14.6666 12.6666 14.6666H3.33325C2.96507 14.6666 2.66659 14.3682 2.66659 14V5.33331H1.33325V3.99998H4.66659V1.99998C4.66659 1.63179 4.96507 1.33331 5.33325 1.33331H10.6666C11.0348 1.33331 11.3333 1.63179 11.3333 1.99998V3.99998ZM11.9999 5.33331H3.99992V13.3333H11.9999V5.33331ZM8.94272 9.33311L10.1213 10.5116L9.17845 11.4544L7.99992 10.2759L6.82139 11.4544L5.8786 10.5116L7.05712 9.33311L5.8786 8.15465L6.82139 7.21185L7.99992 8.39031L9.17845 7.21185L10.1213 8.15465L8.94272 9.33311ZM5.99992 2.66665V3.99998H9.99992V2.66665H5.99992Z" fill="#FE531F"/>
@@ -102,7 +102,6 @@
                                 </clipPath>
                             </defs>
                         </svg>
-
                         Sepeti Temizle
                     </button>
                 </div>
@@ -114,137 +113,229 @@
 <div class="container">
     <div class="row">
         <div class="col-12">
-            <div class="cart-items">
-                <div class="cart-item">
-                    <img class="cart-item-image" src="{{ asset('site/assets/img/product-img-1.jpg') }}" alt="">
-                    <div class="cart-item-content">
-                        <div class="cart-item-title">Izgara Tavuk</div>
-                        <div class="cart-item-text">Izgara tavuk, patates püresi, sebzeler</div>
-                        <div class="cart-item-price">999.99₺</div>
-                    </div>
-                    <div class="cart-item-buttons">
-                        <button class="btn cart-item-number-btn-left">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <g clip-path="url(#clip0_15_1556)">
-                                    <path d="M14.1667 5.00002H18.3334V6.66669H16.6667V17.5C16.6667 17.9603 16.2937 18.3334 15.8334 18.3334H4.16675C3.70651 18.3334 3.33341 17.9603 3.33341 17.5V6.66669H1.66675V5.00002H5.83341V2.50002C5.83341 2.03979 6.20651 1.66669 6.66675 1.66669H13.3334C13.7937 1.66669 14.1667 2.03979 14.1667 2.50002V5.00002ZM15.0001 6.66669H5.00008V16.6667H15.0001V6.66669ZM11.1786 11.6664L12.6517 13.1396L11.4732 14.3181L10.0001 12.8449L8.52691 14.3181L7.34843 13.1396L8.82158 11.6664L7.34843 10.1934L8.52691 9.01485L10.0001 10.4879L11.4732 9.01485L12.6517 10.1934L11.1786 11.6664ZM7.50008 3.33335V5.00002H12.5001V3.33335H7.50008Z" fill="#FE531F"/>
-                                </g>
-                                <defs>
-                                    <clipPath id="clip0_15_1556">
-                                        <rect width="20" height="20" fill="white"/>
-                                    </clipPath>
-                                </defs>
-                            </svg>
-                        </button>
-                        <div class="cart-item-number">
-                            <span>1</span>
+            <div class="cart-items" id="cart-items-container">
+                @forelse($cartItems as $cartItem)
+                    <div class="cart-item" data-cart-id="{{ $cartItem->id }}">
+                        <img class="cart-item-image" src="{{ $cartItem->product->image_url }}" alt="{{ $cartItem->product->name }}">
+                        <div class="cart-item-content">
+                            <div class="cart-item-title">{{ $cartItem->product->name }}</div>
+                            <div class="cart-item-text">{{ $cartItem->product->description ?? $cartItem->product->short_description }}</div>
+                            <div class="cart-item-price" data-item-price="{{ $cartItem->product->price }}">
+                                {{ number_format($cartItem->quantity * $cartItem->product->price, 2) }}₺
+                            </div>
                         </div>
-                        <button class="btn cart-item-number-btn-right">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <g clip-path="url(#clip0_15_1569)">
-                                    <path d="M9.16675 9.16669V4.16669H10.8334V9.16669H15.8334V10.8334H10.8334V15.8334H9.16675V10.8334H4.16675V9.16669H9.16675Z" fill="#FE531F"/>
-                                </g>
-                                <defs>
-                                    <clipPath id="clip0_15_1569">
-                                        <rect width="20" height="20" fill="white"/>
-                                    </clipPath>
-                                </defs>
-                            </svg>
-
-                        </button>
-                    </div>
-                </div>
-                <div class="cart-item">
-                    <img class="cart-item-image" src="{{ asset('site/assets/img/product-img-1.jpg') }}" alt="">
-                    <div class="cart-item-content">
-                        <div class="cart-item-title">Izgara Tavuk</div>
-                        <div class="cart-item-text">Izgara tavuk, patates püresi, sebzeler</div>
-                        <div class="cart-item-price">999.99₺</div>
-                    </div>
-                    <div class="cart-item-buttons">
-                        <button class="btn cart-item-number-btn-left">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <g clip-path="url(#clip0_15_1556)">
-                                    <path d="M14.1667 5.00002H18.3334V6.66669H16.6667V17.5C16.6667 17.9603 16.2937 18.3334 15.8334 18.3334H4.16675C3.70651 18.3334 3.33341 17.9603 3.33341 17.5V6.66669H1.66675V5.00002H5.83341V2.50002C5.83341 2.03979 6.20651 1.66669 6.66675 1.66669H13.3334C13.7937 1.66669 14.1667 2.03979 14.1667 2.50002V5.00002ZM15.0001 6.66669H5.00008V16.6667H15.0001V6.66669ZM11.1786 11.6664L12.6517 13.1396L11.4732 14.3181L10.0001 12.8449L8.52691 14.3181L7.34843 13.1396L8.82158 11.6664L7.34843 10.1934L8.52691 9.01485L10.0001 10.4879L11.4732 9.01485L12.6517 10.1934L11.1786 11.6664ZM7.50008 3.33335V5.00002H12.5001V3.33335H7.50008Z" fill="#FE531F"/>
-                                </g>
-                                <defs>
-                                    <clipPath id="clip0_15_1556">
-                                        <rect width="20" height="20" fill="white"/>
-                                    </clipPath>
-                                </defs>
-                            </svg>
-                        </button>
-                        <div class="cart-item-number">
-                            <span>1</span>
+                        <div class="cart-item-buttons">
+                            <button class="btn cart-item-number-btn-left" onclick="updateQuantity({{ $cartItem->id }}, {{ $cartItem->quantity - 1 }})">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <g clip-path="url(#clip0_15_1556)">
+                                        <path d="M14.1667 5.00002H18.3334V6.66669H16.6667V17.5C16.6667 17.9603 16.2937 18.3334 15.8334 18.3334H4.16675C3.70651 18.3334 3.33341 17.9603 3.33341 17.5V6.66669H1.66675V5.00002H5.83341V2.50002C5.83341 2.03979 6.20651 1.66669 6.66675 1.66669H13.3334C13.7937 1.66669 14.1667 2.03979 14.1667 2.50002V5.00002ZM15.0001 6.66669H5.00008V16.6667H15.0001V6.66669ZM11.1786 11.6664L12.6517 13.1396L11.4732 14.3181L10.0001 12.8449L8.52691 14.3181L7.34843 13.1396L8.82158 11.6664L7.34843 10.1934L8.52691 9.01485L10.0001 10.4879L11.4732 9.01485L12.6517 10.1934L11.1786 11.6664ZM7.50008 3.33335V5.00002H12.5001V3.33335H7.50008Z" fill="#FE531F"/>
+                                    </g>
+                                    <defs>
+                                        <clipPath id="clip0_15_1556">
+                                            <rect width="20" height="20" fill="white"/>
+                                        </clipPath>
+                                    </defs>
+                                </svg>
+                            </button>
+                            <div class="cart-item-number">
+                                <span class="quantity-display">{{ $cartItem->quantity }}</span>
+                            </div>
+                            <button class="btn cart-item-number-btn-right" onclick="updateQuantity({{ $cartItem->id }}, {{ $cartItem->quantity + 1 }})">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <g clip-path="url(#clip0_15_1569)">
+                                        <path d="M9.16675 9.16669V4.16669H10.8334V9.16669H15.8334V10.8334H10.8334V15.8334H9.16675V10.8334H4.16675V9.16669H9.16675Z" fill="#FE531F"/>
+                                    </g>
+                                    <defs>
+                                        <clipPath id="clip0_15_1569">
+                                            <rect width="20" height="20" fill="white"/>
+                                        </clipPath>
+                                    </defs>
+                                </svg>
+                            </button>
                         </div>
-                        <button class="btn cart-item-number-btn-right">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <g clip-path="url(#clip0_15_1569)">
-                                    <path d="M9.16675 9.16669V4.16669H10.8334V9.16669H15.8334V10.8334H10.8334V15.8334H9.16675V10.8334H4.16675V9.16669H9.16675Z" fill="#FE531F"/>
-                                </g>
-                                <defs>
-                                    <clipPath id="clip0_15_1569">
-                                        <rect width="20" height="20" fill="white"/>
-                                    </clipPath>
-                                </defs>
-                            </svg>
-
-                        </button>
                     </div>
-                </div>
-                <div class="cart-item">
-                    <img class="cart-item-image" src="{{ asset('site/assets/img/product-img-1.jpg') }}" alt="">
-                    <div class="cart-item-content">
-                        <div class="cart-item-title">Izgara Tavuk</div>
-                        <div class="cart-item-text">Izgara tavuk, patates püresi, sebzeler</div>
-                        <div class="cart-item-price">999.99₺</div>
+                @empty
+                    <div class="text-center py-5">
+                        <p>Sepetiniz boş.</p>
+                        <a href="{{ route('site.home') }}" class="btn btn-primary">Alışverişe Başla</a>
                     </div>
-                    <div class="cart-item-buttons">
-                        <button class="btn cart-item-number-btn-left">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <g clip-path="url(#clip0_15_1556)">
-                                    <path d="M14.1667 5.00002H18.3334V6.66669H16.6667V17.5C16.6667 17.9603 16.2937 18.3334 15.8334 18.3334H4.16675C3.70651 18.3334 3.33341 17.9603 3.33341 17.5V6.66669H1.66675V5.00002H5.83341V2.50002C5.83341 2.03979 6.20651 1.66669 6.66675 1.66669H13.3334C13.7937 1.66669 14.1667 2.03979 14.1667 2.50002V5.00002ZM15.0001 6.66669H5.00008V16.6667H15.0001V6.66669ZM11.1786 11.6664L12.6517 13.1396L11.4732 14.3181L10.0001 12.8449L8.52691 14.3181L7.34843 13.1396L8.82158 11.6664L7.34843 10.1934L8.52691 9.01485L10.0001 10.4879L11.4732 9.01485L12.6517 10.1934L11.1786 11.6664ZM7.50008 3.33335V5.00002H12.5001V3.33335H7.50008Z" fill="#FE531F"/>
-                                </g>
-                                <defs>
-                                    <clipPath id="clip0_15_1556">
-                                        <rect width="20" height="20" fill="white"/>
-                                    </clipPath>
-                                </defs>
-                            </svg>
-                        </button>
-                        <div class="cart-item-number">
-                            <span>1</span>
-                        </div>
-                        <button class="btn cart-item-number-btn-right">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <g clip-path="url(#clip0_15_1569)">
-                                    <path d="M9.16675 9.16669V4.16669H10.8334V9.16669H15.8334V10.8334H10.8334V15.8334H9.16675V10.8334H4.16675V9.16669H9.16675Z" fill="#FE531F"/>
-                                </g>
-                                <defs>
-                                    <clipPath id="clip0_15_1569">
-                                        <rect width="20" height="20" fill="white"/>
-                                    </clipPath>
-                                </defs>
-                            </svg>
-
-                        </button>
-                    </div>
-                </div>
+                @endforelse
             </div>
         </div>
     </div>
 </div>
 
-
 <div class="mobile-add-to-cart">
-    <div class="mobile-add-to-cart-price">
-        999.99₺
+    <div class="mobile-add-to-cart-price" id="mobile-total-price">
+        {{ number_format($total ?? 0, 2) }}₺
     </div>
-    <button class="btn btn-primary mobile-add-to-cart-button">
+    <button class="btn btn-primary mobile-add-to-cart-button" id="place-order-btn">
         Sipariş Ver
     </button>
 </div>
 
-<script src="{{ asset('site/assets/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('site/assets/js/bootstrap.bundle.js') }}"></script>
 <script src="{{ asset('site/assets/js/swiper-bundle.min.js') }}"></script>
+<script>
+    function updateQuantity(cartItemId, newQuantity) {
+        if (newQuantity < 1) {
+            removeItem(cartItemId);
+            return;
+        }
+
+        fetch(`/sepet/item/${cartItemId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ quantity: newQuantity })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const cartItem = document.querySelector(`[data-cart-id="${cartItemId}"]`);
+                const quantityDisplay = cartItem.querySelector('.quantity-display');
+                const priceDisplay = cartItem.querySelector('.cart-item-price');
+                const itemPrice = parseFloat(priceDisplay.getAttribute('data-item-price'));
+                
+                quantityDisplay.textContent = newQuantity;
+                priceDisplay.textContent = data.item_total.toFixed(2) + '₺';
+                
+                // Update buttons
+                const decreaseBtn = cartItem.querySelector('.cart-item-number-btn-left');
+                const increaseBtn = cartItem.querySelector('.cart-item-number-btn-right');
+                decreaseBtn.setAttribute('onclick', `updateQuantity(${cartItemId}, ${newQuantity - 1})`);
+                increaseBtn.setAttribute('onclick', `updateQuantity(${cartItemId}, ${newQuantity + 1})`);
+                
+                // Update total
+                document.getElementById('mobile-total-price').textContent = data.total.toFixed(2) + '₺';
+                
+                // Update cart count
+                updateCartCount();
+            } else {
+                alert('Bir hata oluştu.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Bir hata oluştu.');
+        });
+    }
+
+    function removeItem(cartItemId) {
+        if (!confirm('Bu ürünü sepetten çıkarmak istediğinize emin misiniz?')) {
+            return;
+        }
+
+        fetch(`/sepet/item/${cartItemId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const cartItem = document.querySelector(`[data-cart-id="${cartItemId}"]`);
+                cartItem.remove();
+                
+                // Update total
+                document.getElementById('mobile-total-price').textContent = data.total.toFixed(2) + '₺';
+                
+                // Update cart count
+                updateCartCount();
+                
+                // Check if cart is empty
+                const cartItems = document.querySelectorAll('.cart-item');
+                if (cartItems.length === 0) {
+                    document.getElementById('cart-items-container').innerHTML = 
+                        '<div class="text-center py-5"><p>Sepetiniz boş.</p><a href="{{ route("site.home") }}" class="btn btn-primary">Alışverişe Başla</a></div>';
+                }
+            } else {
+                alert('Bir hata oluştu.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Bir hata oluştu.');
+        });
+    }
+
+    // Clear cart
+    document.getElementById('clear-cart-btn').addEventListener('click', function() {
+        if (!confirm('Sepeti tamamen temizlemek istediğinize emin misiniz?')) {
+            return;
+        }
+
+        fetch('{{ route("site.cart.clear") }}', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('cart-items-container').innerHTML = 
+                    '<div class="text-center py-5"><p>Sepetiniz boş.</p><a href="{{ route("site.home") }}" class="btn btn-primary">Alışverişe Başla</a></div>';
+                document.getElementById('mobile-total-price').textContent = '0.00₺';
+                updateCartCount();
+            } else {
+                alert('Bir hata oluştu.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Bir hata oluştu.');
+        });
+    });
+
+    function updateCartCount() {
+        fetch('{{ route("site.cart.count") }}')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('cart-count').textContent = data.count || 0;
+            });
+    }
+
+    // Place order
+    document.getElementById('place-order-btn').addEventListener('click', function() {
+        const button = this;
+        const originalText = button.textContent;
+        
+        // Disable button
+        button.disabled = true;
+        button.textContent = 'Sipariş Oluşturuluyor...';
+
+        fetch('{{ route("site.order.store") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Redirect to order complete page
+                window.location.href = '{{ route("site.order.complete", ":orderNumber") }}'.replace(':orderNumber', data.order_number);
+            } else {
+                alert(data.message || 'Bir hata oluştu.');
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Bir hata oluştu.');
+            button.textContent = originalText;
+            button.disabled = false;
+        });
+    });
+</script>
 </body>
 </html>

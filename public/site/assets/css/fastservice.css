@@ -358,6 +358,49 @@ a {
     right: 4px;
 }
 
+.product-card-quantity-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.product-card-quantity-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border: none;
+    background-color: #ffffff;
+    cursor: pointer;
+}
+
+.product-card-quantity-btn:hover {
+    background-color: #f5f5f5;
+}
+
+.product-card-quantity-number {
+    min-width: 24px;
+    width: auto;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    line-height: 14px;
+    font-weight: 600;
+    background-color: var(--primary-color);
+    color: #ffffff;
+    padding: 0 6px;
+}
+
 .product-cards-row {
     --bs-gutter-y: 8px;
     --bs-gutter-x: 8px;

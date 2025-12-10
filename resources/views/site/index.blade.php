@@ -8,6 +8,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <link rel="stylesheet" href="{{ asset('site/assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('site/assets/css/swiper-bundle.min.css') }}">
@@ -77,19 +80,48 @@
     <div class="row">
         <div class="col-8 col-md-6">
             <div class="h-100 d-flex align-items-center justify-content-start">
-                <p class="welcome-text">Fast Hotel’e Hoş geldiniz!</p>
+                <p class="welcome-text">Fast Hotel'e Hoş geldiniz!</p>
             </div>
         </div>
         <div class="col-4 col-md-6">
             <div class="d-flex align-items-center justify-content-end">
                 <div class="room-number-container d-flex align-items-center">
                     <div class="room-number-text d-flex align-items-center justify-content-center">Oda Numaranız</div>
-                    <div class="room-number d-flex align-items-center justify-content-center">203</div>
+                    <div class="room-number d-flex align-items-center justify-content-center" id="room-number-display">
+                        {{ Session::get('room_number', 'Belirtilmedi') }}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@if(session('success'))
+    <div class="container mt-3">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="container mt-3">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+@endif
+
+@if(!Session::has('room_number'))
+    <div class="container mt-3">
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>Uyarı:</strong> Oda numaranız seçilmedi. Lütfen odanızdaki QR kodu okutun.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+@endif
 
 
 <!-- Slider -->
@@ -147,8 +179,34 @@
     </div>
 </div>
 
+
 <script src="{{ asset('site/assets/js/bootstrap.bundle.js') }}"></script>
 <script src="{{ asset('site/assets/js/swiper-bundle.min.js') }}"></script>
 <script src="{{ asset('site/assets/js/homepage.js') }}"></script>
+<script>
+    // Update cart count
+    function updateCartCount() {
+        fetch('{{ route("site.cart.count") }}')
+            .then(response => response.json())
+            .then(data => {
+                const cartCountElements = document.querySelectorAll('.header-right .btn-fastservice span');
+                cartCountElements.forEach(el => {
+                    el.textContent = data.count || 0;
+                });
+            });
+    }
+
+    // Update cart count on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCartCount();
+        
+        // Check if room number is set, if not show warning
+        const roomNumber = '{{ Session::get('room_number', '') }}';
+        if (!roomNumber) {
+            // Show a subtle warning that QR code should be scanned
+            console.warn('Oda numarası seçilmedi. Lütfen QR kodu okutun.');
+        }
+    });
+</script>
 </body>
 </html>

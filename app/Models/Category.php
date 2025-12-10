@@ -11,11 +11,13 @@ class Category extends Model
     // use SoftDeletes isteğe bağlı;
 
     protected $fillable = [
-        'parent_id','name','slug','image_path','sort_order','is_active','description'
+        'parent_id','name','slug','image_path','sort_order','is_active','description','user_id','company_id'
     ];
 
     public function parent(){ return $this->belongsTo(Category::class, 'parent_id'); }
     public function children(){ return $this->hasMany(Category::class, 'parent_id'); }
     public function products(){ return $this->hasMany(Product::class); }
+    public function user(){ return $this->belongsTo(User::class); }
+    public function company(){ return $this->belongsTo(Company::class); }
     
 }

@@ -1,21 +1,6 @@
 @extends('admin.index')
-<!DOCTYPE html>
-<link href="{{ asset('admin/assets/plugins/global/plugins.bundle.css') }}" rel="stylesheet" type="text/css" />
 
-				<!--end::Header-->
-				<!--begin::Wrapper-->
-				<div class="app-wrapper flex-column flex-row-fluid" id="kt_app_wrapper">
-					<!--begin::Sidebar-->
-					<div id="kt_app_sidebar" class="app-sidebar flex-column" data-kt-drawer="true" data-kt-drawer-name="app-sidebar" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="225px" data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_app_sidebar_mobile_toggle">
-						
-					
-						<!--end::Footer-->
-					</div>
-					<!--end::Sidebar-->
-					<!--begin::Main-->
-					<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
-						<!--begin::Content wrapper-->
-						<div class="d-flex flex-column flex-column-fluid">
+@section('content')
 							<!--begin::Toolbar-->
 							<div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
 								<!--begin::Toolbar container-->
@@ -23,13 +8,13 @@
 									<!--begin::Page title-->
 									<div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
 										<!--begin::Title-->
-										<h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Categories</h1>
+										<h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Kategoriler</h1>
 										<!--end::Title-->
 										<!--begin::Breadcrumb-->
 										<ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
 											<!--begin::Item-->
 											<li class="breadcrumb-item text-muted">
-												<a href="index.html" class="text-muted text-hover-primary">Home</a>
+												<a href="{{ route('admin.index') }}" class="text-muted text-hover-primary">Ana Sayfa</a>
 											</li>
 											<!--end::Item-->
 											<!--begin::Item-->
@@ -38,15 +23,7 @@
 											</li>
 											<!--end::Item-->
 											<!--begin::Item-->
-											<li class="breadcrumb-item text-muted">eCommerce</li>
-											<!--end::Item-->
-											<!--begin::Item-->
-											<li class="breadcrumb-item">
-												<span class="bullet bg-gray-500 w-5px h-2px"></span>
-											</li>
-											<!--end::Item-->
-											<!--begin::Item-->
-											<li class="breadcrumb-item text-muted">Catalog</li>
+											<li class="breadcrumb-item text-muted">Kategoriler</li>
 											<!--end::Item-->
 										</ul>
 										<!--end::Breadcrumb-->
@@ -61,58 +38,58 @@
 											<i class="ki-duotone ki-filter fs-6 text-muted me-1">
 												<span class="path1"></span>
 												<span class="path2"></span>
-											</i>Filter</a>
+											</i>Filtrele</a>
 											<!--end::Menu toggle-->
 											<!--begin::Menu 1-->
 										    <div class="menu menu-sub menu-sub-dropdown w-250px w-md-300px" data-kt-menu="true" id="kt_menu_category_filter">
 												<form method="GET" action="{{ route('admin.categories.index') }}" class="px-7 py-5">
 													<!--begin::Header-->
-													<div class="fs-5 text-gray-900 fw-bold mb-7">Filter Options</div>
+													<div class="fs-5 text-gray-900 fw-bold mb-7">Filtre Seçenekleri</div>
 												
 													<!--begin::Search-->
 													<div class="mb-10">
-														<label class="form-label fw-semibold">Search:</label>
-														<input type="text" name="q" class="form-control form-control-solid" placeholder="Category name or slug" value="{{ request('q') }}" />
+														<label class="form-label fw-semibold">Arama:</label>
+														<input type="text" name="q" class="form-control form-control-solid" placeholder="Kategori adı veya slug" value="{{ request('q') }}" />
 													</div>
 													<!--end::Search-->
 												
 													<!--begin::Status Filter-->
 													<div class="mb-10">
-														<label class="form-label fw-semibold">Status:</label>
-														<select class="form-select form-select-solid" name="status" data-kt-select2="true" data-placeholder="Select status" data-dropdown-parent="#kt_menu_category_filter">
-															<option value="">All</option>
-															<option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Published</option>
-															<option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Unpublished</option>
+														<label class="form-label fw-semibold">Durum:</label>
+														<select class="form-select form-select-solid" name="status" data-kt-select2="true" data-placeholder="Durum seçin" data-dropdown-parent="#kt_menu_category_filter">
+															<option value="">Tümü</option>
+															<option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Yayında</option>
+															<option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Yayında Değil</option>
 														</select>
 													</div>
 													<!--end::Status Filter-->
 												
 													<!--begin::Sort Order-->
 													<div class="mb-10">
-														<label class="form-label fw-semibold">Sort Order:</label>
-														<select class="form-select form-select-solid" name="sort_order" data-kt-select2="true" data-placeholder="Sort by" data-dropdown-parent="#kt_menu_category_filter">
-															<option value="">Default</option>
-															<option value="asc" {{ request('sort_order') === 'asc' ? 'selected' : '' }}>Ascending</option>
-															<option value="desc" {{ request('sort_order') === 'desc' ? 'selected' : '' }}>Descending</option>
+														<label class="form-label fw-semibold">Sıralama:</label>
+														<select class="form-select form-select-solid" name="sort_order" data-kt-select2="true" data-placeholder="Sırala" data-dropdown-parent="#kt_menu_category_filter">
+															<option value="">Varsayılan</option>
+															<option value="asc" {{ request('sort_order') === 'asc' ? 'selected' : '' }}>Artan</option>
+															<option value="desc" {{ request('sort_order') === 'desc' ? 'selected' : '' }}>Azalan</option>
 														</select>
 													</div>
 													<!--end::Sort Order-->
 												
 													<!--begin::Description Filter-->
 													<div class="mb-10">
-														<label class="form-label fw-semibold">With Description:</label>
-														<select class="form-select form-select-solid" name="has_description" data-kt-select2="true" data-placeholder="Choose" data-dropdown-parent="#kt_menu_category_filter">
-															<option value="">All</option>
-															<option value="1" {{ request('has_description') === '1' ? 'selected' : '' }}>Only with Description</option>
-															<option value="0" {{ request('has_description') === '0' ? 'selected' : '' }}>Without Description</option>
+														<label class="form-label fw-semibold">Açıklama ile:</label>
+														<select class="form-select form-select-solid" name="has_description" data-kt-select2="true" data-placeholder="Seçin" data-dropdown-parent="#kt_menu_category_filter">
+															<option value="">Tümü</option>
+															<option value="1" {{ request('has_description') === '1' ? 'selected' : '' }}>Sadece Açıklamalı</option>
+															<option value="0" {{ request('has_description') === '0' ? 'selected' : '' }}>Açıklamasız</option>
 														</select>
 													</div>
 													<!--end::Description Filter-->
 												
 													<!--begin::Actions-->
 													<div class="d-flex justify-content-end">
-														<a href="{{ route('admin.categories.index') }}" class="btn btn-sm btn-light btn-active-light-primary me-2" data-kt-menu-dismiss="true">Reset</a>
-														<button type="submit" class="btn btn-sm btn-primary" data-kt-menu-dismiss="true">Apply</button>
+														<a href="{{ route('admin.categories.index') }}" class="btn btn-sm btn-light btn-active-light-primary me-2" data-kt-menu-dismiss="true">Temizle</a>
+														<button type="submit" class="btn btn-sm btn-primary" data-kt-menu-dismiss="true">Uygula</button>
 													</div>
 													<!--end::Actions-->
 												</form>
@@ -124,7 +101,7 @@
 										<!--begin::Secondary button-->
 										<!--end::Secondary button-->
 										<!--begin::Primary button-->
-										<a href="#" class="btn btn-sm fw-bold btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_create_app">Add Category</a>
+										<a href="{{ route('admin.categories.create') }}" class="btn btn-sm fw-bold btn-primary">Kategori Ekle</a>
 										<!--end::Primary button-->
 									</div>
 									<!--end::Actions-->
@@ -149,7 +126,7 @@
 														<span class="path2"></span>
 													</i>
 													<form method="GET" action="{{ route('admin.categories.index') }}">
-														<input type="text" name="q" value="{{ request('q') }}" class="form-control form-control-solid w-250px ps-12" placeholder="Search Category" />
+														<input type="text" name="q" value="{{ request('q') }}" class="form-control form-control-solid w-250px ps-12" placeholder="Kategori ara..." />
 													</form>												</div>
 												<!--end::Search-->
 											</div>
@@ -172,9 +149,10 @@
 																	   data-kt-check-target="#kt_ecommerce_category_table .form-check-input" value="1" />
 															</div>
 														</th>
-														<th class="min-w-250px">Category</th>
-														<th class="min-w-150px">Category Type</th>
-														<th class="text-end min-w-70px">Actions</th>
+														<th class="min-w-250px">Kategori</th>
+														<th class="min-w-150px">Kategori Tipi</th>
+														<th class="min-w-150px">Görevli</th>
+														<th class="text-end min-w-70px">İşlemler</th>
 													</tr>
 												</thead>
 											
@@ -207,7 +185,7 @@
 																		<div class="text-muted fs-7 fw-bold">
 																			Slug: {{ $category->slug }}
 																			@if($category->parent)
-																				• Parent: {{ $category->parent->name }}
+																				• Üst Kategori: {{ $category->parent->name }}
 																			@endif
 																			@if(!is_null($category->sort_order))
 																				• Sıra: {{ $category->sort_order }}
@@ -226,11 +204,19 @@
 																</div>
 															</td>
 											
+															<td>
+																@if($category->user)
+																	<span class="badge badge-light-info">{{ $category->user->name }}</span>
+																@else
+																	<span class="text-muted">Atanmamış</span>
+																@endif
+															</td>
+											
 															<td class="text-end">
 																<div class="d-inline-flex">
 																	<a href="{{ route('admin.categories.edit', $category) }}"
 																	   class="btn btn-sm btn-light btn-active-light-primary me-2">
-																		Edit
+																		Düzenle
 																	</a>
 											
 																	<form action="{{ route('admin.categories.destroy', $category->id) }}"
@@ -239,7 +225,7 @@
 																	  @csrf
 																	  @method('DELETE')
 																	  <button type="submit" class="btn btn-sm btn-light btn-active-light-danger">
-																		  Delete
+																		  Sil
 																	  </button>
 																  </form>
 																  
@@ -276,8 +262,6 @@
 								<!--end::Content container-->
 							</div>
 							<!--end::Content-->
-						</div>
-						<!--end::Content wrapper-->
 						<!--begin::Footer-->
 						<div id="kt_app_footer" class="app-footer">
 							<!--begin::Footer container-->
@@ -3489,10 +3473,5 @@
 		</div>
 		<!--end::Modal - Invite Friend-->
 		<!--end::Modals-->
-		<!--begin::Javascript-->
-		
-
-	</body>
-	<!--end::Body-->
-</html>
+@endsection
 

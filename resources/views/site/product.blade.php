@@ -23,11 +23,31 @@
         <div class="row">
             <div class="col-3">
                 <div class="d-flex align-items-center justify-content-start gap-2">
-                    <a href="{{ route('site.category') }}" class="btn btn-light btn-fastservice">
+                    <a href="{{ $backUrl ?? url()->previous() }}" class="btn btn-light btn-fastservice">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12.6667 7.33331H6L8.19333 5.13998C8.25582 5.078 8.30542 5.00427 8.33926 4.92303C8.37311 4.84179 8.39053 4.75465 8.39053 4.66665C8.39053 4.57864 8.37311 4.4915 8.33926 4.41026C8.30542 4.32902 8.25582 4.25529 8.19333 4.19331C8.06843 4.06915 7.89946 3.99945 7.72333 3.99945C7.54721 3.99945 7.37824 4.06915 7.25333 4.19331L4.39333 7.05998C4.14294 7.30888 4.00149 7.64693 4 7.99998C4.00324 8.35072 4.14456 8.68605 4.39333 8.93331L7.25333 11.8C7.31549 11.8617 7.3892 11.9106 7.47025 11.9438C7.55129 11.977 7.63809 11.994 7.72569 11.9937C7.81329 11.9934 7.89997 11.9758 7.98078 11.942C8.06159 11.9082 8.13495 11.8588 8.19667 11.7966C8.25839 11.7345 8.30726 11.6608 8.3405 11.5797C8.37373 11.4987 8.39068 11.4119 8.39037 11.3243C8.39006 11.2367 8.3725 11.15 8.33869 11.0692C8.30489 10.9884 8.25549 10.915 8.19333 10.8533L6 8.66665H12.6667C12.8435 8.66665 13.013 8.59641 13.1381 8.47138C13.2631 8.34636 13.3333 8.17679 13.3333 7.99998C13.3333 7.82317 13.2631 7.6536 13.1381 7.52857C13.013 7.40355 12.8435 7.33331 12.6667 7.33331Z" fill="black"/>
                         </svg>
                     </a>
+                    <div class="dropdown">
+                        <button class="btn btn-light btn-fastservice dropdown-toggle lang-button" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_13_896)">
+                                    <path d="M16 4.66667V6C16 6.368 15.7013 6.66667 15.3333 6.66667C14.9653 6.66667 14.6667 6.368 14.6667 6V4.66667C14.6667 3.93133 14.0687 3.33333 13.3333 3.33333H11.9807L12.814 4.20467C13.0693 4.47 13.0613 4.892 12.7953 5.14733C12.666 5.272 12.5 5.33333 12.3333 5.33333C12.1587 5.33333 11.984 5.26467 11.8527 5.12867L10.378 3.59467C9.87067 3.08733 9.87067 2.246 10.3867 1.72933L11.8527 0.204667C12.108 -0.0606667 12.5307 -0.0686667 12.7953 0.186C13.0607 0.441333 13.0693 0.863333 12.814 1.12867L11.976 2H13.3333C14.804 2 16 3.196 16 4.66667ZM4.14733 10.8713C3.892 10.606 3.47 10.5987 3.20467 10.8533C2.93933 11.1087 2.93067 11.5307 3.186 11.796L4.01933 12.6673H2.66667C1.93133 12.6673 1.33333 12.0693 1.33333 11.334V10.0007C1.33333 9.632 1.03467 9.334 0.666667 9.334C0.298667 9.334 0 9.632 0 10.0007V11.334C0 12.8047 1.196 14.0007 2.66667 14.0007H4.02333L3.186 14.872C2.93067 15.1373 2.93867 15.5593 3.20467 15.8147C3.334 15.9393 3.5 16.0007 3.66667 16.0007C3.84133 16.0007 4.016 15.932 4.14733 15.796L5.61333 14.2707C6.12867 13.7547 6.12867 12.9133 5.622 12.4053L4.14733 10.8713ZM8 5.33333C8 6.806 6.806 8 5.33333 8H2.66667C1.194 8 0 6.806 0 5.33333V2.66667C0 1.194 1.194 0 2.66667 0H5.33333C6.806 0 8 1.194 8 2.66667V5.33333ZM6.33333 2.41067C6.33333 2.184 6.14933 2 5.92267 2H4.418V1.744C4.418 1.51733 4.234 1.33333 4.00733 1.33333H3.99333C3.76667 1.33333 3.58267 1.51733 3.58267 1.744V2H2.07733C1.85067 2 1.66667 2.184 1.66667 2.41067V2.42467C1.66667 2.65133 1.85067 2.83533 2.07733 2.83533H4.872C4.798 3.47733 4.54933 4.26933 4.00333 4.88267C3.81933 4.676 3.66533 4.45067 3.542 4.216C3.47133 4.08133 3.33 3.99933 3.17867 3.99933C2.86933 3.99933 2.666 4.32733 2.81 4.60133C2.96 4.888 3.144 5.16333 3.36333 5.41467C3.004 5.63333 2.57067 5.78733 2.04533 5.838C1.832 5.85867 1.66667 6.03333 1.66667 6.24733V6.26133C1.66667 6.50467 1.87733 6.69333 2.11933 6.67067C2.88333 6.59933 3.50533 6.34733 4.00733 5.98933C4.50667 6.34467 5.12133 6.598 5.87933 6.67067C6.122 6.694 6.33267 6.50533 6.33267 6.262V6.248C6.33267 6.03733 6.17267 5.85933 5.96267 5.83933C5.43467 5.78933 5.00133 5.63267 4.64 5.41333C5.3 4.65667 5.63 3.686 5.71133 2.836H5.922C6.14867 2.836 6.33267 2.652 6.33267 2.42533V2.41133L6.33333 2.41067ZM16 10.6667V13.3333C16 14.806 14.806 16 13.3333 16H10.6667C9.194 16 8 14.806 8 13.3333V10.6667C8 9.194 9.194 8 10.6667 8H13.3333C14.806 8 16 9.194 16 10.6667ZM13.8693 14.096L12.9607 10.1307C12.8893 9.82133 12.692 9.54 12.3993 9.41733C11.7867 9.16067 11.1627 9.52067 11.0287 10.098L10.0867 14.0933C10.0173 14.386 10.24 14.6667 10.5407 14.6667C10.7567 14.6667 10.9447 14.518 10.9947 14.3073L11.1773 13.5333H12.7833L12.96 14.3047C13.0087 14.5167 13.1973 14.6667 13.4147 14.6667H13.416C13.7153 14.6667 13.9373 14.388 13.8707 14.096H13.8693ZM11.9907 10.2667C11.9653 10.2667 11.9433 10.284 11.938 10.3087L11.3973 12.6H12.5687L12.044 10.3087C12.038 10.284 12.016 10.2667 11.9907 10.2667Z" fill="black"/>
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_13_896">
+                                        <rect width="16" height="16" fill="white"/>
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Türkçe</a></li>
+                            <li><a class="dropdown-item" href="#">English</a></li>
+                            <li><a class="dropdown-item" href="#">Lorem</a></li>
+                            <li><a class="dropdown-item" href="#">Ipsum</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
             <div class="col-6">
@@ -60,19 +80,21 @@
     <div class="row">
         <div class="col-12 col-md-6">
             <div>
-                <img class="product-detail-page-image" src="{{ asset('site/assets/img/product-img-1.jpg') }}" alt="">
+                <img class="product-detail-page-image" src="{{ $product->image_url }}" alt="{{ $product->name }}">
             </div>
         </div>
         <div class="col-12 col-md-6">
             <div>
-                <h1 class="product-detail-page-title">Izgara Tavuk</h1>
+                <h1 class="product-detail-page-title">
+                    {{ $product->name }}
+                </h1>
                 <p class="product-detail-page-description">
-                    Izgara tavuk, patates püresi, sebzeler
+                    {{ $product->description ?? $product->short_description }}
                 </p>
                 <p class="product-detail-page-price d-none d-md-flex">
-                    999.99₺
+                    {{ number_format($product->price, 2) }}₺
                 </p>
-                <button class="btn btn-primary d-none d-md-flex">
+                <button class="btn btn-primary d-none d-md-flex add-to-cart-button" data-product-id="{{ $product->id }}">
                     Sepete Ekle
                 </button>
             </div>
@@ -81,15 +103,77 @@
 </div>
 
 <div class="mobile-add-to-cart">
-    <div class="mobile-add-to-cart-price">999.99₺</div>
-    <button class="btn btn-primary add-to-cart-button mobile-add-to-cart-button">
+    <div class="mobile-add-to-cart-price">
+        {{ number_format($product->price, 2) }}₺
+    </div>
+    <button class="btn btn-primary add-to-cart-button mobile-add-to-cart-button" data-product-id="{{ $product->id }}">
         Sepete Ekle
     </button>
 </div>
 
-<script src="{{ asset('site/assets/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('site/assets/js/bootstrap.bundle.js') }}"></script>
 <script src="{{ asset('site/assets/js/swiper-bundle.min.js') }}"></script>
-<script src="{{ asset('site/assets/js/product-page.js') }}"></script>
+<script>
+    document.querySelectorAll('.add-to-cart-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            const originalText = this.innerHTML;
+
+            // Disable button
+            this.disabled = true;
+            this.innerHTML = 'Ekleniyor...';
+
+            fetch('{{ route("site.cart.add") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ product_id: productId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.innerHTML = 'Sepete Eklendi ✓';
+                    
+                    // Update cart count in header
+                    const cartCountElements = document.querySelectorAll('.header-right .btn-fastservice span');
+                    cartCountElements.forEach(el => {
+                        el.textContent = data.cart_count || 0;
+                    });
+
+                    // Reset button after 2 seconds
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                    }, 2000);
+                } else {
+                    alert(data.message || 'Bir hata oluştu. Lütfen önce oda numaranızı girin.');
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Bir hata oluştu.');
+                this.innerHTML = originalText;
+                this.disabled = false;
+            });
+        });
+    });
+
+    // Update cart count on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('{{ route("site.cart.count") }}')
+            .then(response => response.json())
+            .then(data => {
+                const cartCountElements = document.querySelectorAll('.header-right .btn-fastservice span');
+                cartCountElements.forEach(el => {
+                    el.textContent = data.count || 0;
+                });
+            });
+    });
+</script>
 
 </body>
 </html>

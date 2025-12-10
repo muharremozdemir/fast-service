@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <!--
 Author: Keenthemes
@@ -17,13 +15,6 @@ License: For each use you must have a valid license purchased only from above li
 	<head>
 		@include('admin.layouts.header')
 	</head>
-	<body>
-		@include('admin.layouts.sidebar') 
-			<main class="main-content">
-				@yield('content')             
-				
-			</main>
-		@include('admin.layouts.scripts')  
-	</body>
-
+	@include('admin.layouts.sidebar')
+	@include('admin.layouts.scripts')
 </html>

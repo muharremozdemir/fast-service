@@ -1,18 +1,6 @@
 @extends('admin.index')
 
-						<div id="kt_app_sidebar_menu_scroll" class="scroll-y my-5 mx-3" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-height="auto" data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer" data-kt-scroll-wrappers="#kt_app_sidebar_menu" data-kt-scroll-offset="5px" data-kt-scroll-save-state="true">
-								
-						</div>
-								
-						<div class="app-sidebar-footer flex-column-auto pt-2 pb-6 px-6" id="kt_app_sidebar_footer">
-						
-						</div>
-						
-					</div>
-
-					<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
-						<!--begin::Content wrapper-->
-						<div class="d-flex flex-column flex-column-fluid">
+@section('content')
 							<!--begin::Toolbar-->
 							<div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
 								<!--begin::Toolbar container-->
@@ -246,6 +234,37 @@
 											</div>
 											
 											<!--end::Status-->
+											<!--begin::Staff Assignment-->
+											<div class="card card-flush py-4">
+												<!--begin::Card header-->
+												<div class="card-header">
+													<!--begin::Card title-->
+													<div class="card-title">
+														<h2>Görevli</h2>
+													</div>
+													<!--end::Card title-->
+												</div>
+												<!--end::Card header-->
+												<!--begin::Card body-->
+												<div class="card-body pt-0">
+													<!--begin::Select staff-->
+													<label for="kt_ecommerce_add_category_staff" class="form-label">Kategori Görevlisi</label>
+													<!--end::Select staff-->
+													<!--begin::Select2-->
+													<select name="user_id" id="kt_ecommerce_add_category_staff" class="form-select mb-2" data-control="select2" data-placeholder="Görevli seçin (Opsiyonel)">
+														<option value="">Görevli Seçin</option>
+														@foreach($staff as $user)
+															<option value="{{ $user->id }}" {{ old('user_id', $category->user_id) == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+														@endforeach
+													</select>
+													<!--end::Select2-->
+													<!--begin::Description-->
+													<div class="text-muted fs-7">Bu kategoriye atanacak görevliyi seçin.</div>
+													<!--end::Description-->
+												</div>
+												<!--end::Card body-->
+											</div>
+											<!--end::Staff Assignment-->
 											<!--begin::Template settings-->
 											<div class="card card-flush py-4">
 												<!--begin::Card header-->
@@ -548,6 +567,5 @@
 								
 							</div>
 							<!--end::Content-->
-						</div>
-						<!--end::Content wrapper-->
+@endsection
 						

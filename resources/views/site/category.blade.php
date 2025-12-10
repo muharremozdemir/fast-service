@@ -109,12 +109,53 @@
     @if($products && $products->count())
         <div class="row product-cards-row">
             @foreach ($products as $product)
+                @php
+                    $cartItem = $cartItems->get($product->id);
+                    $isInCart = $cartItem !== null;
+                @endphp
                 <div class="col-4 col-md-3">
                     <div>
                         <a class="product-card" href="{{ route('site.product.show', $product->slug) }}">
-                            <span class="btn product-card-add-to-cart">
-                                <img width="24" height="24" src="{{ asset('site/assets/img/plus-icon.svg') }}" alt="">
-                            </span>
+                            @if($isInCart)
+                                <div class="product-card-quantity-controls" 
+                                     data-product-id="{{ $product->id }}"
+                                     data-cart-item-id="{{ $cartItem->id }}"
+                                     onclick="event.preventDefault(); event.stopPropagation();">
+                                    <button class="btn product-card-quantity-btn product-card-quantity-decrease" 
+                                            onclick="event.preventDefault(); event.stopPropagation(); updateProductQuantity({{ $cartItem->id }}, {{ $cartItem->quantity - 1 }}, this);">
+                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <g clip-path="url(#clip0_15_1556)">
+                                                <path d="M14.1667 5.00002H18.3334V6.66669H16.6667V17.5C16.6667 17.9603 16.2937 18.3334 15.8334 18.3334H4.16675C3.70651 18.3334 3.33341 17.9603 3.33341 17.5V6.66669H1.66675V5.00002H5.83341V2.50002C5.83341 2.03979 6.20651 1.66669 6.66675 1.66669H13.3334C13.7937 1.66669 14.1667 2.03979 14.1667 2.50002V5.00002ZM15.0001 6.66669H5.00008V16.6667H15.0001V6.66669ZM11.1786 11.6664L12.6517 13.1396L11.4732 14.3181L10.0001 12.8449L8.52691 14.3181L7.34843 13.1396L8.82158 11.6664L7.34843 10.1934L8.52691 9.01485L10.0001 10.4879L11.4732 9.01485L12.6517 10.1934L11.1786 11.6664ZM7.50008 3.33335V5.00002H12.5001V3.33335H7.50008Z" fill="#FE531F"/>
+                                            </g>
+                                            <defs>
+                                                <clipPath id="clip0_15_1556">
+                                                    <rect width="20" height="20" fill="white"/>
+                                                </clipPath>
+                                            </defs>
+                                        </svg>
+                                    </button>
+                                    <span class="product-card-quantity-number">{{ $cartItem->quantity }}</span>
+                                    <button class="btn product-card-quantity-btn product-card-quantity-increase" 
+                                            onclick="event.preventDefault(); event.stopPropagation(); updateProductQuantity({{ $cartItem->id }}, {{ $cartItem->quantity + 1 }}, this);">
+                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <g clip-path="url(#clip0_15_1569)">
+                                                <path d="M9.16675 9.16669V4.16669H10.8334V9.16669H15.8334V10.8334H10.8334V15.8334H9.16675V10.8334H4.16675V9.16669H9.16675Z" fill="#FE531F"/>
+                                            </g>
+                                            <defs>
+                                                <clipPath id="clip0_15_1569">
+                                                    <rect width="20" height="20" fill="white"/>
+                                                </clipPath>
+                                            </defs>
+                                        </svg>
+                                    </button>
+                                </div>
+                            @else
+                                <span class="btn product-card-add-to-cart" 
+                                      data-product-id="{{ $product->id }}"
+                                      onclick="event.preventDefault(); event.stopPropagation(); addToCart({{ $product->id }}, this);">
+                                    <img width="24" height="24" src="{{ asset('site/assets/img/plus-icon.svg') }}" alt="">
+                                </span>
+                            @endif
                             <img class="product-card-image"
                                  src="{{ $product->image_url ?? asset('site/assets/img/product-img-1.jpg') }}"
                                  alt="{{ $product->name }}">
@@ -154,5 +195,175 @@
 
 <script src="{{ asset('site/assets/js/bootstrap.bundle.min.js') }}"></script>
 <script src="{{ asset('site/assets/js/swiper-bundle.min.js') }}"></script>
+<script>
+    function addToCart(productId, button) {
+        // Disable button
+        button.disabled = true;
+        const originalHTML = button.innerHTML;
+        button.innerHTML = '<span style="color: green;">✓</span>';
+
+        fetch('{{ route("site.cart.add") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ product_id: productId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update cart count in header
+                const cartCountElements = document.querySelectorAll('.header-right .btn-fastservice span');
+                cartCountElements.forEach(el => {
+                    el.textContent = data.cart_count || 0;
+                });
+                
+                // Replace + button with quantity controls
+                const quantityControlsHTML = `
+                    <div class="product-card-quantity-controls" 
+                         data-product-id="${productId}"
+                         data-cart-item-id="${data.cart_item_id}"
+                         onclick="event.preventDefault(); event.stopPropagation();">
+                        <button class="btn product-card-quantity-btn product-card-quantity-decrease" 
+                                onclick="event.preventDefault(); event.stopPropagation(); updateProductQuantity(${data.cart_item_id}, ${data.quantity - 1}, this);">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_15_1556)">
+                                    <path d="M14.1667 5.00002H18.3334V6.66669H16.6667V17.5C16.6667 17.9603 16.2937 18.3334 15.8334 18.3334H4.16675C3.70651 18.3334 3.33341 17.9603 3.33341 17.5V6.66669H1.66675V5.00002H5.83341V2.50002C5.83341 2.03979 6.20651 1.66669 6.66675 1.66669H13.3334C13.7937 1.66669 14.1667 2.03979 14.1667 2.50002V5.00002ZM15.0001 6.66669H5.00008V16.6667H15.0001V6.66669ZM11.1786 11.6664L12.6517 13.1396L11.4732 14.3181L10.0001 12.8449L8.52691 14.3181L7.34843 13.1396L8.82158 11.6664L7.34843 10.1934L8.52691 9.01485L10.0001 10.4879L11.4732 9.01485L12.6517 10.1934L11.1786 11.6664ZM7.50008 3.33335V5.00002H12.5001V3.33335H7.50008Z" fill="#FE531F"/>
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_15_1556">
+                                        <rect width="20" height="20" fill="white"/>
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                        </button>
+                        <span class="product-card-quantity-number">${data.quantity}</span>
+                        <button class="btn product-card-quantity-btn product-card-quantity-increase" 
+                                onclick="event.preventDefault(); event.stopPropagation(); updateProductQuantity(${data.cart_item_id}, ${data.quantity + 1}, this);">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_15_1569)">
+                                    <path d="M9.16675 9.16669V4.16669H10.8334V9.16669H15.8334V10.8334H10.8334V15.8334H9.16675V10.8334H4.16675V9.16669H9.16675Z" fill="#FE531F"/>
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_15_1569">
+                                        <rect width="20" height="20" fill="white"/>
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                button.outerHTML = quantityControlsHTML;
+            } else {
+                alert(data.message || 'Bir hata oluştu. Lütfen önce oda numaranızı girin.');
+                button.innerHTML = originalHTML;
+                button.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Bir hata oluştu.');
+            button.innerHTML = originalHTML;
+            button.disabled = false;
+        });
+    }
+
+    function updateProductQuantity(cartItemId, newQuantity, button) {
+        if (newQuantity < 1) {
+            removeProductFromCart(cartItemId, button);
+            return;
+        }
+
+        fetch(`/sepet/item/${cartItemId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ quantity: newQuantity })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const controls = button.closest('.product-card-quantity-controls');
+                const quantityDisplay = controls.querySelector('.product-card-quantity-number');
+                quantityDisplay.textContent = newQuantity;
+                
+                // Update buttons
+                const decreaseBtn = controls.querySelector('.product-card-quantity-decrease');
+                const increaseBtn = controls.querySelector('.product-card-quantity-increase');
+                decreaseBtn.setAttribute('onclick', `event.preventDefault(); event.stopPropagation(); updateProductQuantity(${cartItemId}, ${newQuantity - 1}, this);`);
+                increaseBtn.setAttribute('onclick', `event.preventDefault(); event.stopPropagation(); updateProductQuantity(${cartItemId}, ${newQuantity + 1}, this);`);
+                
+                // Update cart count
+                updateCartCount();
+            } else {
+                alert('Bir hata oluştu.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Bir hata oluştu.');
+        });
+    }
+
+    function removeProductFromCart(cartItemId, button) {
+        if (!confirm('Bu ürünü sepetten çıkarmak istediğinize emin misiniz?')) {
+            return;
+        }
+
+        fetch(`/sepet/item/${cartItemId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const controls = button.closest('.product-card-quantity-controls');
+                const productCard = controls.closest('.product-card');
+                const productId = controls.getAttribute('data-product-id');
+                
+                // Replace quantity controls with + button
+                const addButtonHTML = `
+                    <span class="btn product-card-add-to-cart" 
+                          data-product-id="${productId}"
+                          onclick="event.preventDefault(); addToCart(${productId}, this);">
+                        <img width="24" height="24" src="{{ asset('site/assets/img/plus-icon.svg') }}" alt="">
+                    </span>
+                `;
+                controls.outerHTML = addButtonHTML;
+                
+                // Update cart count
+                updateCartCount();
+            } else {
+                alert('Bir hata oluştu.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Bir hata oluştu.');
+        });
+    }
+
+    function updateCartCount() {
+        fetch('{{ route("site.cart.count") }}')
+            .then(response => response.json())
+            .then(data => {
+                const cartCountElements = document.querySelectorAll('.header-right .btn-fastservice span');
+                cartCountElements.forEach(el => {
+                    el.textContent = data.count || 0;
+                });
+            });
+    }
+
+    // Update cart count on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCartCount();
+    });
+</script>
 </body>
 </html>
