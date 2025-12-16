@@ -4,6 +4,26 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>FastService - Otel Hizmetleri</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('site/assets/img/logo.png') }}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url('/') }}">
+    <meta property="og:title" content="FastService - Otel Hizmetleri">
+    <meta property="og:description" content="FastService, otel işletmeleri için tasarlanmış kapsamlı bir dijital hizmet yönetim platformudur. QR kod teknolojisi ile hızlı erişim, detaylı raporlama ve analiz araçları ile işletmenizin verimliliğini artırın.">
+    <meta property="og:image" content="{{ url(asset('site/assets/img/logo.png')) }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/png">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="{{ url('/') }}">
+    <meta name="twitter:title" content="FastService - Otel Hizmetleri">
+    <meta name="twitter:description" content="FastService, otel işletmeleri için tasarlanmış kapsamlı bir dijital hizmet yönetim platformudur. QR kod teknolojisi ile hızlı erişim, detaylı raporlama ve analiz araçları ile işletmenizin verimliliğini artırın.">
+    <meta name="twitter:image" content="{{ url(asset('site/assets/img/logo.png')) }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
