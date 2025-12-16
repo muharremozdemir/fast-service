@@ -8,14 +8,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    
+
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <link rel="stylesheet" href="{{ asset('site/assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('site/assets/css/swiper-bundle.min.css') }}">
     <link rel="stylesheet" href="{{ asset('site/assets/css/fastservice.css') }}">
-    
+
     <style>
         :root {
             --primary-color: #2563eb;
@@ -62,8 +62,12 @@
         }
 
         .header-logo img {
-            height: 40px;
-            margin-right: 10px;
+            height: 50px;
+            width: auto;
+        }
+
+        .header-logo span {
+            display: none;
         }
 
         .header-nav {
@@ -703,7 +707,7 @@
     <header class="main-header">
         <div class="header-content">
             <a href="/" class="header-logo">
-                <img src="{{ asset('site/assets/img/logo.svg') }}" alt="FastService Logo" onerror="this.style.display='none'">
+                <img src="{{ asset('site/assets/img/logo.png') }}" alt="FastService Logo" onerror="this.style.display='none'">
                 <span>FastService</span>
             </a>
             <nav class="header-nav" id="headerNav">
@@ -725,10 +729,10 @@
             <div class="hero-text">
                 <h1>FastService ile Otel Yönetiminizi Dijitalleştirin</h1>
                 <p class="hero-description">
-                    FastService, otel işletmeleri için tasarlanmış kapsamlı bir dijital hizmet yönetim platformudur. 
-                    Müşterilerinizin oda servisi, otel hizmetleri, arıza bildirimi ve resepsiyon iletişim ihtiyaçlarını 
-                    tek bir platform üzerinden yönetin. QR kod teknolojisi ile hızlı erişim, detaylı raporlama ve 
-                    analiz araçları ile işletmenizin verimliliğini artırın. Modern arayüzü ve kullanıcı dostu tasarımı 
+                    FastService, otel işletmeleri için tasarlanmış kapsamlı bir dijital hizmet yönetim platformudur.
+                    Müşterilerinizin oda servisi, otel hizmetleri, arıza bildirimi ve resepsiyon iletişim ihtiyaçlarını
+                    tek bir platform üzerinden yönetin. QR kod teknolojisi ile hızlı erişim, detaylı raporlama ve
+                    analiz araçları ile işletmenizin verimliliğini artırın. Modern arayüzü ve kullanıcı dostu tasarımı
                     ile hem müşterileriniz hem de personeliniz için mükemmel bir deneyim sunun.
                 </p>
                 <a href="#demo-request" class="btn btn-hero" onclick="event.preventDefault(); document.getElementById('demo-request').scrollIntoView({behavior: 'smooth'});">Demo Talebi</a>
@@ -889,27 +893,27 @@
                     <form class="demo-form" id="demoRequestForm">
                         <h3>Demo Talep Et</h3>
                         <p>Size özel bir demo için bilgilerinizi bırakın</p>
-                        
+
                         <div class="mb-3">
                             <label for="name" class="form-label">Ad Soyad *</label>
                             <input type="text" class="form-control" id="name" name="name" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="email" class="form-label">E-posta *</label>
                             <input type="email" class="form-control" id="email" name="email" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="phone" class="form-label">Telefon *</label>
                             <input type="tel" class="form-control" id="phone" name="phone" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="company" class="form-label">Şirket Adı</label>
                             <input type="text" class="form-control" id="company" name="company">
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="package" class="form-label">İlgilendiğiniz Paket</label>
                             <select class="form-control" id="package" name="package">
@@ -918,12 +922,12 @@
                                 <option value="premium">Premium Paket</option>
                             </select>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="message" class="form-label">Mesaj</label>
                             <textarea class="form-control" id="message" name="message" rows="4"></textarea>
                         </div>
-                        
+
                         <button type="submit" class="btn btn-submit">Demo Talebini Gönder</button>
                     </form>
                 </div>
@@ -1061,7 +1065,7 @@
         // Demo form submit
         document.getElementById('demoRequestForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const formData = {
                 name: document.getElementById('name').value,
                 email: document.getElementById('email').value,
@@ -1073,11 +1077,11 @@
 
             // Burada form verilerini backend'e gönderebilirsiniz
             // Şimdilik alert gösteriyoruz
-            alert('Demo talebiniz alındı! En kısa sürede size dönüş yapacağız.\n\n' + 
+            alert('Demo talebiniz alındı! En kısa sürede size dönüş yapacağız.\n\n' +
                   'Ad Soyad: ' + formData.name + '\n' +
                   'E-posta: ' + formData.email + '\n' +
                   'Telefon: ' + formData.phone);
-            
+
             // Formu temizle
             this.reset();
         });
