@@ -12,7 +12,7 @@
     <meta property="og:url" content="https://keenthemes.com/metronic" />
     <meta property="og:site_name" content="Metronic by Keenthemes" />
     <link rel="canonical" href="http://preview.keenthemes.comindex.html" />
-    <link rel="shortcut icon" href="{{ asset('site/assets/img/logo.png') }}" />
+    <link rel="shortcut icon" href="{{ asset('admin/assets/media/logos/favicon.ico') }}" />
     <!--begin::Fonts(mandatory for all pages)-->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -37,4 +37,40 @@
     <!--end::Global Stylesheets Bundle-->
     <script>// Frame-busting to prevent site from being loaded within a frame without permission (click-jacking) if (window.top != window.self) { window.top.location.replace(window.self.location.href); }</script>
     
+    <!--begin::Custom Logo Styles-->
+    <style>
+        .app-sidebar-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+        }
+        
+        .app-sidebar-logo a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .app-sidebar-logo img {
+            height: 60px !important;
+            width: auto;
+            object-fit: contain;
+        }
+        
+        /* Mobile logo */
+        .d-flex.align-items-center.flex-grow-1.flex-lg-grow-0 a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .d-flex.align-items-center.flex-grow-1.flex-lg-grow-0 img {
+            height: 60px !important;
+            width: auto;
+            object-fit: contain;
+        }
+    </style>
+    <!--end::Custom Logo Styles-->
 </head>
