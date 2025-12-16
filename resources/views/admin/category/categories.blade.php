@@ -3475,3 +3475,49 @@
 		<!--end::Modals-->
 @endsection
 
+@push('scripts')
+@if(session('success'))
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        text: "{{ session('success') }}",
+                        icon: "success",
+                        buttonsStyling: false,
+                        confirmButtonText: "Tamam",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    });
+                } else {
+                    alert("{{ session('success') }}");
+                }
+            }, 500);
+        });
+    </script>
+@endif
+
+@if(session('error'))
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        text: "{{ session('error') }}",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Tamam",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    });
+                } else {
+                    alert("{{ session('error') }}");
+                }
+            }, 500);
+        });
+    </script>
+@endif
+@endpush
+

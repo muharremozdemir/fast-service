@@ -33,4 +33,7 @@
 		<script src="{{ asset('admin/assets/js/custom/utilities/modals/new-target.js') }}"></script>
 		<script src="{{ asset('admin/assets/js/custom/utilities/modals/users-search.js') }}"></script>
 		
+		<!-- SweetAlert2 -->
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+		
 		@stack('scripts')
