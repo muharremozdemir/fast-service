@@ -53,19 +53,48 @@ class CategoryController extends Controller
 
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'category_name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'sort_order' => 'nullable|integer',
+            'is_active' => 'required|in:0,1',
+            'user_id' => [
+                'nullable',
+                'exists:users,id',
+                function ($attribute, $value, $fail) {
+                    if ($value) {
+                        $user = User::find($value);
+                        if ($user && $user->company_id !== Auth::user()->company_id) {
+                            $fail('Seçilen personel sizin şirketinize ait değil.');
+                        }
+                    }
+                },
+            ],
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
         $category = Category::where('company_id', Auth::user()->company_id)->findOrFail($id);
 
         $category->name = $request->input('category_name');
         $category->slug = \Str::slug($category->name);
         $category->description = $request->input('description');
-        $category->is_active = $request->input('is_active', 0);
-        $category->sort_order = $request->input('sort_order', 0);
-        $category->user_id = $request->input('user_id');
+        $category->is_active = (int) $request->input('is_active', 0);
+        $category->sort_order = (int) $request->input('sort_order', 0);
+        $category->user_id = $request->input('user_id') ?: null;
+
+        if ($request->hasFile('image')) {
+            // Eski görseli sil
+            if ($category->image_path) {
+                \Storage::disk('public')->delete($category->image_path);
+            }
+            $path = $request->file('image')->store('categories', 'public');
+            $category->image_path = $path;
+        }
 
         $category->save();
 
         return redirect()
-            ->route('admin.categories.edit', $category->id)
+            ->route('admin.categories.index')
             ->with('success', 'Kategori başarıyla güncellendi.');
     }
 
@@ -75,8 +104,19 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'sort_order' => 'nullable|integer',
-            'is_active' => 'required|boolean',
-            'user_id' => 'nullable|exists:users,id',
+            'is_active' => 'required|in:0,1',
+            'user_id' => [
+                'nullable',
+                'exists:users,id',
+                function ($attribute, $value, $fail) {
+                    if ($value) {
+                        $user = User::find($value);
+                        if ($user && $user->company_id !== Auth::user()->company_id) {
+                            $fail('Seçilen personel sizin şirketinize ait değil.');
+                        }
+                    }
+                },
+            ],
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
@@ -84,9 +124,9 @@ class CategoryController extends Controller
         $category->name = $request->input('name');
         $category->slug = \Str::slug($category->name);
         $category->description = $request->input('description');
-        $category->sort_order = $request->input('sort_order', 0);
-        $category->is_active = $request->input('is_active');
-        $category->user_id = $request->input('user_id');
+        $category->sort_order = (int) $request->input('sort_order', 0);
+        $category->is_active = (int) $request->input('is_active');
+        $category->user_id = $request->input('user_id') ?: null;
         $category->company_id = Auth::user()->company_id;
 
         if ($request->hasFile('image')) {
@@ -96,7 +136,9 @@ class CategoryController extends Controller
 
         $category->save();
 
-        return redirect()->back()->with('success', 'Kategori başarıyla eklendi.');
+        return redirect()
+            ->route('admin.categories.index')
+            ->with('success', 'Kategori başarıyla eklendi.');
     }
 
     public function destroy(Category $category)

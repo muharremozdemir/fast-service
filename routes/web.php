@@ -70,7 +70,7 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAut
     Route::get('/categories/create', [AdminCategoryController::class, 'create'])->name('categories.create');
     Route::post('/categories/store', [AdminCategoryController::class, 'store'])->name('categories.store');
     Route::get('/categories/edit/{id}', [AdminCategoryController::class, 'edit'])->name('categories.edit');
-    Route::post('/categories/update/{id}', [AdminCategoryController::class, 'update'])->name('categories.update');
+    Route::put('/categories/update/{id}', [AdminCategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
 
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
