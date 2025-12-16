@@ -159,8 +159,20 @@
         }
 
         @media (max-width: 768px) {
+            .header-content {
+                position: relative;
+                justify-content: center;
+            }
+
+            .header-logo {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
             .mobile-menu-toggle {
                 display: block;
+                margin-left: auto;
             }
 
             .header-nav {
