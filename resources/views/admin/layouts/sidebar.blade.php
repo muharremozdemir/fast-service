@@ -22,8 +22,8 @@
                     <!--end::Sidebar mobile toggle-->
                     <!--begin::Mobile logo-->
                     <div class="d-flex align-items-center flex-grow-1 flex-lg-grow-0">
-                        <a href="index.html" class="d-lg-none">
-                            <img alt="Logo" src="{{ asset('admin/assets/media/logos/default-small.svg') }}" />
+                        <a href="index.html" class="d-lg-none d-flex align-items-center justify-content-center w-100">
+                            <img alt="Logo" src="{{ asset('site/assets/img/logo.png') }}" style="height: 60px; width: auto; object-fit: contain;" />
                         </a>
                     </div>
                     <!--end::Mobile logo-->
@@ -4922,11 +4922,11 @@
                 <!--begin::Sidebar-->
                 <div id="kt_app_sidebar" class="app-sidebar flex-column" data-kt-drawer="true" data-kt-drawer-name="app-sidebar" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="225px" data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_app_sidebar_mobile_toggle">
                     <!--begin::Logo-->
-                    <div class="app-sidebar-logo px-6" id="kt_app_sidebar_logo">
+                    <div class="app-sidebar-logo px-6" id="kt_app_sidebar_logo" style="display: flex; align-items: center; justify-content: center; min-height: 60px;">
                         <!--begin::Logo image-->
-                        <a href="index.html">
-                            <img alt="Logo" src="{{ asset('admin/assets/media/logos/default-dark.svg') }}" class="app-sidebar-logo-default" />
-                            <img alt="Logo" src="{{ asset('admin/assets/media/logos/default-small.svg') }}" class="app-sidebar-logo-minimize" />
+                        <a href="index.html" style="display: flex; align-items: center; justify-content: center; width: 100%;">
+                            <img alt="Logo" src="{{ asset('site/assets/img/logo.png') }}" class="app-sidebar-logo-default" style="height: 60px; width: auto; object-fit: contain;" />
+                            <img alt="Logo" src="{{ asset('site/assets/img/logo.png') }}" class="app-sidebar-logo-minimize" style="height: 60px; width: auto; object-fit: contain;" />
                         </a>
                         <!--end::Logo image-->
                         <!--begin::Sidebar toggle-->
