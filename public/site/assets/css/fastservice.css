@@ -74,6 +74,12 @@ a {
     border-bottom: 1px solid var(--border-color);
 }
 
+.logo-img {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+}
+
 .btn-fastservice {
     display: flex;
     align-items: center;
