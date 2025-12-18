@@ -70,7 +70,7 @@
             </div>
             <div class="col-6 d-flex align-items-center justify-content-center">
                 <a href="{{ route('site.home') }}">
-                    <img class="logo-img" src="{{ asset('site/assets/img/logo.svg') }}" alt="Logo">
+                    <img class="logo-img" src="{{ asset('site/assets/img/logo.png') }}" alt="Logo">
                 </a>
             </div>
             <div class="col-3">
