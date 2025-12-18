@@ -287,6 +287,20 @@
 
                                     <!--begin:Menu item-->
                                     <div class="menu-item">
+                                        <a class="menu-link" href="{{ route('admin.products.index') }}">
+                                            <span class="menu-icon">
+                                                <i class="ki-duotone ki-element-11 fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                            </span>
+                                            <span class="menu-title">Ürünler</span>
+                                        </a>
+                                    </div>
+                                    <!--end:Menu item-->
+
+                                    <!--begin:Menu item-->
+                                    <div class="menu-item">
                                         <a class="menu-link" href="{{ route('admin.orders.index') }}">
                                             <span class="menu-icon">
                                                 <i class="ki-duotone ki-handcart fs-2"></i>
