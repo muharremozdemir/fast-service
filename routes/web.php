@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\FloorController as AdminFloorController;
 use App\Http\Controllers\Admin\RoomController as AdminRoomController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
+use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 
 // Site
 use App\Http\Controllers\Site\SiteHomeController;
@@ -64,6 +65,10 @@ Route::view('/product', 'site.product')->name('site.product');
 Route::get('/index', [AdminHomeController::class, 'index'])->name('admin.index')
     ->middleware(\App\Http\Middleware\AdminAuth::class);
 
+// License suspended page - should be accessible without license check
+Route::get('/admin/license/suspended', [\App\Http\Controllers\Admin\LicenseController::class, 'suspended'])
+    ->name('admin.license.suspended')
+    ->middleware(\App\Http\Middleware\AdminAuth::class);
 
 Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAuth::class)->group(function () {
 
@@ -126,6 +131,10 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAut
     Route::get('/companies/edit/{id}', [AdminCompanyController::class, 'edit'])->name('companies.edit');
     Route::post('/companies/update/{id}', [AdminCompanyController::class, 'update'])->name('companies.update');
     Route::delete('/companies/{company}', [AdminCompanyController::class, 'destroy'])->name('companies.destroy');
+
+    // Settings (Ayarlar) - Sadece hotel yöneticisi için
+    Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings.index');
+    Route::post('/settings/logo', [AdminSettingsController::class, 'updateLogo'])->name('settings.updateLogo');
 
 });
 

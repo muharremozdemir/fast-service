@@ -17,78 +17,96 @@ class OrderSeeder extends Seeder
      */
     public function run(): void
     {
-        $rooms = Room::where('is_active', true)->get();
-        $products = Product::where('is_active', true)->get();
-
-        if ($products->isEmpty()) {
-            $this->command->warn('Aktif ürün bulunamadı. Önce ürünler oluşturulmalı.');
+        // Tüm şirketler için sipariş oluştur
+        $companies = \App\Models\Company::all();
+        
+        if ($companies->isEmpty()) {
+            $this->command->warn('Şirket bulunamadı. Önce şirketler oluşturulmalı.');
             return;
         }
 
-        // Farklı tarihler için referans noktaları
-        $dateRanges = [
-            Carbon::now()->subDays(rand(0, 1)), // Bugün veya dün
-            Carbon::now()->subDays(rand(2, 7)), // Geçen hafta
-            Carbon::now()->subDays(rand(8, 30)), // Geçen ay
-            Carbon::now()->subDays(rand(31, 180)), // 6 ay önce
-            Carbon::now()->subDays(rand(181, 365)), // 1 yıl önce
-        ];
+        $totalOrdersCreated = 0;
 
-        foreach ($rooms as $room) {
-            // Her oda için 2-3 sipariş oluştur
-            $orderCount = rand(2, 3);
+        foreach ($companies as $company) {
+            $rooms = Room::where('company_id', $company->id)
+                ->where('is_active', true)
+                ->get();
             
-            for ($i = 0; $i < $orderCount; $i++) {
-                // Rastgele bir tarih seç
-                $orderDate = $dateRanges[array_rand($dateRanges)];
-                $closedDate = $orderDate->copy()->addHours(rand(1, 6)); // Sipariş 1-6 saat sonra tamamlandı
+            $products = Product::where('company_id', $company->id)
+                ->where('is_active', true)
+                ->get();
 
-                // Sipariş için 1-3 ürün seç
-                $selectedProducts = $products->random(rand(1, min(3, $products->count())));
+            if ($products->isEmpty() || $rooms->isEmpty()) {
+                $this->command->warn("Şirket '{$company->name}' için aktif ürün veya oda bulunamadı. Atlanıyor.");
+                continue;
+            }
+
+            // Son 3 ay içinde rastgele tarihler
+            $daysAgo = [0, 1, 2, 3, 4, 5, 6, 7, 14, 21, 30, 45, 60, 90];
+
+            // Her oda için 3-8 sipariş oluştur
+            foreach ($rooms as $room) {
+                $orderCount = rand(3, 8);
                 
-                // Toplam tutarı hesapla
-                $total = 0;
-                $orderItems = [];
-                
-                foreach ($selectedProducts as $product) {
-                    $quantity = rand(1, 3);
-                    $itemTotal = $product->price * $quantity;
-                    $total += $itemTotal;
+                for ($i = 0; $i < $orderCount; $i++) {
+                    // Rastgele bir tarih seç
+                    $daysBack = $daysAgo[array_rand($daysAgo)];
+                    $orderDate = Carbon::now()->subDays($daysBack)
+                        ->subHours(rand(0, 23))
+                        ->subMinutes(rand(0, 59));
                     
-                    $orderItems[] = [
-                        'product_id' => $product->id,
-                        'quantity' => $quantity,
-                        'price' => $product->price,
-                    ];
-                }
+                    $closedDate = $orderDate->copy()->addMinutes(rand(10, 120)); // Sipariş 10-120 dakika sonra tamamlandı
 
-                // Sipariş oluştur
-                $order = Order::create([
-                    'room_id' => $room->id,
-                    'room_number' => $room->room_number,
-                    'order_number' => Order::generateOrderNumber(),
-                    'status' => 'completed',
-                    'total' => $total,
-                    'notes' => null,
-                    'closed_at' => $closedDate,
-                    'created_at' => $orderDate,
-                    'updated_at' => $closedDate,
-                ]);
+                    // Sipariş için 1-5 ürün seç
+                    $selectedProducts = $products->random(rand(1, min(5, $products->count())));
+                    
+                    // Toplam tutarı hesapla
+                    $total = 0;
+                    $orderItems = [];
+                    
+                    foreach ($selectedProducts as $product) {
+                        $quantity = rand(1, 5);
+                        $itemTotal = $product->price * $quantity;
+                        $total += $itemTotal;
+                        
+                        $orderItems[] = [
+                            'product_id' => $product->id,
+                            'quantity' => $quantity,
+                            'price' => $product->price,
+                        ];
+                    }
 
-                // Sipariş kalemlerini oluştur
-                foreach ($orderItems as $item) {
-                    OrderItem::create([
-                        'order_id' => $order->id,
-                        'product_id' => $item['product_id'],
-                        'quantity' => $item['quantity'],
-                        'price' => $item['price'],
+                    // Sipariş oluştur
+                    $order = Order::create([
+                        'room_id' => $room->id,
+                        'room_number' => $room->room_number,
+                        'order_number' => Order::generateOrderNumber(),
+                        'status' => 'completed',
+                        'total' => $total,
+                        'notes' => null,
+                        'company_id' => $company->id,
+                        'closed_at' => $closedDate,
                         'created_at' => $orderDate,
-                        'updated_at' => $orderDate,
+                        'updated_at' => $closedDate,
                     ]);
+
+                    // Sipariş kalemlerini oluştur
+                    foreach ($orderItems as $item) {
+                        OrderItem::create([
+                            'order_id' => $order->id,
+                            'product_id' => $item['product_id'],
+                            'quantity' => $item['quantity'],
+                            'price' => $item['price'],
+                            'created_at' => $orderDate,
+                            'updated_at' => $orderDate,
+                        ]);
+                    }
+                    
+                    $totalOrdersCreated++;
                 }
             }
         }
 
-        $this->command->info('Siparişler başarıyla oluşturuldu.');
+        $this->command->info("Toplam {$totalOrdersCreated} adet sipariş başarıyla oluşturuldu!");
     }
 }

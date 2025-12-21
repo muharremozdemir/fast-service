@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Company;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
@@ -12,7 +13,18 @@ class CategorySeeder extends Seeder
 {
     public function run(): void
     {
-        
+        // Test firmasını bul veya oluştur
+        $company = Company::firstOrCreate(
+            ['name' => 'Test Şirketi'],
+            [
+                'email' => 'info@testfirma.com',
+                'phone' => '0212 555 12 34',
+                'address' => 'İstanbul, Türkiye',
+                'tax_number' => '1234567890',
+                'tax_office' => 'Kadıköy Vergi Dairesi',
+                'is_active' => true,
+            ]
+        );
 
         $parents = [
             ['name' => 'Oda Servisi',        'sort_order' => 1],
@@ -31,6 +43,7 @@ class CategorySeeder extends Seeder
                 'sort_order' => $p['sort_order'],
                 'is_active'  => true,
                 'parent_id'  => null,
+                'company_id' => $company->id,
             ]);
         }
 
@@ -86,6 +99,7 @@ class CategorySeeder extends Seeder
                     'sort_order' => $index + 1,
                     'is_active'  => true,
                     'parent_id'  => $parentMap[$parentSlug]->id,
+                    'company_id' => $company->id,
                 ]);
 
                 foreach ($child['products'] as $product) {
@@ -96,6 +110,8 @@ class CategorySeeder extends Seeder
                         'description' => $product['desc'],
                         'is_active'   => true,
                         'category_id' => $childCategory->id,
+                        'company_id'  => $company->id,
+                        'type'        => 'sale',
                     ]);
                 }
             }

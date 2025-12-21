@@ -6,6 +6,7 @@ use App\Models\Company;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class CompanySeeder extends Seeder
@@ -24,6 +25,9 @@ class CompanySeeder extends Seeder
             'tax_number' => '1234567890',
             'tax_office' => 'Kadıköy Vergi Dairesi',
             'is_active' => true,
+            'license_expires_at' => null,
+            'logo_path' => null,
+            'logo_type' => 'fast_service',
         ]);
 
         // Yönetici kullanıcı oluştur
@@ -32,7 +36,7 @@ class CompanySeeder extends Seeder
             'email' => 'iletisim@muharremozdemir.com',
             'phone' => '5423024234',
             'company_id' => $company->id,
-            'password' => null, // OTP sistemi için null
+            'password' => Hash::make('password'), // Geçici şifre, OTP sistemi ile değiştirilecek
         ]);
     }
 }

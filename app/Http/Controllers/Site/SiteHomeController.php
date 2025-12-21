@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Site;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\QrSticker;
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
@@ -25,7 +26,17 @@ class SiteHomeController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        return view('site.index', compact('categories'));
+        // Company bilgisini al (room_number'dan)
+        $company = null;
+        $roomNumber = Session::get('room_number');
+        if ($roomNumber) {
+            $room = Room::where('room_number', $roomNumber)->first();
+            if ($room && $room->company) {
+                $company = $room->company;
+            }
+        }
+
+        return view('site.index', compact('categories', 'company'));
     }
 
     /**

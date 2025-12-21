@@ -70,7 +70,11 @@
             </div>
             <div class="col-6 d-flex align-items-center justify-content-center">
                 <a href="{{ route('site.home') }}">
-                    <img class="logo-img" src="{{ asset('site/assets/img/logo.png') }}" alt="Logo">
+                    @if($company && $company->logo_type === 'company' && $company->logo_path)
+                        <img class="logo-img" src="{{ asset('storage/' . $company->logo_path) }}" alt="Logo">
+                    @else
+                        <img class="logo-img" src="{{ asset('site/assets/img/logo.png') }}" alt="Logo">
+                    @endif
                 </a>
             </div>
             <div class="col-3">

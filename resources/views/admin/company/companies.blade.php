@@ -82,6 +82,7 @@
                             <th class="min-w-150px">Email</th>
                             <th class="min-w-120px">Telefon</th>
                             <th class="min-w-120px">Vergi No</th>
+                            <th class="min-w-150px">Lisans Süresi</th>
                             <th class="min-w-100px">Durum</th>
                             <th class="text-end min-w-70px">İşlemler</th>
                         </tr>
@@ -123,6 +124,29 @@
                                     @endif
                                 </td>
                                 <td>
+                                    @if($company->license_expires_at)
+                                        @php
+                                            $daysRemaining = $company->days_remaining;
+                                        @endphp
+                                        @if($daysRemaining === null || $daysRemaining < 0)
+                                            <span class="badge badge-light-danger">Süresi Dolmuş</span>
+                                        @elseif($daysRemaining <= 15)
+                                            <span class="badge badge-light-warning">
+                                                {{ (int) $daysRemaining }} Gün Kaldı
+                                            </span>
+                                        @else
+                                            <span class="badge badge-light-success">
+                                                {{ (int) $daysRemaining }} Gün Kaldı
+                                            </span>
+                                        @endif
+                                        <div class="text-muted fs-7 mt-1">
+                                            {{ $company->license_expires_at->format('d.m.Y') }}
+                                        </div>
+                                    @else
+                                        <span class="text-muted">Lisans Tanımlı Değil</span>
+                                    @endif
+                                </td>
+                                <td>
                                     <div class="badge badge-light-{{ $company->is_active ? 'success' : 'danger' }}">
                                         {{ $company->is_active ? 'Aktif' : 'Pasif' }}
                                     </div>
@@ -144,7 +168,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center text-muted">Kayıt bulunamadı.</td>
+                                <td colspan="7" class="text-center text-muted">Kayıt bulunamadı.</td>
                             </tr>
                         @endforelse
                     </tbody>

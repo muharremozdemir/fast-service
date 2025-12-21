@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Spatie\Permission\Models\Role;
 
 class LoginController extends Controller
 {
@@ -32,11 +33,26 @@ class LoginController extends Controller
         // Kullanıcıyı bul
         $user = User::where('phone', $phone)->first();
 
+        // AJAX isteği ise JSON döndür
+        $isAjax = $request->expectsJson() || $request->ajax();
+
         if (!$user) {
+            if ($isAjax) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Bu telefon numarasına kayıtlı kullanıcı bulunamadı.'
+                ], 422);
+            }
             return back()->withErrors(['phone' => 'Bu telefon numarasına kayıtlı kullanıcı bulunamadı.'])->withInput();
         }
 
         if (!$user->email) {
+            if ($isAjax) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kullanıcı email adresi bulunamadı.'
+                ], 422);
+            }
             return back()->withErrors(['phone' => 'Kullanıcı email adresi bulunamadı.'])->withInput();
         }
 
@@ -64,11 +80,26 @@ class LoginController extends Controller
         try {
             Mail::to($user->email)->send(new OtpMail($otpCode, $user->name, 10));
         } catch (\Exception $e) {
+            if ($isAjax) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'OTP kodu gönderilirken bir hata oluştu. Lütfen tekrar deneyin.'
+                ], 500);
+            }
             return back()->withErrors(['phone' => 'OTP kodu gönderilirken bir hata oluştu. Lütfen tekrar deneyin.'])->withInput();
         }
 
         // Phone'u session'a kaydet (kalıcı olarak)
         session()->put('phone', $phone);
+
+        // AJAX isteği ise JSON döndür
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP kodu email adresinize gönderildi.',
+                'phone' => $phone
+            ]);
+        }
 
         return redirect()->route('auth.verify-otp')->with('success', 'OTP kodu email adresinize gönderildi.');
     }
@@ -105,7 +136,16 @@ class LoginController extends Controller
             ->where('expires_at', '>', now())
             ->first();
 
+        // AJAX isteği kontrolü
+        $isAjax = $request->expectsJson() || $request->ajax();
+
         if (!$otp) {
+            if ($isAjax) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Geçersiz veya süresi dolmuş OTP kodu.'
+                ], 422);
+            }
             return back()->withErrors(['code' => 'Geçersiz veya süresi dolmuş OTP kodu.'])->withInput();
         }
 
@@ -150,7 +190,36 @@ class LoginController extends Controller
             $cookieMinutes = config('jwt.ttl', 60);
             $cookieSeconds = $cookieMinutes * 60;
 
-            return redirect()->intended(route('admin.reports.index'))
+            // Admin kontrolü - admin ise companies sayfasına yönlendir
+            $isAdmin = false;
+            $adminRole = Role::where('name', 'admin')
+                ->where('company_id', 0)
+                ->first();
+            if ($adminRole) {
+                $isAdmin = DB::table('model_has_roles')
+                    ->where('model_type', get_class($user))
+                    ->where('model_id', $user->id)
+                    ->where('role_id', $adminRole->id)
+                    ->where('company_id', 0)
+                    ->exists();
+            }
+
+            // Admin ise companies sayfasına, değilse mevcut yönlendirmeye git
+            $redirectRoute = $isAdmin 
+                ? route('admin.companies.index')
+                : route('admin.reports.index');
+
+            // AJAX isteği ise JSON döndür
+            if ($isAjax) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Başarıyla giriş yaptınız.',
+                    'redirect_url' => $redirectRoute,
+                    'token' => $token,
+                ])->cookie('jwt_token', $token, $cookieSeconds, '/', null, false, true, false, 'lax');
+            }
+
+            return redirect()->intended($redirectRoute)
                 ->with('success', 'Başarıyla giriş yaptınız.')
                 ->with('jwt_token', $token)
                 ->cookie('jwt_token', $token, $cookieSeconds, '/', null, false, true, false, 'lax');

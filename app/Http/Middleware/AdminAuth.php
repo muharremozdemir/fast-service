@@ -20,8 +20,22 @@ class AdminAuth
     {
         // Önce session auth kontrolü yap
         if (Auth::check()) {
+            $user = Auth::user();
+            
+            // Lisans kontrolü - suspended sayfası ve companies sayfası hariç
+            if (!$request->is('admin/license/suspended') && !$request->is('admin/companies*')) {
+                if ($user->company_id) {
+                    $company = \App\Models\Company::find($user->company_id);
+                    if ($company && $company->license_expires_at) {
+                        // Lisans süresi dolmuş mu kontrol et
+                        if ($company->isLicenseExpired() || ($company->days_remaining !== null && $company->days_remaining < 0)) {
+                            return redirect()->route('admin.license.suspended');
+                        }
+                    }
+                }
+            }
+            
             // Session geçerli, devam et
-            // JWT token cookie'de veya session'da olabilir, ama session yeterli
             return $next($request);
         }
         

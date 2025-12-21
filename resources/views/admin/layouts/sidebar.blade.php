@@ -215,6 +215,25 @@
                                 <!--begin::Menu-->
                                 <div class="menu menu-column menu-rounded menu-sub-indention fw-semibold fs-6" id="#kt_app_sidebar_menu" data-kt-menu="true" data-kt-menu-expand="false">
 
+                                    @php
+                                        $isAdmin = false;
+                                        if (auth()->check()) {
+                                            $user = auth()->user();
+                                            // Admin rolü kontrolü (company_id = 0 olan admin rolü)
+                                            $adminRole = \Spatie\Permission\Models\Role::where('name', 'admin')
+                                                ->where('company_id', 0)
+                                                ->first();
+                                            if ($adminRole) {
+                                                $isAdmin = \Illuminate\Support\Facades\DB::table('model_has_roles')
+                                                    ->where('model_type', get_class($user))
+                                                    ->where('model_id', $user->id)
+                                                    ->where('role_id', $adminRole->id)
+                                                    ->where('company_id', 0)
+                                                    ->exists();
+                                            }
+                                        }
+                                    @endphp
+
                                     {{-- Alt menü örneği (yorum satırı) --}}
                                     {{--
                                     <!--begin:Menu item with submenu-->
@@ -255,6 +274,7 @@
                                     <!--end:Menu item with submenu-->
                                     --}}
 
+                                    @if($isAdmin)
                                     <!--begin:Menu item-->
                                     <div class="menu-item">
                                         <a class="menu-link" href="{{ route('admin.companies.index') }}">
@@ -268,7 +288,7 @@
                                         </a>
                                     </div>
                                     <!--end:Menu item-->
-
+                                    @else
                                     <!--begin:Menu item-->
                                     <div class="menu-item">
                                         <a class="menu-link" href="{{ route('admin.categories.index') }}">
@@ -366,6 +386,21 @@
                                     </div>
                                     <!--end:Menu item-->
 
+                                    <!--begin:Menu item-->
+                                    <div class="menu-item">
+                                        <a class="menu-link" href="{{ route('admin.settings.index') }}">
+                                            <span class="menu-icon">
+                                                <i class="ki-duotone ki-setting-2 fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                    <span class="path3"></span>
+                                                </i>
+                                            </span>
+                                            <span class="menu-title">Ayarlar</span>
+                                        </a>
+                                    </div>
+                                    <!--end:Menu item-->
+                                    @endif
 
 
                                 </div>
@@ -378,7 +413,7 @@
                     <!--end::sidebar menu-->
                     <!--begin::Footer-->
                     <div class="app-sidebar-footer flex-column-auto pt-2 pb-6 px-6" id="kt_app_sidebar_footer">
-                        
+
                     </div>
                     <!--end::Footer-->
                 </div>
@@ -387,6 +422,30 @@
                 <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
                     <!--begin::Content wrapper-->
                     <div class="d-flex flex-column flex-column-fluid">
+                        @auth
+                            @php
+                                $user = \Illuminate\Support\Facades\Auth::user();
+                                $company = $user ? \App\Models\Company::find($user->company_id) : null;
+                            @endphp
+                            @if($company && $company->isLicenseExpiringSoon())
+                                <div class="alert alert-warning m-0 rounded-0 border-0 border-bottom" role="alert" style="border-radius: 0 !important;">
+                                    <div class="d-flex align-items-center">
+                                        <i class="ki-duotone ki-information-5 fs-2hx text-warning me-4">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                        <div class="d-flex flex-column flex-grow-1">
+                                            <h4 class="mb-1 text-dark">Lisans Uyarısı</h4>
+                                            <span>
+                                                Lisansınızın süresi <strong>{{ (int) $company->days_remaining }} gün</strong> içinde dolacak. 
+                                                Lütfen lisansınızı yenileyin. (Bitiş Tarihi: {{ $company->license_expires_at->format('d.m.Y') }})
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+                        @endauth
                         @yield('content')
                     </div>
                     <!--end::Content wrapper-->
