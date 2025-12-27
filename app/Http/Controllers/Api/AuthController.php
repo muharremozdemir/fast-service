@@ -135,8 +135,9 @@ class AuthController extends Controller
         }
 
         // Telefon numarasını response ile geri dön
-        return api_success([
-            'phone' => $phone
+        return response()->json([
+            'status'  => 'success',
+            'data'    => $phone
         ]);
     }
 
