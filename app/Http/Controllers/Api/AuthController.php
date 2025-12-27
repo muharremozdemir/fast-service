@@ -111,9 +111,6 @@ class AuthController extends Controller
             'phone' => 'required|string',
         ]);
 
-        // Telefon numarasını temizle ve formatla
-        $phone = make_mobile($request->phone);
-        
         // Telefon numarası validasyonu
         if (strlen($phone) != 10) {
             return api_error('Geçersiz telefon numarası formatı.');
