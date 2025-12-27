@@ -17,7 +17,7 @@ class AuthController extends Controller
     {
         $phone = $request->phone;
         // Telefon numarası validasyonu
-        if (strlen($phone) != 10) {
+        if (strlen($phone) != 13) {
             return api_error('Geçersiz telefon numarası formatı.');
         }
 
