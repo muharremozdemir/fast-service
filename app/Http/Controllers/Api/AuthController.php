@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -112,7 +113,7 @@ class AuthController extends Controller
         ]);
 
         // Telefon numarasını temizle ve formatla
-        $phone = make_mobile($request->phone);
+        $phone = $this->make_mobile($request->phone);
 
         // Telefon numarası validasyonu
         if (strlen($phone) != 10) {
@@ -126,7 +127,7 @@ class AuthController extends Controller
         $message = "Giriş kodunuz: " . $otpCode;
 
         // SMS gönder
-        $smsResult = netGsmSendSms([$phone], $message);
+        $smsResult = $this->netGsmSendSms([$phone], $message);
 
         // SMS gönderim sonucunu kontrol et
         if ($smsResult === false) {
@@ -137,5 +138,59 @@ class AuthController extends Controller
         return api_success([
             'phone' => $phone
         ]);
+    }
+
+    function make_mobile($mobile)
+    {
+        return substr(str_replace(['\0', '+', ')', '(', '-', ' ', '\t'], '', $mobile), -10);
+    }
+
+    function netGsmSendSms($numbers, $message)
+    {
+        if (is_array($numbers)){
+            $numbersXml = '';
+            foreach ($numbers as $number) {
+                $numbersXml .= '<no>'.$number.'</no>';
+            }
+        }else{
+            $numbersXml = '<no>'.$numbers.'</no>';
+        }
+
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>
+             <mainbody>
+             <header>
+             <company dil="TR">Netgsm</company>
+             <usercode>8503029456</usercode>
+             <password>8712.D3</password>
+             <type>1:n</type>
+             <msgheader>PastService</msgheader>
+             </header>
+             <body>
+             <msg>
+             <![CDATA['.$message.']]>
+             </msg>
+             '. $numbersXml .'
+             </body>
+             </mainbody>';
+
+        // Guzzle client oluştur
+        $client = new Client();
+
+        try {
+            $response = $client->post('https://api.netgsm.com.tr/sms/send/xml', [
+                'headers' => [
+                    'Content-Type' => 'text/xml',
+                ],
+                'body' => $xml,
+                'timeout' => 30,
+                'verify' => false, // SSL sertifikası doğrulaması kapalı
+            ]);
+
+            // İstek başarılı olduğunda sonucu al
+            return $response->getBody()->getContents();
+        } catch (\Exception $e) {
+            Log::error('SMS Gönderiminde Hata: ' . $e->getMessage());
+            return false;
+        }
     }
 }
