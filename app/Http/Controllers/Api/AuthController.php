@@ -112,7 +112,7 @@ class AuthController extends Controller
         ]);
 
         // Telefon numarası validasyonu
-        if (strlen($phone) != 10) {
+        if (strlen($request->phone) != 10) {
             return api_error('Geçersiz telefon numarası formatı.');
         }
 
@@ -123,7 +123,7 @@ class AuthController extends Controller
         $message = "Giriş kodunuz: " . $otpCode;
 
         // SMS gönder
-        $smsResult = netGsmSendSms([$phone], $message);
+        $smsResult = netGsmSendSms([$request->phone], $message);
 
         // SMS gönderim sonucunu kontrol et
         if ($smsResult === false) {
@@ -132,7 +132,7 @@ class AuthController extends Controller
 
         // Telefon numarasını response ile geri dön
         return api_success([
-            'phone' => $phone
+            'phone' => $request->phone
         ]);
     }
 }
