@@ -97,6 +97,7 @@ class AuthController extends Controller
                     'email' => $user->email,
                     'phone' => $user->phone,
                     'company_id' => $user->company_id,
+                    'availability_status' => $user->availability_status,
                 ]
             ]);
         }
@@ -226,7 +227,15 @@ class AuthController extends Controller
         return response()->json([
             "status" => "success",
             "data" => [
-                "user" => $user
+                "user" => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                    'company_id' => $user->company_id,
+                    'subscription_id' => $user->subscription_id,
+                    'availability_status' => $user->availability_status,
+                ]
             ]
         ]);
     }

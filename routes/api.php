@@ -60,6 +60,7 @@ Route::get('user', function (Request $request) {
             'email' => $user->email,
             'phone' => $user->phone,
             'company_id' => $user->company_id,
+            'availability_status' => $user->availability_status,
         ],
         'roles' => $roles,
         'permissions' => $permissions,
