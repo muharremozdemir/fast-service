@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\NetGsmService;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -12,9 +13,22 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    public function sendSmsForLogin(Request $request)
+    public function sendSmsForLogin(Request $request, NetGsmService $netGsmService)
     {
-        $user = User::query()->where('phone', $request->phone)->first();
+        $phone = $request->phone;
+        // Telefon numarası validasyonu
+        if (strlen($phone) != 10) {
+            return api_error('Geçersiz telefon numarası formatı.');
+        }
+
+        $user = User::query()->where('phone', $phone)->first();
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Bu telefon numarasına ait kullanıcı bulunamadı.'
+            ], 400);
+        }
 
         $otpCode = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
 
@@ -35,7 +49,16 @@ class AuthController extends Controller
             'updated_at' => now(),
         ]);
 
-        netGsmSendSms([$user->phone], $otpCode);
+        $message = "Giriş kodunuz: " . $otpCode;
+
+        $netGsmService->send([$user->phone], $message);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                "phone" => $user->phone
+            ]
+        ]);
     }
 
     public function verifyOtp(Request $request)
@@ -46,7 +69,7 @@ class AuthController extends Controller
         // OTP kodunu kontrol et
         $otp = DB::table('otp_codes')
             ->where('phone', $phone)
-            ->where('code', $request->code)
+            ->where('code', $request->verification_code)
             ->where('used', false)
             ->where('expires_at', '>', now())
             ->first();

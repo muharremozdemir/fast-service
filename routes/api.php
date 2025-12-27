@@ -16,14 +16,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('user', function (Request $request) {
     $user = $request->user();
-    
+
     if (!$user) {
         return response()->json(['message' => 'Unauthenticated'], 401);
     }
-    
+
     // Company_id context'ini ayarla (Spatie Permission teams için)
     setPermissionsTeamId($user->company_id);
-    
+
     // Kullanıcının rolleri ve yetkilerini çek
     $roles = $user->roles()->get()->map(function ($role) {
         // Role atanmış yetkileri çek
@@ -35,7 +35,7 @@ Route::get('user', function (Request $request) {
                 'group' => $permission->group,
             ];
         });
-        
+
         return [
             'id' => $role->id,
             'name' => $role->name,
@@ -43,7 +43,7 @@ Route::get('user', function (Request $request) {
             'permissions' => $rolePermissions,
         ];
     });
-    
+
     $permissions = $user->getAllPermissions()->map(function ($permission) {
         return [
             'id' => $permission->id,
@@ -52,7 +52,7 @@ Route::get('user', function (Request $request) {
             'group' => $permission->group,
         ];
     });
-    
+
     return response()->json([
         'user' => [
             'id' => $user->id,
@@ -67,6 +67,5 @@ Route::get('user', function (Request $request) {
 })->middleware('auth:api');
 
 Route::post('send-sms-for-login', [\App\Http\Controllers\Api\AuthController::class, 'sendSmsForLogin']);
-Route::post('send-login-sms', [\App\Http\Controllers\Api\AuthController::class, 'sendLoginSms']);
 Route::post('verify-otp', [\App\Http\Controllers\Api\AuthController::class, 'verifyOtp']);
 Route::post('save-subscription-id', [\App\Http\Controllers\Api\AuthController::class, 'saveSubscriptionId'])->middleware('auth:api');
