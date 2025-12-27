@@ -64,7 +64,7 @@ class AuthController extends Controller
     public function verifyOtp(Request $request)
     {
         // Telefon numarasını temizle
-        $phone = preg_replace('/[^0-9]/', '', $request->phone);
+        $phone = $request->phone;
 
         // OTP kodunu kontrol et
         $otp = DB::table('otp_codes')
