@@ -14,9 +14,7 @@ class ProductsTableSeeder extends Seeder
      */
     public function run()
     {
-        // Test firmasını bul
-        $testCompany = \DB::table('companies')->where('name', 'Test Şirketi')->first();
-        $companyId = $testCompany ? $testCompany->id : 1;
+        
 
         \DB::table('products')->delete();
         
@@ -24,7 +22,7 @@ class ProductsTableSeeder extends Seeder
             0 => 
             array (
                 'id' => 1,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'category_id' => 5,
                 'name' => 'Tavuk Izgara',
                 'slug' => 'tavuk-izgara',
@@ -39,7 +37,7 @@ class ProductsTableSeeder extends Seeder
             1 => 
             array (
                 'id' => 2,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'category_id' => 5,
                 'name' => 'Etli Noodle',
                 'slug' => 'etli-noodle',
@@ -54,7 +52,7 @@ class ProductsTableSeeder extends Seeder
             2 => 
             array (
                 'id' => 3,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'category_id' => 6,
                 'name' => 'Limonata',
                 'slug' => 'limonata',
@@ -69,7 +67,7 @@ class ProductsTableSeeder extends Seeder
             3 => 
             array (
                 'id' => 4,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'category_id' => 6,
                 'name' => 'Soğuk Çay',
                 'slug' => 'soguk-cay',
@@ -84,7 +82,7 @@ class ProductsTableSeeder extends Seeder
             4 => 
             array (
                 'id' => 5,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'category_id' => 7,
                 'name' => 'Günlük Otopark',
                 'slug' => 'gunluk-otopark',
@@ -99,7 +97,7 @@ class ProductsTableSeeder extends Seeder
             5 => 
             array (
                 'id' => 6,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'category_id' => 7,
                 'name' => 'Vale Hizmeti',
                 'slug' => 'vale-hizmeti',
@@ -114,7 +112,7 @@ class ProductsTableSeeder extends Seeder
             6 => 
             array (
                 'id' => 7,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'category_id' => 8,
                 'name' => 'Masaj Seansı',
                 'slug' => 'masaj-seansi',
@@ -129,7 +127,7 @@ class ProductsTableSeeder extends Seeder
             7 => 
             array (
                 'id' => 8,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'category_id' => 8,
                 'name' => 'Buhar Odası',
                 'slug' => 'buhar-odasi',
@@ -144,7 +142,7 @@ class ProductsTableSeeder extends Seeder
             8 => 
             array (
                 'id' => 9,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'category_id' => 9,
                 'name' => 'Lambanın Yanmaması',
                 'slug' => 'lambanin-yanmamasi',
@@ -159,7 +157,7 @@ class ProductsTableSeeder extends Seeder
             9 => 
             array (
                 'id' => 10,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'category_id' => 9,
                 'name' => 'Priz Sorunu',
                 'slug' => 'priz-sorunu',
@@ -174,7 +172,7 @@ class ProductsTableSeeder extends Seeder
             10 => 
             array (
                 'id' => 11,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'category_id' => 10,
                 'name' => 'Kumanda Çalışmıyor',
                 'slug' => 'kumanda-calismiyor',
@@ -189,7 +187,7 @@ class ProductsTableSeeder extends Seeder
             11 => 
             array (
                 'id' => 12,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'category_id' => 10,
                 'name' => 'Klima Soğutmuyor',
                 'slug' => 'klima-sogutmuyor',
@@ -204,7 +202,7 @@ class ProductsTableSeeder extends Seeder
             12 => 
             array (
                 'id' => 13,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'category_id' => 11,
                 'name' => 'Oda ile Görüşme',
                 'slug' => 'oda-ile-gorusme',
@@ -219,7 +217,7 @@ class ProductsTableSeeder extends Seeder
             13 => 
             array (
                 'id' => 14,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'category_id' => 11,
                 'name' => 'Dış Hat',
                 'slug' => 'dis-hat',
@@ -234,7 +232,7 @@ class ProductsTableSeeder extends Seeder
             14 => 
             array (
                 'id' => 15,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'category_id' => 12,
                 'name' => 'Yakın Restoranlar',
                 'slug' => 'yakin-restoranlar',
@@ -249,7 +247,7 @@ class ProductsTableSeeder extends Seeder
             15 => 
             array (
                 'id' => 16,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'category_id' => 12,
                 'name' => 'Etkinlik Bilgisi',
                 'slug' => 'etkinlik-bilgisi',

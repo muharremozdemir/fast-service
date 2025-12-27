@@ -922,9 +922,12 @@
             </div>
             <div class="row mt-4">
                 <div class="col-12">
-                    <form class="demo-form" id="demoRequestForm">
+                    <form class="demo-form" id="demoRequestForm" action="{{ route('site.demo.request') }}" method="POST">
+                        @csrf
                         <h3>Demo Talep Et</h3>
                         <p>Size özel bir demo için bilgilerinizi bırakın</p>
+
+                        <div id="formMessage" style="display: none; padding: 15px; margin-bottom: 20px; border-radius: 10px;"></div>
 
                         <div class="mb-3">
                             <label for="name" class="form-label">Ad Soyad *</label>
@@ -960,7 +963,7 @@
                             <textarea class="form-control" id="message" name="message" rows="4"></textarea>
                         </div>
 
-                        <button type="submit" class="btn btn-submit">Demo Talebini Gönder</button>
+                        <button type="submit" class="btn btn-submit" id="submitBtn">Demo Talebini Gönder</button>
                     </form>
                 </div>
             </div>
@@ -1098,24 +1101,67 @@
         document.getElementById('demoRequestForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            const formData = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value,
-                company: document.getElementById('company').value,
-                package: document.getElementById('package').value,
-                message: document.getElementById('message').value
-            };
+            const form = this;
+            const submitBtn = document.getElementById('submitBtn');
+            const formMessage = document.getElementById('formMessage');
+            const originalBtnText = submitBtn.textContent;
 
-            // Burada form verilerini backend'e gönderebilirsiniz
-            // Şimdilik alert gösteriyoruz
-            alert('Demo talebiniz alındı! En kısa sürede size dönüş yapacağız.\n\n' +
-                  'Ad Soyad: ' + formData.name + '\n' +
-                  'E-posta: ' + formData.email + '\n' +
-                  'Telefon: ' + formData.phone);
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Gönderiliyor...';
 
-            // Formu temizle
-            this.reset();
+            // Hide previous messages
+            formMessage.style.display = 'none';
+
+            // Get form data
+            const formData = new FormData(form);
+
+            // Send AJAX request
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    formMessage.style.display = 'block';
+                    formMessage.style.backgroundColor = '#d4edda';
+                    formMessage.style.color = '#155724';
+                    formMessage.style.border = '1px solid #c3e6cb';
+                    formMessage.textContent = data.message;
+
+                    // Reset form
+                    form.reset();
+
+                    // Scroll to message
+                    formMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    // Show error message
+                    formMessage.style.display = 'block';
+                    formMessage.style.backgroundColor = '#f8d7da';
+                    formMessage.style.color = '#721c24';
+                    formMessage.style.border = '1px solid #f5c6cb';
+                    formMessage.textContent = data.message || 'Bir hata oluştu. Lütfen tekrar deneyin.';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                formMessage.style.display = 'block';
+                formMessage.style.backgroundColor = '#f8d7da';
+                formMessage.style.color = '#721c24';
+                formMessage.style.border = '1px solid #f5c6cb';
+                formMessage.textContent = 'Bir hata oluştu. Lütfen tekrar deneyin.';
+            })
+            .finally(() => {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+            });
         });
 
         // Testimonials Swiper

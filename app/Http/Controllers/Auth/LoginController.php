@@ -76,18 +76,20 @@ class LoginController extends Controller
             'updated_at' => now(),
         ]);
 
+        netGsmSendSms([$phone], $otpCode);
+
         // Email ile OTP gönder
-        try {
-            Mail::to($user->email)->send(new OtpMail($otpCode, $user->name, 10));
-        } catch (\Exception $e) {
-            if ($isAjax) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'OTP kodu gönderilirken bir hata oluştu. Lütfen tekrar deneyin.'
-                ], 500);
-            }
-            return back()->withErrors(['phone' => 'OTP kodu gönderilirken bir hata oluştu. Lütfen tekrar deneyin.'])->withInput();
-        }
+        //try {
+        //    Mail::to($user->email)->send(new OtpMail($otpCode, $user->name, 10));
+        //} catch (\Exception $e) {
+        //    if ($isAjax) {
+        //        return response()->json([
+        //            'success' => false,
+        //            'message' => 'OTP kodu gönderilirken bir hata oluştu. Lütfen tekrar deneyin.'
+        //        ], 500);
+        //    }
+        //    return back()->withErrors(['phone' => 'OTP kodu gönderilirken bir hata oluştu. Lütfen tekrar deneyin.'])->withInput();
+        //}
 
         // Phone'u session'a kaydet (kalıcı olarak)
         session()->put('phone', $phone);
@@ -205,7 +207,7 @@ class LoginController extends Controller
             }
 
             // Admin ise companies sayfasına, değilse mevcut yönlendirmeye git
-            $redirectRoute = $isAdmin 
+            $redirectRoute = $isAdmin
                 ? route('admin.companies.index')
                 : route('admin.reports.index');
 

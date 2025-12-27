@@ -217,8 +217,13 @@
 
                                     @php
                                         $isAdmin = false;
+                                        $isHotelAdmin = false;
                                         if (auth()->check()) {
                                             $user = auth()->user();
+                                            // Company_id context'ini ayarla (Spatie Permission teams için)
+                                            if ($user && $user->company_id) {
+                                                setPermissionsTeamId($user->company_id);
+                                            }
                                             // Admin rolü kontrolü (company_id = 0 olan admin rolü)
                                             $adminRole = \Spatie\Permission\Models\Role::where('name', 'admin')
                                                 ->where('company_id', 0)
@@ -230,6 +235,11 @@
                                                     ->where('role_id', $adminRole->id)
                                                     ->where('company_id', 0)
                                                     ->exists();
+                                            }
+                                            // Hotel Admin rolü kontrolü
+                                            if ($user && $user->company_id) {
+                                                setPermissionsTeamId($user->company_id);
+                                                $isHotelAdmin = $user->hasRole('Hotel Admin');
                                             }
                                         }
                                     @endphp
@@ -386,6 +396,25 @@
                                     </div>
                                     <!--end:Menu item-->
 
+                                    @if($isHotelAdmin)
+                                        <!--begin:Menu item-->
+                                        <div class="menu-item">
+                                            <a class="menu-link" href="{{ route('admin.staff.index') }}">
+                                                <span class="menu-icon">
+                                                    <i class="ki-duotone ki-people fs-2">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                        <span class="path3"></span>
+                                                        <span class="path4"></span>
+                                                        <span class="path5"></span>
+                                                    </i>
+                                                </span>
+                                                <span class="menu-title">Personel Yönetimi</span>
+                                            </a>
+                                        </div>
+                                        <!--end:Menu item-->
+                                    @endif
+
                                     <!--begin:Menu item-->
                                     <div class="menu-item">
                                         <a class="menu-link" href="{{ route('admin.settings.index') }}">
@@ -400,6 +429,24 @@
                                         </a>
                                     </div>
                                     <!--end:Menu item-->
+
+                                        @if(auth()->user()->can('reception'))
+                                            <!--begin:Menu item-->
+                                            <div class="menu-item">
+                                                <a class="menu-link" href="{{ route('admin.roles.index') }}">
+                                            <span class="menu-icon">
+                                                <i class="ki-duotone ki-profile-user fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                    <span class="path3"></span>
+                                                    <span class="path4"></span>
+                                                </i>
+                                            </span>
+                                                    <span class="menu-title">Kullanıcı Rolleri</span>
+                                                </a>
+                                            </div>
+                                            <!--end:Menu item-->
+                                        @endif
                                     @endif
 
 
@@ -438,7 +485,7 @@
                                         <div class="d-flex flex-column flex-grow-1">
                                             <h4 class="mb-1 text-dark">Lisans Uyarısı</h4>
                                             <span>
-                                                Lisansınızın süresi <strong>{{ (int) $company->days_remaining }} gün</strong> içinde dolacak. 
+                                                Lisansınızın süresi <strong>{{ (int) $company->days_remaining }} gün</strong> içinde dolacak.
                                                 Lütfen lisansınızı yenileyin. (Bitiş Tarihi: {{ $company->license_expires_at->format('d.m.Y') }})
                                             </span>
                                         </div>

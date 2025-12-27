@@ -14,9 +14,7 @@ class CategoriesTableSeeder extends Seeder
      */
     public function run()
     {
-        // Test firmasını bul
-        $testCompany = \DB::table('companies')->where('name', 'Test Şirketi')->first();
-        $companyId = $testCompany ? $testCompany->id : 1;
+        
 
         \DB::table('categories')->delete();
         
@@ -24,7 +22,7 @@ class CategoriesTableSeeder extends Seeder
             0 => 
             array (
                 'id' => 1,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'parent_id' => NULL,
                 'name' => 'Oda Servisi',
@@ -40,7 +38,7 @@ class CategoriesTableSeeder extends Seeder
             1 => 
             array (
                 'id' => 2,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'parent_id' => NULL,
                 'name' => 'Otel Hizmetleri',
@@ -56,7 +54,7 @@ class CategoriesTableSeeder extends Seeder
             2 => 
             array (
                 'id' => 3,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'parent_id' => NULL,
                 'name' => 'Arıza Bildirimi',
@@ -72,7 +70,7 @@ class CategoriesTableSeeder extends Seeder
             3 => 
             array (
                 'id' => 4,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'parent_id' => NULL,
                 'name' => 'Resepsiyon İletişim',
@@ -88,7 +86,7 @@ class CategoriesTableSeeder extends Seeder
             4 => 
             array (
                 'id' => 5,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'parent_id' => 1,
                 'name' => 'Yemekler',
@@ -104,7 +102,7 @@ class CategoriesTableSeeder extends Seeder
             5 => 
             array (
                 'id' => 6,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'parent_id' => 1,
                 'name' => 'İçecekler',
@@ -120,7 +118,7 @@ class CategoriesTableSeeder extends Seeder
             6 => 
             array (
                 'id' => 7,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'parent_id' => 2,
                 'name' => 'Otopark',
@@ -136,7 +134,7 @@ class CategoriesTableSeeder extends Seeder
             7 => 
             array (
                 'id' => 8,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'parent_id' => 2,
                 'name' => 'SPA & Wellness',
@@ -152,7 +150,7 @@ class CategoriesTableSeeder extends Seeder
             8 => 
             array (
                 'id' => 9,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'parent_id' => 3,
                 'name' => 'Elektrik Arızası',
@@ -168,7 +166,7 @@ class CategoriesTableSeeder extends Seeder
             9 => 
             array (
                 'id' => 10,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'parent_id' => 3,
                 'name' => 'TV / Klima',
@@ -184,7 +182,7 @@ class CategoriesTableSeeder extends Seeder
             10 => 
             array (
                 'id' => 11,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'parent_id' => 4,
                 'name' => 'Telefon',
@@ -200,7 +198,7 @@ class CategoriesTableSeeder extends Seeder
             11 => 
             array (
                 'id' => 12,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'parent_id' => 4,
                 'name' => 'Danışma',

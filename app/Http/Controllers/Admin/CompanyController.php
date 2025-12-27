@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class CompanyController extends Controller
 {
@@ -15,7 +16,7 @@ class CompanyController extends Controller
     {
         $q = $request->input('q');
         $status = $request->input('status');
-    
+
         $companies = Company::query()
             ->when($q, function ($query, $q) {
                 $query->where(function ($query) use ($q) {
@@ -31,7 +32,7 @@ class CompanyController extends Controller
             ->orderBy('name')
             ->paginate(10)
             ->withQueryString();
-    
+
         return view('admin.company.companies', compact('companies', 'q', 'status'));
     }
 
@@ -73,7 +74,7 @@ class CompanyController extends Controller
         $company->tax_office = $request->input('tax_office');
         $company->is_active = $request->input('is_active', 0);
         $company->logo_type = $request->input('logo_type', 'fast_service');
-        
+
         // Logo yükleme işlemi
         if ($request->has('remove_logo') && $request->input('remove_logo')) {
             // Mevcut logoyu sil
@@ -95,7 +96,7 @@ class CompanyController extends Controller
         $extensionType = $request->input('license_extension_type');
         if ($extensionType) {
             $currentDate = $company->license_expires_at ? $company->license_expires_at : now();
-            
+
             if ($extensionType === 'date') {
                 $newDate = $request->input('license_extension_date');
                 if ($newDate) {
@@ -160,8 +161,8 @@ class CompanyController extends Controller
         $admin->email = $request->input('admin_email');
         $admin->phone = $request->input('admin_phone');
         $admin->company_id = $company->id;
-        // Password OTP sistemi ile yönetileceği için null bırakılıyor
-        $admin->password = null;
+        // Rastgele şifre oluştur (12 karakter, büyük/küçük harf, rakam ve özel karakter)
+        $admin->password = \Illuminate\Support\Str::random(12);
         $admin->save();
 
         // hotel-admin rolünü oluştur (web guard için)
@@ -174,36 +175,30 @@ class CompanyController extends Controller
             ]
         );
 
-        // hotel-admin rolünü oluştur (api guard için)
-        $hotelAdminRoleApi = Role::firstOrCreate(
-            [
-                'name' => 'hotel-admin',
-                'guard_name' => 'api',
-                'company_id' => $company->id,
-            ]
-        );
-
         // Yönetici kullanıcısını rollere ata
         setPermissionsTeamId($company->id);
         if (!$admin->hasRole($hotelAdminRoleWeb)) {
             $admin->assignRole($hotelAdminRoleWeb);
         }
-        
-        // API guard için rol atamasını manuel olarak yap (User modeli web guard kullandığı için)
-        $apiRoleExists = DB::table('model_has_roles')
-            ->where('model_type', get_class($admin))
-            ->where('model_id', $admin->id)
-            ->where('role_id', $hotelAdminRoleApi->id)
-            ->where('company_id', $company->id)
-            ->exists();
-            
-        if (!$apiRoleExists) {
-            DB::table('model_has_roles')->insert([
-                'role_id' => $hotelAdminRoleApi->id,
-                'model_type' => get_class($admin),
-                'model_id' => $admin->id,
+
+        // Resepsiyon yetkisini (permission) oluştur
+        setPermissionsTeamId($company->id);
+        $receptionPermission = Permission::firstOrCreate(
+            [
+                'name' => 'reception',
+                'guard_name' => 'web',
                 'company_id' => $company->id,
-            ]);
+            ],
+            [
+                'label' => 'Resepsiyon',
+                'group' => 'Genel',
+            ]
+        );
+
+        // Yönetici kullanıcısına resepsiyon yetkisini ata
+        setPermissionsTeamId($company->id);
+        if (!$admin->hasPermissionTo($receptionPermission)) {
+            $admin->givePermissionTo($receptionPermission);
         }
 
         return redirect()->route('admin.companies.index')->with('success', 'Şirket ve yönetici kullanıcı başarıyla oluşturuldu. Yönetici girişi SMS ile gönderilecek OTP kodu ile yapılacaktır. SMS ulaşmazsa email ile gönderilecektir.');
@@ -212,7 +207,7 @@ class CompanyController extends Controller
     public function destroy(Company $company)
     {
         $company->delete();
-    
+
         return redirect()
             ->back()
             ->with('success', 'Şirket başarıyla silindi.');

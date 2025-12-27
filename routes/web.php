@@ -13,6 +13,8 @@ use App\Http\Controllers\Admin\RoomController as AdminRoomController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
+use App\Http\Controllers\Admin\RoleController as AdminRoleController;
+use App\Http\Controllers\Admin\StaffController as AdminStaffController;
 
 // Site
 use App\Http\Controllers\Site\SiteHomeController;
@@ -28,6 +30,10 @@ use App\Http\Controllers\Auth\LoginController;
 ||--------------------------------------------------------------------------
 */
 
+Route::get('one-signal-test', function (){
+    dd(sendOneSignalNotification("Hotel Fast Servie", "Eyüp Abi?", 1, ["64ab759d-2445-4ec7-b930-7b0a55579c0e"]));
+});
+
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('auth.login');
 Route::post('/send-otp', [LoginController::class, 'sendOtp'])->name('auth.send-otp');
 Route::get('/verify-otp', [LoginController::class, 'showVerifyOtpForm'])->name('auth.verify-otp');
@@ -42,6 +48,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('auth.logout');
 
 // Landing page - Ana sayfa
 Route::get('/', [SiteHomeController::class, 'landing'])->name('site.landing');
+Route::post('/demo-request', [SiteHomeController::class, 'submitDemoRequest'])->name('site.demo.request');
 
 // QR Code route - must be before other routes to avoid conflicts
 Route::get('/{uuid}', [SiteHomeController::class, 'qrScan'])->name('site.qr.scan')
@@ -135,6 +142,21 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAut
     // Settings (Ayarlar) - Sadece hotel yöneticisi için
     Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings/logo', [AdminSettingsController::class, 'updateLogo'])->name('settings.updateLogo');
+
+    // Roles (Kullanıcı Rolleri)
+    Route::get('/roles', [AdminRoleController::class, 'index'])->name('roles.index');
+    Route::get('/roles/create', [AdminRoleController::class, 'create'])->name('roles.create');
+    Route::post('/roles/store', [AdminRoleController::class, 'store'])->name('roles.store');
+    Route::get('/roles/edit/{id}', [AdminRoleController::class, 'edit'])->name('roles.edit');
+    Route::put('/roles/update/{id}', [AdminRoleController::class, 'update'])->name('roles.update');
+    Route::delete('/roles/{id}', [AdminRoleController::class, 'destroy'])->name('roles.destroy');
+
+    // Staff (Personel Yönetimi) - Sadece hotel-admin rolü için
+    Route::get('/staff', [AdminStaffController::class, 'index'])->name('staff.index');
+    Route::get('/staff/create', [AdminStaffController::class, 'create'])->name('staff.create');
+    Route::post('/staff/store', [AdminStaffController::class, 'store'])->name('staff.store');
+    Route::get('/staff/edit/{id}', [AdminStaffController::class, 'edit'])->name('staff.edit');
+    Route::put('/staff/update/{id}', [AdminStaffController::class, 'update'])->name('staff.update');
 
 });
 

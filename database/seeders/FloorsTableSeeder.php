@@ -14,9 +14,7 @@ class FloorsTableSeeder extends Seeder
      */
     public function run()
     {
-        // Test firmasını bul
-        $testCompany = \DB::table('companies')->where('name', 'Test Şirketi')->first();
-        $companyId = $testCompany ? $testCompany->id : 1;
+        
 
         \DB::table('floors')->delete();
         
@@ -24,7 +22,7 @@ class FloorsTableSeeder extends Seeder
             0 => 
             array (
                 'id' => 1,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'block_id' => NULL,
                 'user_id' => NULL,
                 'name' => '1. Kat',
@@ -39,7 +37,7 @@ class FloorsTableSeeder extends Seeder
             1 => 
             array (
                 'id' => 2,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'block_id' => NULL,
                 'user_id' => NULL,
                 'name' => '2. Kat',
@@ -54,7 +52,7 @@ class FloorsTableSeeder extends Seeder
             2 => 
             array (
                 'id' => 3,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'block_id' => NULL,
                 'user_id' => NULL,
                 'name' => '3. Kat',
@@ -69,7 +67,7 @@ class FloorsTableSeeder extends Seeder
             3 => 
             array (
                 'id' => 4,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'block_id' => NULL,
                 'user_id' => NULL,
                 'name' => '4. Kat',
@@ -84,7 +82,7 @@ class FloorsTableSeeder extends Seeder
             4 => 
             array (
                 'id' => 5,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'block_id' => NULL,
                 'user_id' => NULL,
                 'name' => '5. Kat',

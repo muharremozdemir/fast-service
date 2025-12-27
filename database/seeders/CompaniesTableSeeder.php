@@ -35,6 +35,22 @@ class CompaniesTableSeeder extends Seeder
                 'created_at' => '2025-12-21 15:52:51',
                 'updated_at' => '2025-12-21 17:42:59',
             ),
+            1 => 
+            array (
+                'id' => 3,
+                'name' => 'Özdemir Hotel',
+                'email' => 'muharrem@ozdemirhotel.com',
+                'phone' => '5555555555',
+                'address' => 'Deneme Adres',
+                'tax_number' => '4444444444',
+                'tax_office' => 'Göz',
+                'logo_path' => NULL,
+                'logo_type' => 'fast_service',
+                'is_active' => 1,
+                'license_expires_at' => NULL,
+                'created_at' => '2025-12-24 19:18:40',
+                'updated_at' => '2025-12-24 19:18:40',
+            ),
         ));
         
         

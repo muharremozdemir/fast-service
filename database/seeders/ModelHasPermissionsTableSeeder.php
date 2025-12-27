@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
-class ModelHasRolesTableSeeder extends Seeder
+class ModelHasPermissionsTableSeeder extends Seeder
 {
 
     /**
@@ -16,19 +16,12 @@ class ModelHasRolesTableSeeder extends Seeder
     {
         
 
-        \DB::table('model_has_roles')->delete();
+        \DB::table('model_has_permissions')->delete();
         
-        \DB::table('model_has_roles')->insert(array (
+        \DB::table('model_has_permissions')->insert(array (
             0 => 
             array (
-                'role_id' => 1,
-                'model_type' => 'App\\Models\\User',
-                'model_id' => 2,
-                'company_id' => 0,
-            ),
-            1 => 
-            array (
-                'role_id' => 2,
+                'permission_id' => 2,
                 'model_type' => 'App\\Models\\User',
                 'model_id' => 14,
                 'company_id' => 3,

@@ -44,5 +44,12 @@ class DatabaseSeeder extends Seeder
         // $this->call(CategorySeeder::class);
         // $this->call(StaffSeeder::class);
         // $this->call(FloorRoomSeeder::class);
+        $this->call(BlocksTableSeeder::class);
+        $this->call(CartItemsTableSeeder::class);
+        $this->call(CartsTableSeeder::class);
+        $this->call(ModelHasPermissionsTableSeeder::class);
+        $this->call(OrderItemsTableSeeder::class);
+        $this->call(OrdersTableSeeder::class);
+        $this->call(OtpCodesTableSeeder::class);
     }
 }

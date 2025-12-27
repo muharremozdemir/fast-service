@@ -14,9 +14,7 @@ class RoomsTableSeeder extends Seeder
      */
     public function run()
     {
-        // Test firmasını bul
-        $testCompany = \DB::table('companies')->where('name', 'Test Şirketi')->first();
-        $companyId = $testCompany ? $testCompany->id : 1;
+        
 
         \DB::table('rooms')->delete();
         
@@ -24,7 +22,7 @@ class RoomsTableSeeder extends Seeder
             0 => 
             array (
                 'id' => 1,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 1,
                 'room_number' => '101',
@@ -39,7 +37,7 @@ class RoomsTableSeeder extends Seeder
             1 => 
             array (
                 'id' => 2,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 1,
                 'room_number' => '102',
@@ -54,7 +52,7 @@ class RoomsTableSeeder extends Seeder
             2 => 
             array (
                 'id' => 3,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 1,
                 'room_number' => '103',
@@ -69,7 +67,7 @@ class RoomsTableSeeder extends Seeder
             3 => 
             array (
                 'id' => 4,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 1,
                 'room_number' => '104',
@@ -84,7 +82,7 @@ class RoomsTableSeeder extends Seeder
             4 => 
             array (
                 'id' => 5,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 1,
                 'room_number' => '105',
@@ -99,7 +97,7 @@ class RoomsTableSeeder extends Seeder
             5 => 
             array (
                 'id' => 6,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 2,
                 'room_number' => '201',
@@ -114,7 +112,7 @@ class RoomsTableSeeder extends Seeder
             6 => 
             array (
                 'id' => 7,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 2,
                 'room_number' => '202',
@@ -129,7 +127,7 @@ class RoomsTableSeeder extends Seeder
             7 => 
             array (
                 'id' => 8,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 2,
                 'room_number' => '203',
@@ -144,7 +142,7 @@ class RoomsTableSeeder extends Seeder
             8 => 
             array (
                 'id' => 9,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 2,
                 'room_number' => '204',
@@ -159,7 +157,7 @@ class RoomsTableSeeder extends Seeder
             9 => 
             array (
                 'id' => 10,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 2,
                 'room_number' => '205',
@@ -174,7 +172,7 @@ class RoomsTableSeeder extends Seeder
             10 => 
             array (
                 'id' => 11,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 3,
                 'room_number' => '301',
@@ -189,7 +187,7 @@ class RoomsTableSeeder extends Seeder
             11 => 
             array (
                 'id' => 12,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 3,
                 'room_number' => '302',
@@ -204,7 +202,7 @@ class RoomsTableSeeder extends Seeder
             12 => 
             array (
                 'id' => 13,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 3,
                 'room_number' => '303',
@@ -219,7 +217,7 @@ class RoomsTableSeeder extends Seeder
             13 => 
             array (
                 'id' => 14,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 3,
                 'room_number' => '304',
@@ -234,7 +232,7 @@ class RoomsTableSeeder extends Seeder
             14 => 
             array (
                 'id' => 15,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 3,
                 'room_number' => '305',
@@ -249,7 +247,7 @@ class RoomsTableSeeder extends Seeder
             15 => 
             array (
                 'id' => 16,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 4,
                 'room_number' => '401',
@@ -264,7 +262,7 @@ class RoomsTableSeeder extends Seeder
             16 => 
             array (
                 'id' => 17,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 4,
                 'room_number' => '402',
@@ -279,7 +277,7 @@ class RoomsTableSeeder extends Seeder
             17 => 
             array (
                 'id' => 18,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 4,
                 'room_number' => '403',
@@ -294,7 +292,7 @@ class RoomsTableSeeder extends Seeder
             18 => 
             array (
                 'id' => 19,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 4,
                 'room_number' => '404',
@@ -309,7 +307,7 @@ class RoomsTableSeeder extends Seeder
             19 => 
             array (
                 'id' => 20,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 4,
                 'room_number' => '405',
@@ -324,7 +322,7 @@ class RoomsTableSeeder extends Seeder
             20 => 
             array (
                 'id' => 21,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 5,
                 'room_number' => '501',
@@ -339,7 +337,7 @@ class RoomsTableSeeder extends Seeder
             21 => 
             array (
                 'id' => 22,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 5,
                 'room_number' => '502',
@@ -354,7 +352,7 @@ class RoomsTableSeeder extends Seeder
             22 => 
             array (
                 'id' => 23,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 5,
                 'room_number' => '503',
@@ -369,7 +367,7 @@ class RoomsTableSeeder extends Seeder
             23 => 
             array (
                 'id' => 24,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 5,
                 'room_number' => '504',
@@ -384,7 +382,7 @@ class RoomsTableSeeder extends Seeder
             24 => 
             array (
                 'id' => 25,
-                'company_id' => $companyId,
+                'company_id' => 1,
                 'user_id' => NULL,
                 'floor_id' => 5,
                 'room_number' => '505',
