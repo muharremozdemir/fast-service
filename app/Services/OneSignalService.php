@@ -51,11 +51,21 @@ class OneSignalService
             'Authorization' => "Bearer {$this->apiKey}",
         ];
 
+        // OneSignal requires English content, so we include both the requested language and English
+        $headings = ['en' => $title];
+        $contents = ['en' => $message];
+        
+        // If a different language is requested, add it alongside English
+        if ($language !== 'en') {
+            $headings[$language] = $title;
+            $contents[$language] = $message;
+        }
+
         $body = [
             'app_id' => $this->appId,
             'include_player_ids' => $playerIdsArray,
-            'headings' => [$language => $title],
-            'contents' => [$language => $message],
+            'headings' => $headings,
+            'contents' => $contents,
         ];
 
         // Eğer data varsa ekle
