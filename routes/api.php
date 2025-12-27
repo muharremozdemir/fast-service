@@ -68,4 +68,5 @@ Route::get('user', function (Request $request) {
 
 Route::post('send-sms-for-login', [\App\Http\Controllers\Api\AuthController::class, 'sendSmsForLogin']);
 Route::post('verify-otp', [\App\Http\Controllers\Api\AuthController::class, 'verifyOtp']);
+Route::get('me', [\App\Http\Controllers\Api\AuthController::class, 'me'])->middleware('auth:api');
 Route::post('save-subscription-id', [\App\Http\Controllers\Api\AuthController::class, 'saveSubscriptionId'])->middleware('auth:api');

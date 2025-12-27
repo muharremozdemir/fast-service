@@ -8,6 +8,7 @@ use App\Services\NetGsmService;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -216,5 +217,17 @@ class AuthController extends Controller
             Log::error('SMS Gönderiminde Hata: ' . $e->getMessage());
             return false;
         }
+    }
+
+    public function me()
+    {
+        $user = Auth::user();
+
+        return response()->json([
+            "status" => "success",
+            "data" => [
+                "user" => $user
+            ]
+        ]);
     }
 }
