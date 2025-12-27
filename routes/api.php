@@ -70,3 +70,10 @@ Route::post('send-sms-for-login', [\App\Http\Controllers\Api\AuthController::cla
 Route::post('verify-otp', [\App\Http\Controllers\Api\AuthController::class, 'verifyOtp']);
 Route::get('me', [\App\Http\Controllers\Api\AuthController::class, 'me'])->middleware('auth:api');
 Route::post('save-subscription-id', [\App\Http\Controllers\Api\AuthController::class, 'saveSubscriptionId'])->middleware('auth:api');
+
+// User Availability Routes
+Route::prefix('user/availability')->middleware('auth:api')->group(function () {
+    Route::put('status', [\App\Http\Controllers\Api\UserAvailabilityController::class, 'updateStatus']);
+    Route::get('status', [\App\Http\Controllers\Api\UserAvailabilityController::class, 'getStatus']);
+    Route::get('statuses', [\App\Http\Controllers\Api\UserAvailabilityController::class, 'getAvailableStatuses']);
+});
