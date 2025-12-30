@@ -63,7 +63,7 @@ class AvailabilityService
     protected function sendAvailabilityNotification(User $user, string $status): void
     {
         // Kullanıcının subscription_id (OneSignal player ID) yoksa bildirim gönderme
-        if (!$user->subscription_id) {
+        if (!$user->player_id) {
             Log::info('Kullanıcının subscription_id yok, bildirim gönderilmedi', [
                 'user_id' => $user->id,
             ]);
