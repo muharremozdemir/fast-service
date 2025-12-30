@@ -177,7 +177,7 @@ class CompanyController extends Controller
         setPermissionsTeamId($company->id);
         $hotelAdminRoleWeb = Role::firstOrCreate(
             [
-                'name' => 'hotel-admin',
+                'name' => 'Hotel Admin',
                 'guard_name' => 'web',
                 'company_id' => $company->id,
             ]

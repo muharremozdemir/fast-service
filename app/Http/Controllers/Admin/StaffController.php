@@ -25,7 +25,7 @@ class StaffController extends Controller
             ->where('company_id', Auth::user()->company_id)
             ->when($q, function ($query, $q) {
                 $query->where(function ($query) use ($q) {
-                    $query->where('name', 'like', "%{$q}%")
+                    $query->where('name_surname', 'like', "%{$q}%")
                           ->orWhere('email', 'like', "%{$q}%")
                           ->orWhere('phone', 'like', "%{$q}%");
                 });
@@ -33,7 +33,7 @@ class StaffController extends Controller
 
         // Sıralama
         if ($sort === 'name') {
-            $query->orderBy('name');
+            $query->orderBy('name_surname');
         } elseif ($sort === 'created_desc') {
             $query->orderBy('created_at', 'desc');
         } elseif ($sort === 'created_asc') {
@@ -112,7 +112,7 @@ class StaffController extends Controller
         // Rolleri ata
         if ($request->has('roles')) {
             setPermissionsTeamId(Auth::user()->company_id);
-            
+
             $roles = Role::where('company_id', Auth::user()->company_id)
                 ->whereIn('id', $request->input('roles'))
                 ->get();
@@ -186,7 +186,7 @@ class StaffController extends Controller
 
         // Rolleri güncelle
         setPermissionsTeamId(Auth::user()->company_id);
-        
+
         // Mevcut rolleri kaldır
         $user->roles()->detach();
 
