@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Mail\OtpMail;
+use App\Services\NetGsmService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -16,6 +17,13 @@ use Spatie\Permission\Models\Role;
 
 class LoginController extends Controller
 {
+    private NetGsmService $netGsmService;
+
+    public function __construct(NetGsmService $netGsmService)
+    {
+        $this->netGsmService = $netGsmService;
+    }
+
     public function showLoginForm()
     {
         return view('auth.login');
@@ -76,7 +84,7 @@ class LoginController extends Controller
             'updated_at' => now(),
         ]);
 
-        netGsmSendSms([$phone], $otpCode);
+        $this->netGsmService->send([$phone], $otpCode);
 
         // Email ile OTP gönder
         //try {
