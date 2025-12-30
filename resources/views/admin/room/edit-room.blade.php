@@ -86,14 +86,16 @@
                     </div>
                     
                     <div class="fv-row mb-7">
-                        <label class="fs-6 fw-semibold mb-2">Görevli</label>
-                        <select name="user_id" class="form-select form-select-solid">
-                            <option value="">Görevli Seçin (Opsiyonel)</option>
-                            @foreach($staff as $user)
-                                <option value="{{ $user->id }}" {{ old('user_id', $room->user_id) == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
-                            @endforeach
-                        </select>
-                        <div class="text-muted fs-7 mt-1">Bu odaya atanacak görevliyi seçin.</div>
+                        <label class="fs-6 fw-semibold mb-2">Kategoriler ve Görevliler</label>
+                        <div id="categories-container">
+                            <div class="mb-3">
+                                <button type="button" class="btn btn-sm btn-primary" id="add-category-btn">
+                                    <i class="fas fa-plus"></i> Kategori Ekle
+                                </button>
+                            </div>
+                            <div id="category-items"></div>
+                        </div>
+                        <div class="text-muted fs-7 mt-1">Her kategori için o kategorideki görevlileri seçebilirsiniz. Birden fazla kategori ekleyebilirsiniz.</div>
                     </div>
                     
                     <div class="fv-row mb-7">
@@ -120,4 +122,153 @@
 </div>
 <!--end::Content-->
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const categories = @json($categories);
+    const assignedCategoryUsers = @json($assignedCategoryUsers ?? []);
+    let categoryCounter = 0;
+    const selectedCategories = new Set();
+
+    function addCategoryItem(categoryId = null, selectedUserIds = []) {
+        const currentIndex = categoryCounter++;
+        const itemId = `category_${currentIndex}`;
+        const categoryItem = document.createElement('div');
+        categoryItem.className = 'card mb-3';
+        categoryItem.id = itemId;
+        categoryItem.dataset.index = currentIndex;
+        
+        const availableCategories = categories.filter(cat => !selectedCategories.has(cat.id) || cat.id == categoryId);
+        const selectedCategory = categoryId ? categories.find(cat => cat.id == categoryId) : null;
+        
+        if (selectedCategory) {
+            selectedCategories.add(selectedCategory.id);
+        }
+        
+        categoryItem.innerHTML = `
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0">Kategori ve Görevliler</h6>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removeCategoryItem('${itemId}')">
+                        <i class="fas fa-times"></i> Kaldır
+                    </button>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Kategori</label>
+                    <select name="category_users[${currentIndex}][category_id]" class="form-select category-select" onchange="loadUsersForCategory(this, '${itemId}', ${currentIndex})" required>
+                        <option value="">Kategori Seçin</option>
+                        ${availableCategories.map(cat => 
+                            `<option value="${cat.id}" ${cat.id == categoryId ? 'selected' : ''}>${cat.name}</option>`
+                        ).join('')}
+                    </select>
+                </div>
+                <div class="users-container" id="users_${itemId}">
+                    ${selectedCategory ? '<div class="text-center"><span class="spinner-border spinner-border-sm"></span> Yükleniyor...</div>' : '<div class="text-muted text-center">Lütfen bir kategori seçin.</div>'}
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('category-items').appendChild(categoryItem);
+        
+        if (selectedCategory) {
+            loadUsersForCategory(categoryItem.querySelector('.category-select'), itemId, selectedUserIds, currentIndex);
+        }
+    }
+
+    window.removeCategoryItem = function(itemId) {
+        const item = document.getElementById(itemId);
+        const select = item.querySelector('.category-select');
+        if (select && select.value) {
+            selectedCategories.delete(parseInt(select.value));
+        }
+        item.remove();
+    };
+
+    window.loadUsersForCategory = function(selectElement, itemId, selectedUserIds = [], categoryIndex = null) {
+        const categoryId = selectElement.value;
+        const usersContainer = document.getElementById(`users_${itemId}`);
+        const previousCategoryId = selectElement.dataset.previousCategoryId;
+        
+        if (previousCategoryId && previousCategoryId != categoryId) {
+            selectedCategories.delete(parseInt(previousCategoryId));
+        }
+        
+        if (categoryId) {
+            selectedCategories.add(parseInt(categoryId));
+            selectElement.dataset.previousCategoryId = categoryId;
+        }
+        
+        if (!categoryId) {
+            usersContainer.innerHTML = '<div class="text-muted text-center">Lütfen bir kategori seçin.</div>';
+            return;
+        }
+
+        // Index'i item'dan al
+        if (categoryIndex === null) {
+            const item = document.getElementById(itemId);
+            categoryIndex = item ? parseInt(item.dataset.index) : 0;
+        }
+
+        usersContainer.innerHTML = '<div class="text-center"><span class="spinner-border spinner-border-sm"></span> Yükleniyor...</div>';
+
+        fetch(`{{ route('admin.rooms.usersByCategory') }}?category_id=${categoryId}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response data:', data);
+            if (data.success && data.users && data.users.length > 0) {
+                // selectedUserIds'in array olduğundan emin ol
+                const selectedIds = Array.isArray(selectedUserIds) ? selectedUserIds : [];
+                let html = '<div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">';
+                data.users.forEach(user => {
+                    const isChecked = selectedIds.includes(user.id);
+                    html += `
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="category_users[${categoryIndex}][user_ids][]" value="${user.id}" id="user_${itemId}_${user.id}" ${isChecked ? 'checked' : ''}>
+                            <label class="form-check-label" for="user_${itemId}_${user.id}">
+                                ${user.name} ${user.email ? '(' + user.email + ')' : ''}
+                            </label>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                usersContainer.innerHTML = html;
+            } else {
+                usersContainer.innerHTML = '<div class="text-muted text-center">Bu kategoride görevli bulunamadı.</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            usersContainer.innerHTML = '<div class="text-danger text-center">Kullanıcılar yüklenirken bir hata oluştu: ' + error.message + '</div>';
+        });
+    };
+
+    document.getElementById('add-category-btn').addEventListener('click', function() {
+        addCategoryItem();
+    });
+
+    // Mevcut atanmış kategorileri yükle
+    Object.keys(assignedCategoryUsers).forEach(categoryId => {
+        addCategoryItem(parseInt(categoryId), assignedCategoryUsers[categoryId]);
+    });
+
+    // Eğer hiç kategori yoksa, bir tane ekle
+    if (Object.keys(assignedCategoryUsers).length === 0) {
+        addCategoryItem();
+    }
+});
+</script>
+@endpush
+
 

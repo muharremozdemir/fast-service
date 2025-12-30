@@ -9,30 +9,32 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('products', function (Blueprint $table) {
+        Schema::create('blocks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')
                 ->nullable()
                 ->constrained('companies')
                 ->onDelete('cascade');
-            $table->foreignId('category_id')->constrained()->onDelete('cascade');
-            $table->string('name');
-            $table->string('slug')->unique();
+
+            $table->string('name'); // Blok adı (örn: "A Blok", "B Blok", "Ana Bina")
+            $table->string('block_code')->unique()->nullable(); // Blok kodu (örn: "A", "B", "MAIN")
             $table->text('description')->nullable();
-            $table->decimal('price', 10, 2);
-            $table->string('image')->nullable();
-            $table->enum('type', ['sale', 'service'])->default('sale');
             $table->boolean('is_active')->default(true);
+            $table->unsignedInteger('sort_order')->default(0);
+            $table->softDeletes();
             $table->timestamps();
+
+            $table->index(['is_active', 'sort_order']);
         });
     }
+
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('products');
+        Schema::dropIfExists('blocks');
     }
 };

@@ -28,7 +28,7 @@ class LoginController extends Controller
         ]);
 
         // Telefon numarasını temizle (sadece rakamlar)
-        $phone = preg_replace('/[^0-9]/', '', $request->phone);
+        $phone = "+9".str_replace('', '', $request->phone);
 
         // Kullanıcıyı bul
         $user = User::where('phone', $phone)->first();
@@ -126,9 +126,6 @@ class LoginController extends Controller
         if (!$phone) {
             return redirect()->route('auth.login');
         }
-
-        // Telefon numarasını temizle
-        $phone = preg_replace('/[^0-9]/', '', $phone);
 
         // OTP kodunu kontrol et
         $otp = DB::table('otp_codes')

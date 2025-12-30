@@ -57,6 +57,11 @@ class Company extends Model
         return $this->hasMany(Product::class);
     }
 
+    public function departments()
+    {
+        return $this->hasMany(Department::class);
+    }
+
     /**
      * Lisansın kalan gün sayısını döndürür
      */

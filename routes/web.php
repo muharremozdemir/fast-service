@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\RoleController as AdminRoleController;
 use App\Http\Controllers\Admin\StaffController as AdminStaffController;
+use App\Http\Controllers\Admin\DepartmentController as AdminDepartmentController;
 
 // Site
 use App\Http\Controllers\Site\SiteHomeController;
@@ -119,14 +120,15 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAut
     Route::get('/rooms', [AdminRoomController::class, 'index'])->name('rooms.index');
     Route::get('/rooms/create', [AdminRoomController::class, 'create'])->name('rooms.create');
     Route::post('/rooms/store', [AdminRoomController::class, 'store'])->name('rooms.store');
-    Route::get('/rooms/{id}', [AdminRoomController::class, 'show'])->name('rooms.show');
-    Route::get('/rooms/edit/{id}', [AdminRoomController::class, 'edit'])->name('rooms.edit');
-    Route::post('/rooms/update/{id}', [AdminRoomController::class, 'update'])->name('rooms.update');
-    Route::delete('/rooms/{room}', [AdminRoomController::class, 'destroy'])->name('rooms.destroy');
+    Route::get('/rooms/users-by-category', [AdminRoomController::class, 'getUsersByCategory'])->name('rooms.usersByCategory');
     Route::post('/rooms/bulk-assign-staff', [AdminRoomController::class, 'bulkAssignStaff'])->name('rooms.bulkAssignStaff');
+    Route::post('/rooms/bulk-print-qr', [AdminRoomController::class, 'bulkPrintQr'])->name('rooms.bulkPrintQr');
     Route::get('/rooms/{id}/qr-code', [AdminRoomController::class, 'generateQrCode'])->name('rooms.qr-code');
     Route::get('/rooms/{id}/qr-code/download', [AdminRoomController::class, 'downloadQrCode'])->name('rooms.qr-code.download');
-    Route::post('/rooms/bulk-print-qr', [AdminRoomController::class, 'bulkPrintQr'])->name('rooms.bulkPrintQr');
+    Route::get('/rooms/edit/{id}', [AdminRoomController::class, 'edit'])->name('rooms.edit');
+    Route::post('/rooms/update/{id}', [AdminRoomController::class, 'update'])->name('rooms.update');
+    Route::get('/rooms/{id}', [AdminRoomController::class, 'show'])->name('rooms.show');
+    Route::delete('/rooms/{room}', [AdminRoomController::class, 'destroy'])->name('rooms.destroy');
 
     // Reports (Raporlar)
     Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
@@ -157,6 +159,14 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAut
     Route::post('/staff/store', [AdminStaffController::class, 'store'])->name('staff.store');
     Route::get('/staff/edit/{id}', [AdminStaffController::class, 'edit'])->name('staff.edit');
     Route::put('/staff/update/{id}', [AdminStaffController::class, 'update'])->name('staff.update');
+
+    // Departments (Departmanlar)
+    Route::get('/departments', [AdminDepartmentController::class, 'index'])->name('departments.index');
+    Route::get('/departments/create', [AdminDepartmentController::class, 'create'])->name('departments.create');
+    Route::post('/departments/store', [AdminDepartmentController::class, 'store'])->name('departments.store');
+    Route::get('/departments/edit/{id}', [AdminDepartmentController::class, 'edit'])->name('departments.edit');
+    Route::put('/departments/update/{id}', [AdminDepartmentController::class, 'update'])->name('departments.update');
+    Route::delete('/departments/{id}', [AdminDepartmentController::class, 'destroy'])->name('departments.destroy');
 
 });
 

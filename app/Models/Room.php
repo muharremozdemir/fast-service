@@ -40,6 +40,20 @@ class Room extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'room_user')
+            ->withPivot('category_id')
+            ->withTimestamps();
+    }
+
+    public function usersByCategory($categoryId)
+    {
+        return $this->belongsToMany(User::class, 'room_user')
+            ->wherePivot('category_id', $categoryId)
+            ->withTimestamps();
+    }
+
     public function qrSticker()
     {
         return $this->hasOne(QrSticker::class);

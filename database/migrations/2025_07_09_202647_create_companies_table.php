@@ -19,7 +19,10 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->string('tax_number')->nullable();
             $table->string('tax_office')->nullable();
+            $table->string('logo_path')->nullable();
+            $table->enum('logo_type', ['fast_service', 'company'])->default('fast_service');
             $table->boolean('is_active')->default(true);
+            $table->date('license_expires_at')->nullable();
             $table->timestamps();
         });
     }

@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')
+                ->nullable()
+                ->constrained('companies')
+                ->onDelete('cascade');
+
             $table->foreignId('floor_id')->constrained('floors')->onDelete('cascade');
             $table->string('room_number'); // Oda numarası (örn: "101", "201A")
             $table->string('name')->nullable(); // Oda adı (opsiyonel)
@@ -21,9 +26,6 @@ return new class extends Migration
             $table->unsignedInteger('sort_order')->default(0);
             $table->softDeletes();
             $table->timestamps();
-            
-            $table->unique(['floor_id', 'room_number']); // Aynı katta aynı oda numarası olamaz
-            $table->index(['floor_id', 'is_active']);
         });
     }
 

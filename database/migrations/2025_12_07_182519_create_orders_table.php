@@ -13,16 +13,20 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')
+                ->constrained('companies')
+                ->onDelete('cascade');
+
+            $table->foreignId('room_id')
+                ->constrained('rooms');
+
             $table->string('room_number');
             $table->string('order_number')->unique();
             $table->enum('status', ['pending', 'preparing', 'completed', 'cancelled'])->default('pending');
-            $table->decimal('total', 10, 2);
+            $table->decimal('total', 10);
             $table->text('notes')->nullable();
+            $table->timestamp('closed_at')->nullable();
             $table->timestamps();
-            
-            $table->index('room_number');
-            $table->index('order_number');
-            $table->index('status');
         });
     }
 

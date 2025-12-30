@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\User;
+use App\Services\NetGsmService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
@@ -12,6 +13,13 @@ use Spatie\Permission\Models\Permission;
 
 class CompanyController extends Controller
 {
+    private NetGsmService $netGsmService;
+
+    public function __construct(NetGsmService $netGsmService)
+    {
+        $this->netGsmService = $netGsmService;
+    }
+
     public function index(Request $request)
     {
         $q = $request->input('q');
@@ -147,7 +155,7 @@ class CompanyController extends Controller
         $company = new Company();
         $company->name = $request->input('name');
         $company->email = $request->input('email');
-        $company->phone = $request->input('phone');
+        $company->phone = "+9".str_replace(" ", "", $request->input('phone'));
         $company->address = $request->input('address');
         $company->tax_number = $request->input('tax_number');
         $company->tax_office = $request->input('tax_office');
@@ -157,9 +165,9 @@ class CompanyController extends Controller
 
         // Yönetici kullanıcı oluştur
         $admin = new User();
-        $admin->name = $request->input('admin_name');
+        $admin->name_surname = $request->input('admin_name');
         $admin->email = $request->input('admin_email');
-        $admin->phone = $request->input('admin_phone');
+        $admin->phone = "+9".str_replace(" ", "", $request->input('admin_phone'));
         $admin->company_id = $company->id;
         // Rastgele şifre oluştur (12 karakter, büyük/küçük harf, rakam ve özel karakter)
         $admin->password = \Illuminate\Support\Str::random(12);
@@ -200,6 +208,10 @@ class CompanyController extends Controller
         if (!$admin->hasPermissionTo($receptionPermission)) {
             $admin->givePermissionTo($receptionPermission);
         }
+
+        $message = "Sayın {$admin->name_surname}; \nHotel Fast Service programında şirketiniz başarıyla açılmıştır. Gerekli kurulumlar için teknik ekip yardımcı olacaktır.";
+
+        $this->netGsmService->send([$admin->phone], $message);
 
         return redirect()->route('admin.companies.index')->with('success', 'Şirket ve yönetici kullanıcı başarıyla oluşturuldu. Yönetici girişi SMS ile gönderilecek OTP kodu ile yapılacaktır. SMS ulaşmazsa email ile gönderilecektir.');
     }

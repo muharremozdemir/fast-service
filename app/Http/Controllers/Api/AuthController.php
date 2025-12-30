@@ -118,7 +118,7 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $user->subscription_id = $request->subscription_id;
+        $user->player_id = $request->subscription_id;
         $user->save();
 
         return response()->json([
@@ -126,7 +126,7 @@ class AuthController extends Controller
             'message' => 'Subscription ID başarıyla kaydedildi.',
             'user' => [
                 'id' => $user->id,
-                'subscription_id' => $user->subscription_id,
+                'subscription_id' => $user->player_id,
             ]
         ]);
     }

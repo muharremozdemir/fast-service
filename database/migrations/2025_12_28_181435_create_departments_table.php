@@ -11,17 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('blocks', function (Blueprint $table) {
+        Schema::create('departments', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // Blok adı (örn: "A Blok", "B Blok", "Ana Bina")
-            $table->string('block_code')->unique()->nullable(); // Blok kodu (örn: "A", "B", "MAIN")
+            $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
+            $table->string('name');
             $table->text('description')->nullable();
             $table->boolean('is_active')->default(true);
-            $table->unsignedInteger('sort_order')->default(0);
-            $table->softDeletes();
             $table->timestamps();
-            
-            $table->index(['is_active', 'sort_order']);
+
+            $table->index(['company_id', 'is_active']);
         });
     }
 
@@ -30,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('blocks');
+        Schema::dropIfExists('departments');
     }
 };

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Room;
 use App\Models\Floor;
 use App\Models\User;
+use App\Models\Category;
 use App\Models\QrSticker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,7 +29,7 @@ class RoomController extends Controller
     
         $query = Room::query()
             ->where('company_id', Auth::user()->company_id)
-            ->with(['floor', 'user'])
+            ->with(['floor', 'users'])
             ->withCount('orders')
             ->when($q, function ($query, $q) {
                 $query->where(function ($query) use ($q) {
@@ -70,17 +71,30 @@ class RoomController extends Controller
     {
         $companyId = Auth::user()->company_id;
         $floors = Floor::where('company_id', $companyId)->where('is_active', true)->orderBy('floor_number')->get();
-        $staff = User::where('company_id', $companyId)->orderBy('name')->get();
-        return view('admin.room.add-room', compact('floors', 'staff'));
+        $categories = Category::where('company_id', $companyId)->where('is_active', true)->orderBy('name')->get();
+        return view('admin.room.add-room', compact('floors', 'categories'));
     }
 
     public function edit($id)
     {
         $companyId = Auth::user()->company_id;
-        $room = Room::where('company_id', $companyId)->with('floor')->findOrFail($id);
+        $room = Room::where('company_id', $companyId)->with(['floor', 'users'])->findOrFail($id);
         $floors = Floor::where('company_id', $companyId)->where('is_active', true)->orderBy('floor_number')->get();
-        $staff = User::where('company_id', $companyId)->orderBy('name')->get();
-        return view('admin.room.edit-room', compact('room', 'floors', 'staff'));
+        $categories = Category::where('company_id', $companyId)->where('is_active', true)->orderBy('name')->get();
+        
+        // Odaya atanmış kullanıcıları kategori bazında grupla
+        $assignedCategoryUsers = [];
+        foreach ($room->users as $user) {
+            $categoryId = $user->pivot->category_id;
+            if ($categoryId) {
+                if (!isset($assignedCategoryUsers[$categoryId])) {
+                    $assignedCategoryUsers[$categoryId] = [];
+                }
+                $assignedCategoryUsers[$categoryId][] = $user->id;
+            }
+        }
+        
+        return view('admin.room.edit-room', compact('room', 'floors', 'categories', 'assignedCategoryUsers'));
     }
 
     public function update(Request $request, $id)
@@ -92,7 +106,10 @@ class RoomController extends Controller
             'description' => 'nullable|string',
             'sort_order' => 'nullable|integer',
             'is_active' => 'required|boolean',
-            'user_id' => 'nullable|exists:users,id',
+            'category_users' => 'nullable|array',
+            'category_users.*.category_id' => 'required|exists:categories,id',
+            'category_users.*.user_ids' => 'nullable|array',
+            'category_users.*.user_ids.*' => 'exists:users,id',
         ]);
 
         $room = Room::where('company_id', Auth::user()->company_id)->findOrFail($id);
@@ -117,9 +134,24 @@ class RoomController extends Controller
         $room->description = $request->input('description');
         $room->is_active = $request->input('is_active', 0);
         $room->sort_order = $request->input('sort_order', 0);
-        $room->user_id = $request->input('user_id');
 
         $room->save();
+
+        // Tüm kategori bazlı kullanıcı atamalarını kaldır
+        $room->users()->detach();
+
+        // Yeni kategori bazlı kullanıcı atamalarını yap
+        $categoryUsers = $request->input('category_users', []);
+        foreach ($categoryUsers as $categoryUser) {
+            $categoryId = $categoryUser['category_id'] ?? null;
+            $userIds = $categoryUser['user_ids'] ?? [];
+            
+            if ($categoryId && !empty($userIds)) {
+                foreach ($userIds as $userId) {
+                    $room->users()->attach($userId, ['category_id' => $categoryId]);
+                }
+            }
+        }
 
         return redirect()
             ->route('admin.rooms.edit', $room->id)
@@ -135,7 +167,10 @@ class RoomController extends Controller
             'description' => 'nullable|string',
             'sort_order' => 'nullable|integer',
             'is_active' => 'required|boolean',
-            'user_id' => 'nullable|exists:users,id',
+            'category_users' => 'nullable|array',
+            'category_users.*.category_id' => 'required|exists:categories,id',
+            'category_users.*.user_ids' => 'nullable|array',
+            'category_users.*.user_ids.*' => 'exists:users,id',
         ]);
 
         // Aynı katta aynı oda numarası kontrolü
@@ -158,10 +193,22 @@ class RoomController extends Controller
         $room->description = $request->input('description');
         $room->sort_order = $request->input('sort_order', 0);
         $room->is_active = $request->input('is_active');
-        $room->user_id = $request->input('user_id');
         $room->company_id = Auth::user()->company_id;
 
         $room->save();
+
+        // Kategori bazlı kullanıcı atamalarını yap
+        $categoryUsers = $request->input('category_users', []);
+        foreach ($categoryUsers as $categoryUser) {
+            $categoryId = $categoryUser['category_id'] ?? null;
+            $userIds = $categoryUser['user_ids'] ?? [];
+            
+            if ($categoryId && !empty($userIds)) {
+                foreach ($userIds as $userId) {
+                    $room->users()->attach($userId, ['category_id' => $categoryId]);
+                }
+            }
+        }
 
         return redirect()->route('admin.rooms.index')->with('success', 'Oda başarıyla eklendi.');
     }
@@ -337,5 +384,32 @@ class RoomController extends Controller
         }
 
         return view('admin.room.bulk-print-qr', compact('qrCodes', 'company'));
+    }
+
+    /**
+     * Get users by category ID
+     */
+    public function getUsersByCategory(Request $request)
+    {
+        $request->validate([
+            'category_id' => 'required|exists:categories,id',
+        ]);
+
+        $companyId = Auth::user()->company_id;
+        $categoryId = $request->input('category_id');
+
+        // Kategoriye ait kullanıcıları getir
+        $category = Category::where('company_id', $companyId)
+            ->findOrFail($categoryId);
+
+        $users = $category->users()
+            ->where('users.company_id', $companyId)
+            ->orderBy('users.name')
+            ->get(['users.id', 'users.name', 'users.email']);
+
+        return response()->json([
+            'success' => true,
+            'users' => $users,
+        ]);
     }
 }

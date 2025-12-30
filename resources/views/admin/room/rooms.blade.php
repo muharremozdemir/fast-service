@@ -67,7 +67,7 @@
                             <label class="form-label fw-semibold">Görevli Seç:</label>
                             <select class="form-select form-select-solid" id="bulkStaffSelect" data-kt-select2="true" data-placeholder="Görevli seçin">
                                 <option value="">Görevli Seçin</option>
-                                @foreach(\App\Models\User::orderBy('name')->get() as $user)
+                                @foreach(\App\Models\User::orderBy('name_surname')->get() as $user)
                                     <option value="{{ $user->id }}">{{ $user->name }}</option>
                                 @endforeach
                             </select>
@@ -180,8 +180,10 @@
                                     <span class="badge badge-light-primary">{{ $room->floor->name }}</span>
                                 </td>
                                 <td>
-                                    @if($room->user)
-                                        <span class="badge badge-light-info">{{ $room->user->name }}</span>
+                                    @if($room->users && $room->users->count() > 0)
+                                        @foreach($room->users as $user)
+                                            <span class="badge badge-light-info me-1">{{ $user->name }}</span>
+                                        @endforeach
                                     @else
                                         <span class="text-muted">Atanmamış</span>
                                     @endif
@@ -224,7 +226,7 @@
                         @endforelse
                     </tbody>
                 </table>
-                
+
                 @if ($rooms->hasPages())
                 <div class="d-flex justify-content-between align-items-center mt-5">
                     <div>
@@ -290,7 +292,7 @@
                 const selectedIds = Array.from(roomCheckboxes)
                     .filter(cb => cb.checked)
                     .map(cb => cb.value);
-                
+
                 if (selectedIds.length === 0) {
                     alert('Lütfen en az bir oda seçin.');
                     return;
@@ -334,7 +336,7 @@
                 const selectedIds = Array.from(roomCheckboxes)
                     .filter(cb => cb.checked)
                     .map(cb => cb.value);
-                
+
                 if (selectedIds.length === 0) {
                     alert('Lütfen yazdırmak istediğiniz odaları seçin.');
                     return;
@@ -344,7 +346,7 @@
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = '{{ route("admin.rooms.bulkPrintQr") }}';
-                
+
                 // Add CSRF token
                 const csrfInput = document.createElement('input');
                 csrfInput.type = 'hidden';

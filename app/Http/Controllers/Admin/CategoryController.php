@@ -18,7 +18,7 @@ class CategoryController extends Controller
     
         $categories = Category::query()
             ->where('company_id', Auth::user()->company_id)
-            ->with(['user'])
+            ->with(['users'])
             ->when($q, function ($query, $q) {
                 $query->where(function ($query) use ($q) {
                     $query->where('name', 'like', "%{$q}%")
@@ -46,7 +46,7 @@ class CategoryController extends Controller
 
     public function edit($id)
     {
-        $category = Category::where('company_id', Auth::user()->company_id)->findOrFail($id);
+        $category = Category::where('company_id', Auth::user()->company_id)->with('users')->findOrFail($id);
         $staff = User::where('company_id', Auth::user()->company_id)->orderBy('name')->get();
         return view('admin.category.edit-category', compact('category', 'staff'));
     }
@@ -58,29 +58,31 @@ class CategoryController extends Controller
             'description' => 'nullable|string',
             'sort_order' => 'nullable|integer',
             'is_active' => 'required|in:0,1',
-            'user_id' => [
-                'nullable',
-                'exists:users,id',
-                function ($attribute, $value, $fail) {
-                    if ($value) {
-                        $user = User::find($value);
-                        if ($user && $user->company_id !== Auth::user()->company_id) {
-                            $fail('Seçilen personel sizin şirketinize ait değil.');
-                        }
-                    }
-                },
-            ],
+            'user_ids' => 'nullable|array',
+            'user_ids.*' => 'exists:users,id',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $category = Category::where('company_id', Auth::user()->company_id)->findOrFail($id);
+
+        // Seçilen kullanıcıların şirkete ait olduğunu kontrol et
+        $userIds = $request->input('user_ids', []);
+        if (!empty($userIds)) {
+            $invalidUsers = User::whereIn('id', $userIds)
+                ->where('company_id', '!=', Auth::user()->company_id)
+                ->exists();
+            if ($invalidUsers) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Seçilen personellerden biri veya birkaçı sizin şirketinize ait değil.');
+            }
+        }
 
         $category->name = $request->input('category_name');
         $category->slug = \Str::slug($category->name);
         $category->description = $request->input('description');
         $category->is_active = (int) $request->input('is_active', 0);
         $category->sort_order = (int) $request->input('sort_order', 0);
-        $category->user_id = $request->input('user_id') ?: null;
 
         if ($request->hasFile('image')) {
             // Eski görseli sil
@@ -92,6 +94,9 @@ class CategoryController extends Controller
         }
 
         $category->save();
+
+        // Görevlileri güncelle
+        $category->users()->sync($userIds);
 
         return redirect()
             ->route('admin.categories.index')
@@ -105,20 +110,23 @@ class CategoryController extends Controller
             'description' => 'nullable|string',
             'sort_order' => 'nullable|integer',
             'is_active' => 'required|in:0,1',
-            'user_id' => [
-                'nullable',
-                'exists:users,id',
-                function ($attribute, $value, $fail) {
-                    if ($value) {
-                        $user = User::find($value);
-                        if ($user && $user->company_id !== Auth::user()->company_id) {
-                            $fail('Seçilen personel sizin şirketinize ait değil.');
-                        }
-                    }
-                },
-            ],
+            'user_ids' => 'nullable|array',
+            'user_ids.*' => 'exists:users,id',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
+
+        // Seçilen kullanıcıların şirkete ait olduğunu kontrol et
+        $userIds = $request->input('user_ids', []);
+        if (!empty($userIds)) {
+            $invalidUsers = User::whereIn('id', $userIds)
+                ->where('company_id', '!=', Auth::user()->company_id)
+                ->exists();
+            if ($invalidUsers) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Seçilen personellerden biri veya birkaçı sizin şirketinize ait değil.');
+            }
+        }
 
         $category = new Category();
         $category->name = $request->input('name');
@@ -126,7 +134,6 @@ class CategoryController extends Controller
         $category->description = $request->input('description');
         $category->sort_order = (int) $request->input('sort_order', 0);
         $category->is_active = (int) $request->input('is_active');
-        $category->user_id = $request->input('user_id') ?: null;
         $category->company_id = Auth::user()->company_id;
 
         if ($request->hasFile('image')) {
@@ -135,6 +142,11 @@ class CategoryController extends Controller
         }
 
         $category->save();
+
+        // Görevlileri ata
+        if (!empty($userIds)) {
+            $category->users()->attach($userIds);
+        }
 
         return redirect()
             ->route('admin.categories.index')

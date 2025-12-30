@@ -20,12 +20,12 @@ class User extends Authenticatable implements JWTSubject
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'name_surname',
         'email',
         'password',
         'phone',
         'company_id',
-        'subscription_id',
+        'player_id',
         'availability_status',
     ];
 
@@ -72,6 +72,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(Company::class);
     }
 
+    public function departments()
+    {
+        return $this->belongsToMany(Department::class, 'department_user');
+    }
+
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
@@ -91,7 +96,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return [
             'company_id' => $this->company_id,
-            'name' => $this->name,
+            'name_surname' => $this->name_surname,
             'email' => $this->email,
             'phone' => $this->phone,
         ];

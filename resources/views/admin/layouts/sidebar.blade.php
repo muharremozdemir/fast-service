@@ -415,33 +415,47 @@
                                         <!--end:Menu item-->
                                     @endif
 
-                                    <!--begin:Menu item-->
-                                    <div class="menu-item">
-                                        <a class="menu-link" href="{{ route('admin.settings.index') }}">
-                                            <span class="menu-icon">
-                                                <i class="ki-duotone ki-setting-2 fs-2">
-                                                    <span class="path1"></span>
-                                                    <span class="path2"></span>
-                                                    <span class="path3"></span>
-                                                </i>
-                                            </span>
-                                            <span class="menu-title">Ayarlar</span>
-                                        </a>
-                                    </div>
-                                    <!--end:Menu item-->
+                                        <!--begin:Menu item-->
+                                        <div class="menu-item">
+                                            <a class="menu-link" href="{{ route('admin.settings.index') }}">
+                                                <span class="menu-icon">
+                                                    <i class="ki-duotone ki-setting-2 fs-2">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                        <span class="path3"></span>
+                                                    </i>
+                                                </span>
+                                                <span class="menu-title">Ayarlar</span>
+                                            </a>
+                                        </div>
+                                        <!--end:Menu item-->
+
+                                        <!--begin:Menu item-->
+                                        <div class="menu-item">
+                                            <a class="menu-link" href="{{ route('admin.departments.index') }}">
+                                                <span class="menu-icon">
+                                                    <i class="ki-duotone ki-briefcase fs-2">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                    </i>
+                                                </span>
+                                                <span class="menu-title">Departmanlar</span>
+                                            </a>
+                                        </div>
+                                        <!--end:Menu item-->
 
                                         @if(auth()->user()->can('reception'))
                                             <!--begin:Menu item-->
                                             <div class="menu-item">
                                                 <a class="menu-link" href="{{ route('admin.roles.index') }}">
-                                            <span class="menu-icon">
-                                                <i class="ki-duotone ki-profile-user fs-2">
-                                                    <span class="path1"></span>
-                                                    <span class="path2"></span>
-                                                    <span class="path3"></span>
-                                                    <span class="path4"></span>
-                                                </i>
-                                            </span>
+                                                    <span class="menu-icon">
+                                                        <i class="ki-duotone ki-profile-user fs-2">
+                                                            <span class="path1"></span>
+                                                            <span class="path2"></span>
+                                                            <span class="path3"></span>
+                                                            <span class="path4"></span>
+                                                        </i>
+                                                    </span>
                                                     <span class="menu-title">Kullanıcı Rolleri</span>
                                                 </a>
                                             </div>
