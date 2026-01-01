@@ -71,4 +71,22 @@ class SettingsController extends Controller
             ->route('admin.settings.index')
             ->with('success', 'Ana renk başarıyla güncellendi.');
     }
+
+    /**
+     * Otel bilgilerini güncelle
+     */
+    public function updateHotelInfo(Request $request)
+    {
+        $request->validate([
+            'hotel_info' => 'nullable|string|max:5000',
+        ]);
+
+        $company = Company::where('id', Auth::user()->company_id)->firstOrFail();
+        $company->hotel_info = $request->input('hotel_info');
+        $company->save();
+
+        return redirect()
+            ->route('admin.settings.index')
+            ->with('success', 'Otel bilgileri başarıyla güncellendi.');
+    }
 }

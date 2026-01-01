@@ -21,6 +21,7 @@ class Company extends Model
         'logo_path',
         'logo_type',
         'primary_color',
+        'hotel_info',
     ];
 
     protected $casts = [

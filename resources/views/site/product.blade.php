@@ -8,6 +8,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <link rel="stylesheet" href="{{ asset('site/assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('site/assets/css/swiper-bundle.min.css') }}">
@@ -56,17 +59,29 @@
                             <li><a class="dropdown-item" href="#">Ipsum</a></li>
                         </ul>
                     </div>
+                    @if($company && $company->hotel_info)
+                    <button class="btn btn-light btn-fastservice" type="button" data-bs-toggle="modal" data-bs-target="#hotelInfoModal">
+                        <i class="fas fa-info-circle" style="font-size: 16px;"></i>
+                    </button>
+                    @endif
                 </div>
             </div>
             <div class="col-6">
                 <div class="logo h-100 d-flex align-items-center justify-content-center">
                     <a href="{{ route('site.home') }}">
-                        <img class="logo-img" src="{{ asset('site/assets/img/logo.png') }}" alt="Logo">
+                        @if($company && $company->logo_type === 'company' && $company->logo_path)
+                            <img class="logo-img" src="{{ asset('storage/' . $company->logo_path) }}" alt="Logo">
+                        @else
+                            <img class="logo-img" src="{{ asset('site/assets/img/logo.png') }}" alt="Logo">
+                        @endif
                     </a>
                 </div>
             </div>
             <div class="col-3">
-                <div class="header-right d-flex align-items-center justify-content-end">
+                <div class="header-right d-flex align-items-center justify-content-end gap-2">
+                    <button class="btn btn-light btn-fastservice" type="button" data-bs-toggle="modal" data-bs-target="#announcementsModal">
+                        <i class="fas fa-bullhorn" style="font-size: 16px;"></i>
+                    </button>
                     <a href="{{ route('site.cart') }}" class="btn btn-light btn-fastservice">
                         <!-- sepet ikon svg -->
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -180,8 +195,324 @@
                     el.textContent = data.count || 0;
                 });
             });
+
+        // Load announcements when modal is shown
+        const announcementsModal = document.getElementById('announcementsModal');
+        if (announcementsModal) {
+            announcementsModal.addEventListener('show.bs.modal', function() {
+                loadAnnouncements();
+            });
+        }
     });
+
+    // Load announcements
+    function loadAnnouncements() {
+        const announcementsList = document.getElementById('announcements-list');
+        if (!announcementsList) return;
+        
+        announcementsList.innerHTML = `
+            <div class="loading-state">
+                <div class="spinner-custom"></div>
+                <p style="color: #6c757d; margin: 0; font-size: 14px;">Duyurular yükleniyor...</p>
+            </div>
+        `;
+
+        fetch('{{ route("site.announcements.index") }}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.announcements && data.announcements.length > 0) {
+                    let html = '';
+                    data.announcements.forEach(function(announcement, index) {
+                        const delay = index * 0.1;
+                        html += `
+                            <div class="announcement-card" style="animation: fadeInUp 0.4s ease ${delay}s both;">
+                                <div class="announcement-header">
+                                    <h6 class="announcement-title">${announcement.title}</h6>
+                                    <div class="announcement-date">
+                                        <i class="far fa-clock"></i>
+                                        <span>${announcement.published_at}</span>
+                                    </div>
+                                </div>
+                                <div class="announcement-content">
+                                    ${announcement.content}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    announcementsList.innerHTML = html;
+                } else {
+                    announcementsList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-bullhorn"></i>
+                            </div>
+                            <p class="empty-state-text">Henüz duyuru bulunmamaktadır.</p>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading announcements:', error);
+                announcementsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon" style="background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%); color: #dc3545;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <p class="empty-state-text" style="color: #dc3545;">Duyurular yüklenirken bir hata oluştu.</p>
+                    </div>
+                `;
+            });
+    }
 </script>
 
+<!-- Hotel Info Modal -->
+@if($company && $company->hotel_info)
+<div class="modal fade" id="hotelInfoModal" tabindex="-1" aria-labelledby="hotelInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0px 8px 32px rgba(0,0,0,0.12); overflow: hidden;">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-color, #4F46E5) 0%, rgba(79, 70, 229, 0.9) 100%); border: none; padding: 24px 28px;">
+                <h5 class="modal-title d-flex align-items-center" id="hotelInfoModalLabel" style="font-weight: 700; font-size: 20px; color: #ffffff; margin: 0;">
+                    <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                        <i class="fas fa-hotel" style="font-size: 18px;"></i>
+                    </div>
+                    <span>Otel Bilgileri</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="opacity: 0.9;"></button>
+            </div>
+            <div class="modal-body" style="padding: 28px; max-height: 65vh; overflow-y: auto; background: #ffffff; font-size: 15px; line-height: 1.8; color: #495057; white-space: pre-line;" id="hotel-info-modal-body">
+                <style>
+                    #hotel-info-modal-body::-webkit-scrollbar {
+                        width: 8px;
+                    }
+                    #hotel-info-modal-body::-webkit-scrollbar-track {
+                        background: #f1f1f1;
+                        border-radius: 10px;
+                    }
+                    #hotel-info-modal-body::-webkit-scrollbar-thumb {
+                        background: var(--primary-color, #4F46E5);
+                        border-radius: 10px;
+                        opacity: 0.5;
+                    }
+                    #hotel-info-modal-body::-webkit-scrollbar-thumb:hover {
+                        opacity: 0.8;
+                    }
+                    #hotel-info-modal-body p {
+                        margin-bottom: 14px;
+                        color: #495057;
+                    }
+                    #hotel-info-modal-body p:last-child {
+                        margin-bottom: 0;
+                    }
+                    #hotel-info-modal-body strong,
+                    #hotel-info-modal-body b {
+                        color: #1a1a1a;
+                        font-weight: 600;
+                    }
+                </style>
+                {!! nl2br(e($company->hotel_info)) !!}
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #e9ecef; padding: 20px 28px; background: #ffffff;">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" style="border-radius: 10px; padding: 10px 28px; font-weight: 600; background: var(--primary-color, #4F46E5); border: none;">
+                    <i class="fas fa-times me-2"></i>Kapat
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+<!-- Announcements Modal -->
+<div class="modal fade" id="announcementsModal" tabindex="-1" aria-labelledby="announcementsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0px 8px 32px rgba(0,0,0,0.12); overflow: hidden;">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-color, #4F46E5) 0%, rgba(79, 70, 229, 0.9) 100%); border: none; padding: 24px 28px;">
+                <h5 class="modal-title d-flex align-items-center" id="announcementsModalLabel" style="font-weight: 700; font-size: 20px; color: #ffffff; margin: 0;">
+                    <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                        <i class="fas fa-bullhorn" style="font-size: 18px;"></i>
+                    </div>
+                    <span>Duyurular</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="opacity: 0.9;"></button>
+            </div>
+            <div class="modal-body" style="padding: 28px; max-height: 65vh; overflow-y: auto; background: #f8f9fa;" id="announcements-modal-body">
+                <style>
+                    #announcements-modal-body::-webkit-scrollbar {
+                        width: 8px;
+                    }
+                    #announcements-modal-body::-webkit-scrollbar-track {
+                        background: #f1f1f1;
+                        border-radius: 10px;
+                    }
+                    #announcements-modal-body::-webkit-scrollbar-thumb {
+                        background: var(--primary-color, #4F46E5);
+                        border-radius: 10px;
+                        opacity: 0.5;
+                    }
+                    #announcements-modal-body::-webkit-scrollbar-thumb:hover {
+                        opacity: 0.8;
+                    }
+                    #announcements-list {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 16px;
+                    }
+                    .announcement-card {
+                        background: #ffffff;
+                        border-radius: 12px;
+                        padding: 20px 24px;
+                        border: 1px solid #e9ecef;
+                        transition: all 0.3s ease;
+                        position: relative;
+                        overflow: hidden;
+                    }
+                    .announcement-card::before {
+                        content: '';
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        bottom: 0;
+                        width: 4px;
+                        background: var(--primary-color, #4F46E5);
+                        border-radius: 0 4px 4px 0;
+                    }
+                    .announcement-card:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0px 4px 16px rgba(0,0,0,0.1);
+                        border-color: rgba(79, 70, 229, 0.2);
+                    }
+                    .announcement-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: flex-start;
+                        margin-bottom: 12px;
+                        gap: 12px;
+                    }
+                    .announcement-title {
+                        font-weight: 700;
+                        font-size: 17px;
+                        color: #1a1a1a;
+                        margin: 0;
+                        line-height: 1.4;
+                        flex: 1;
+                    }
+                    .announcement-date {
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                        font-size: 12px;
+                        color: #6c757d;
+                        white-space: nowrap;
+                        background: #f8f9fa;
+                        padding: 6px 12px;
+                        border-radius: 20px;
+                        font-weight: 500;
+                    }
+                    .announcement-date i {
+                        font-size: 11px;
+                        opacity: 0.7;
+                    }
+                    .announcement-content {
+                        font-size: 14px;
+                        line-height: 1.7;
+                        color: #495057;
+                        margin-top: 8px;
+                    }
+                    .announcement-content p {
+                        margin-bottom: 10px;
+                    }
+                    .announcement-content p:last-child {
+                        margin-bottom: 0;
+                    }
+                    .announcement-content h1,
+                    .announcement-content h2,
+                    .announcement-content h3 {
+                        font-weight: 700;
+                        color: #1a1a1a;
+                        margin-top: 16px;
+                        margin-bottom: 10px;
+                    }
+                    .announcement-content h1:first-child,
+                    .announcement-content h2:first-child,
+                    .announcement-content h3:first-child {
+                        margin-top: 0;
+                    }
+                    .announcement-content ul,
+                    .announcement-content ol {
+                        padding-left: 24px;
+                        margin-bottom: 12px;
+                    }
+                    .announcement-content a {
+                        color: var(--primary-color, #4F46E5);
+                        text-decoration: underline;
+                    }
+                    .announcement-content img {
+                        max-width: 100%;
+                        height: auto;
+                        border-radius: 8px;
+                        margin: 12px 0;
+                    }
+                    @keyframes fadeInUp {
+                        from {
+                            opacity: 0;
+                            transform: translateY(20px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+                    .empty-state {
+                        text-align: center;
+                        padding: 60px 20px;
+                    }
+                    .empty-state-icon {
+                        width: 80px;
+                        height: 80px;
+                        background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(79, 70, 229, 0.05) 100%);
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 0 auto 20px;
+                        color: var(--primary-color, #4F46E5);
+                        font-size: 36px;
+                    }
+                    .empty-state-text {
+                        color: #6c757d;
+                        font-size: 15px;
+                        margin: 0;
+                    }
+                    .loading-state {
+                        text-align: center;
+                        padding: 60px 20px;
+                    }
+                    .spinner-custom {
+                        width: 48px;
+                        height: 48px;
+                        border: 4px solid rgba(79, 70, 229, 0.1);
+                        border-top-color: var(--primary-color, #4F46E5);
+                        border-radius: 50%;
+                        animation: spin 0.8s linear infinite;
+                        margin: 0 auto 16px;
+                    }
+                    @keyframes spin {
+                        to { transform: rotate(360deg); }
+                    }
+                </style>
+                <div id="announcements-list">
+                    <div class="loading-state">
+                        <div class="spinner-custom"></div>
+                        <p style="color: #6c757d; margin: 0; font-size: 14px;">Duyurular yükleniyor...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #e9ecef; padding: 20px 28px; background: #ffffff;">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" style="border-radius: 10px; padding: 10px 28px; font-weight: 600; background: var(--primary-color, #4F46E5); border: none;">
+                    <i class="fas fa-times me-2"></i>Kapat
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

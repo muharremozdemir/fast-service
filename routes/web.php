@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\StaffController as AdminStaffController;
 use App\Http\Controllers\Admin\DepartmentController as AdminDepartmentController;
 use App\Http\Controllers\Admin\OnboardingController as AdminOnboardingController;
 use App\Http\Controllers\Admin\SliderController as AdminSliderController;
+use App\Http\Controllers\Admin\AnnouncementController as AdminAnnouncementController;
 
 // Site
 use App\Http\Controllers\Site\SiteHomeController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\Site\SiteCategoryController;
 use App\Http\Controllers\Site\ProductController;
 use App\Http\Controllers\Site\CartController;
 use App\Http\Controllers\Site\OrderController;
+use App\Http\Controllers\Site\AnnouncementController as SiteAnnouncementController;
 use App\Http\Controllers\Auth\LoginController;
 
 /*
@@ -157,6 +159,7 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAut
     Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings/logo', [AdminSettingsController::class, 'updateLogo'])->name('settings.updateLogo');
     Route::post('/settings/primary-color', [AdminSettingsController::class, 'updatePrimaryColor'])->name('settings.updatePrimaryColor');
+    Route::post('/settings/hotel-info', [AdminSettingsController::class, 'updateHotelInfo'])->name('settings.updateHotelInfo');
 
     // Roles (Kullanıcı Rolleri)
     Route::get('/roles', [AdminRoleController::class, 'index'])->name('roles.index');
@@ -190,6 +193,15 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAut
     Route::put('/sliders/update/{id}', [AdminSliderController::class, 'update'])->name('sliders.update');
     Route::delete('/sliders/{id}', [AdminSliderController::class, 'destroy'])->name('sliders.destroy');
 
+    // Announcements (Duyuru Yönetimi)
+    Route::get('/announcements', [AdminAnnouncementController::class, 'index'])->name('announcements.index');
+    Route::get('/announcements/create', [AdminAnnouncementController::class, 'create'])->name('announcements.create');
+    Route::post('/announcements/store', [AdminAnnouncementController::class, 'store'])->name('announcements.store');
+    Route::get('/announcements/edit/{id}', [AdminAnnouncementController::class, 'edit'])->name('announcements.edit');
+    Route::put('/announcements/update/{id}', [AdminAnnouncementController::class, 'update'])->name('announcements.update');
+    Route::delete('/announcements/{id}', [AdminAnnouncementController::class, 'destroy'])->name('announcements.destroy');
+    Route::post('/announcements/{id}/unpublish', [AdminAnnouncementController::class, 'unpublish'])->name('announcements.unpublish');
+
 });
 
 Route::get('/urun/{product:slug}', [ProductController::class, 'show'])->name('site.product.show');
@@ -207,3 +219,6 @@ Route::get('/sepet/sayisi', [CartController::class, 'getCount'])->name('site.car
 // Order routes
 Route::post('/siparis-olustur', [OrderController::class, 'store'])->name('site.order.store');
 Route::get('/siparis-tamamlandi/{orderNumber}', [OrderController::class, 'complete'])->name('site.order.complete');
+
+// Announcement routes
+Route::get('/duyurular', [SiteAnnouncementController::class, 'index'])->name('site.announcements.index');

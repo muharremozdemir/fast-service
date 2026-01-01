@@ -165,6 +165,46 @@
             </div>
         </div>
         <!--end::Primary Color Settings-->
+
+        <!--begin::Hotel Info Settings-->
+        <div class="card card-flush mt-5">
+            <div class="card-header">
+                <div class="card-title">
+                    <h2>Bilgilendirme Alanı</h2>
+                </div>
+            </div>
+            <div class="card-body pt-0">
+                <form method="POST" action="{{ route('admin.settings.updateHotelInfo') }}">
+                    @csrf
+
+                    <div class="mb-7">
+
+                        <div class="fv-row mb-7">
+                            <textarea
+                                class="form-control form-control-solid"
+                                name="hotel_info"
+                                id="hotel_info_input"
+                                rows="10"
+                                placeholder="Otel hakkında bilgiler, wifi şifresi, iletişim bilgileri vb. buraya yazabilirsiniz...">{{ old('hotel_info', $company->hotel_info ?? '') }}</textarea>
+                            <div class="form-text">Bu bilgiler, misafirlerin görebileceği otel bilgileri modal'ında görüntülenecektir. İstediğiniz bilgileri buraya yazabilirsiniz (wifi şifresi, otel kuralları, iletişim bilgileri vb.).</div>
+                            @error('hotel_info')
+                                <div class="text-danger fs-7 mt-2">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="indicator-label">Kaydet</span>
+                            <span class="indicator-progress">Lütfen bekleyin...
+                                <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!--end::Hotel Info Settings-->
     </div>
 </div>
 <!--end::Content-->
