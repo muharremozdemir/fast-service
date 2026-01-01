@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Room;
 use App\Models\Category;
+use App\Services\OneSignalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -15,13 +16,23 @@ use Illuminate\Support\Facades\Session;
 
 class OrderController extends Controller
 {
+    private OneSignalService $oneSignalService;
+
+    /**
+     * @param OneSignalService $oneSignalService
+     */
+    public function __construct(OneSignalService $oneSignalService)
+    {
+        $this->oneSignalService = $oneSignalService;
+    }
+
     /**
      * Create order from cart
      */
     public function store(Request $request)
     {
         $roomNumber = Session::get('room_number');
-        
+
         if (!$roomNumber) {
             return response()->json([
                 'success' => false,
@@ -30,7 +41,7 @@ class OrderController extends Controller
         }
 
         $cart = Cart::where('room_number', $roomNumber)->first();
-        
+
         if (!$cart || $cart->items()->count() === 0) {
             return response()->json([
                 'success' => false,
@@ -87,7 +98,7 @@ class OrderController extends Controller
                 // Collect category IDs for notifications
                 if ($cartItem->product->category_id) {
                     $categoryIds[] = $cartItem->product->category_id;
-                    
+
                     // Get users assigned to this category and attach them to order item
                     $category = Category::with('users')->find($cartItem->product->category_id);
                     if ($category && $category->users->isNotEmpty()) {
@@ -114,7 +125,7 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Sipariş oluşturulurken hata: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Sipariş oluşturulurken bir hata oluştu.'
@@ -155,12 +166,7 @@ class OrderController extends Controller
                 $title = "Yeni Sipariş - {$category->name}";
                 $message = "Oda {$order->room_number} - Sipariş #{$order->order_number}";
 
-                $result = sendOneSignalNotification(
-                    $title,
-                    $message,
-                    $order->id,
-                    $playerIds
-                );
+                $result = $this->oneSignalService->sendNotification($title, $message, $playerIds);
 
                 Log::info("Bildirim gönderildi - Kategori: {$category->name}", [
                     'order_id' => $order->id,
