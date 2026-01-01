@@ -149,7 +149,7 @@ class OrderController extends Controller
                 ->with(['users' => function ($query) {
                     $query->whereNotNull('player_id')
                         ->where('player_id', '!=', '')
-                        ->where('availability_status', 'busy');
+                        ->where('availability_status', 'available');
                 }])
                 ->get();
 
