@@ -54,7 +54,7 @@ class OneSignalService
         // OneSignal requires English content, so we include both the requested language and English
         $headings = ['en' => $title];
         $contents = ['en' => $message];
-        
+
         // If a different language is requested, add it alongside English
         if ($language !== 'en') {
             $headings[$language] = $title;
@@ -66,6 +66,9 @@ class OneSignalService
             'include_player_ids' => $playerIdsArray,
             'headings' => $headings,
             'contents' => $contents,
+            'android_sound' => "notification_sound",
+            'android_channel_id' => "e243dfe2-3865-4b65-ad6b-fa4b47419ff5",
+            'ios_sound' => "notification_sound.mp3",
         ];
 
         // Eğer data varsa ekle

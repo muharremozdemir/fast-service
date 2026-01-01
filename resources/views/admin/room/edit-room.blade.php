@@ -41,7 +41,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @endif
-                
+
                 @if ($errors->any())
                     <div class="alert alert-danger">
                         <ul class="mb-0">
@@ -51,7 +51,7 @@
                         </ul>
                     </div>
                 @endif
-                
+
                 <form method="POST" action="{{ route('admin.rooms.update', $room->id) }}">
                     @csrf
                     <div class="fv-row mb-7">
@@ -63,28 +63,28 @@
                             @endforeach
                         </select>
                     </div>
-                    
+
                     <div class="fv-row mb-7">
                         <label class="required fs-6 fw-semibold mb-2">Oda Numarası</label>
                         <input type="text" class="form-control form-control-solid" name="room_number" placeholder="Örn: 101, 201A" value="{{ old('room_number', $room->room_number) }}" required />
                         <div class="text-muted fs-7 mt-1">Aynı katta aynı oda numarası olamaz.</div>
                     </div>
-                    
+
                     <div class="fv-row mb-7">
                         <label class="fs-6 fw-semibold mb-2">Oda Adı</label>
                         <input type="text" class="form-control form-control-solid" name="name" placeholder="Oda adı (opsiyonel)" value="{{ old('name', $room->name) }}" />
                     </div>
-                    
+
                     <div class="fv-row mb-7">
                         <label class="fs-6 fw-semibold mb-2">Açıklama</label>
                         <textarea class="form-control form-control-solid" name="description" rows="3" placeholder="Açıklama...">{{ old('description', $room->description) }}</textarea>
                     </div>
-                    
+
                     <div class="fv-row mb-7">
                         <label class="fs-6 fw-semibold mb-2">Sıralama</label>
                         <input type="number" class="form-control form-control-solid" name="sort_order" placeholder="0" value="{{ old('sort_order', $room->sort_order) }}" />
                     </div>
-                    
+
                     <div class="fv-row mb-7">
                         <label class="fs-6 fw-semibold mb-2">Kategoriler ve Görevliler</label>
                         <div id="categories-container">
@@ -97,7 +97,7 @@
                         </div>
                         <div class="text-muted fs-7 mt-1">Her kategori için o kategorideki görevlileri seçebilirsiniz. Birden fazla kategori ekleyebilirsiniz.</div>
                     </div>
-                    
+
                     <div class="fv-row mb-7">
                         <label class="required fs-6 fw-semibold mb-2">Durum</label>
                         <select name="is_active" class="form-select form-select-solid" required>
@@ -105,7 +105,7 @@
                             <option value="0" {{ old('is_active', $room->is_active) == 0 ? 'selected' : '' }}>Pasif</option>
                         </select>
                     </div>
-                    
+
                     <div class="text-end">
                         <a href="{{ route('admin.rooms.index') }}" class="btn btn-light me-2">İptal</a>
                         <button type="submit" class="btn btn-primary">
@@ -138,14 +138,14 @@ document.addEventListener('DOMContentLoaded', function() {
         categoryItem.className = 'card mb-3';
         categoryItem.id = itemId;
         categoryItem.dataset.index = currentIndex;
-        
+
         const availableCategories = categories.filter(cat => !selectedCategories.has(cat.id) || cat.id == categoryId);
         const selectedCategory = categoryId ? categories.find(cat => cat.id == categoryId) : null;
-        
+
         if (selectedCategory) {
             selectedCategories.add(selectedCategory.id);
         }
-        
+
         categoryItem.innerHTML = `
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <label class="form-label">Kategori</label>
                     <select name="category_users[${currentIndex}][category_id]" class="form-select category-select" onchange="loadUsersForCategory(this, '${itemId}', ${currentIndex})" required>
                         <option value="">Kategori Seçin</option>
-                        ${availableCategories.map(cat => 
+                        ${availableCategories.map(cat =>
                             `<option value="${cat.id}" ${cat.id == categoryId ? 'selected' : ''}>${cat.name}</option>`
                         ).join('')}
                     </select>
@@ -168,9 +168,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>
         `;
-        
+
         document.getElementById('category-items').appendChild(categoryItem);
-        
+
         if (selectedCategory) {
             loadUsersForCategory(categoryItem.querySelector('.category-select'), itemId, selectedUserIds, currentIndex);
         }
@@ -189,16 +189,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const categoryId = selectElement.value;
         const usersContainer = document.getElementById(`users_${itemId}`);
         const previousCategoryId = selectElement.dataset.previousCategoryId;
-        
+
         if (previousCategoryId && previousCategoryId != categoryId) {
             selectedCategories.delete(parseInt(previousCategoryId));
         }
-        
+
         if (categoryId) {
             selectedCategories.add(parseInt(categoryId));
             selectElement.dataset.previousCategoryId = categoryId;
         }
-        
+
         if (!categoryId) {
             usersContainer.innerHTML = '<div class="text-muted text-center">Lütfen bir kategori seçin.</div>';
             return;
@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="checkbox" name="category_users[${categoryIndex}][user_ids][]" value="${user.id}" id="user_${itemId}_${user.id}" ${isChecked ? 'checked' : ''}>
                             <label class="form-check-label" for="user_${itemId}_${user.id}">
-                                ${user.name} ${user.email ? '(' + user.email + ')' : ''}
+                                ${user.name_surname} ${user.email ? '(' + user.email + ')' : ''}
                             </label>
                         </div>
                     `;

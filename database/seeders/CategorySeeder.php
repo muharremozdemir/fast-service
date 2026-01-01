@@ -181,7 +181,7 @@ class CategorySeeder extends Seeder
                 $subSlug = Str::slug($subCatName);
                 $childCategory = Category::create([
                     'name' => $subCatName,
-                    'slug' => $subSlug . '-' . $mainSlug, // Benzersiz slug için
+                    'slug' => $subSlug, // company_id ile birlikte unique
                     'sort_order' => $subIndex + 1,
                     'is_active' => true,
                     'parent_id' => $parentMap[$mainSlug]->id,
@@ -205,13 +205,14 @@ class CategorySeeder extends Seeder
                         $type = 'sale';
                     }
 
-                    // Benzersiz slug oluştur
-                    $baseSlug = Str::slug($productName);
-                    $uniqueSlug = $baseSlug . '-' . $mainSlug . '-' . $subSlug . '-' . $i . '-' . time() . '-' . $faker->unique()->numberBetween(1000, 9999);
+                    // Slug oluştur (alt kategori slug'ı ile birlikte benzersiz, company_id ile birlikte unique)
+                    $productSlug = Str::slug($productName);
+                    // Aynı ürün adı farklı kategorilerde olabilir, bu yüzden kategori slug'ını ekle
+                    $productSlug = $subSlug . '-' . $productSlug;
 
                     Product::create([
                         'name' => $productName,
-                        'slug' => $uniqueSlug,
+                        'slug' => $productSlug,
                         'price' => $price,
                         'description' => $faker->sentence(12),
                         'is_active' => true,
