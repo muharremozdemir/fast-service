@@ -58,7 +58,7 @@
                             <label class="form-label fw-semibold">Görevli Seç:</label>
                             <select class="form-select form-select-solid" id="bulkStaffSelect" data-kt-select2="true" data-placeholder="Görevli seçin">
                                 <option value="">Görevli Seçin</option>
-                                @foreach(\App\Models\User::orderBy('name')->get() as $user)
+                                @foreach(\App\Models\User::orderBy('name_surname')->get() as $user)
                                     <option value="{{ $user->id }}">{{ $user->name }}</option>
                                 @endforeach
                             </select>
@@ -177,7 +177,7 @@
                         @endforelse
                     </tbody>
                 </table>
-                
+
                 @if ($floors->hasPages())
                 <div class="d-flex justify-content-between align-items-center mt-5">
                     <div>
@@ -243,7 +243,7 @@
                 const selectedIds = Array.from(floorCheckboxes)
                     .filter(cb => cb.checked)
                     .map(cb => cb.value);
-                
+
                 if (selectedIds.length === 0) {
                     alert('Lütfen en az bir kat seçin.');
                     return;

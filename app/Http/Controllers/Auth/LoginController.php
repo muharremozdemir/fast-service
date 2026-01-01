@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Mail\OtpMail;
 use App\Services\NetGsmService;
+use App\Models\Block;
+use App\Models\Floor;
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -36,7 +39,25 @@ class LoginController extends Controller
         ]);
 
         // Telefon numarasını temizle (sadece rakamlar)
-        $phone = "+9".str_replace('', '', $request->phone);
+        $phone = preg_replace('/[^0-9]/', '', $request->phone);
+
+        // Eğer telefon numarası 10 haneli ise (5XX XXX XX XX formatından geliyorsa)
+        // +90 ekle
+        if (strlen($phone) === 10 && substr($phone, 0, 1) === '5') {
+            $phone = '+90' . $phone;
+        } elseif (strlen($phone) === 11 && substr($phone, 0, 2) === '05') {
+            // 05XX formatındaysa 0'ı kaldır ve +90 ekle
+            $phone = '+90' . substr($phone, 1);
+        } elseif (strlen($phone) === 13 && substr($phone, 0, 3) === '+90') {
+            // Zaten +90 ile başlıyorsa olduğu gibi bırak
+            $phone = $phone;
+        } elseif (strlen($phone) === 12 && substr($phone, 0, 2) === '90') {
+            // 90 ile başlıyorsa + ekle
+            $phone = '+' . $phone;
+        } else {
+            // Diğer durumlarda +90 ekle
+            $phone = '+90' . ltrim($phone, '0');
+        }
 
         // Kullanıcıyı bul
         $user = User::where('phone', $phone)->first();
@@ -170,27 +191,12 @@ class LoginController extends Controller
             // Session login (web için)
             Auth::login($user, true);
 
-            // JWT token'ı session'a kaydet (mobil uygulama için)
-            session(['jwt_token' => $token]);
-            session()->forget('phone');
+            // Session'ı yenile (CSRF token için gerekli) - login'den hemen sonra yapılmalı
+            $request->session()->regenerate();
 
-            // API isteği mi kontrol et
-            if ($request->expectsJson() || $request->wantsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Başarıyla giriş yaptınız.',
-                    'token' => $token,
-                    'token_type' => 'bearer',
-                    'expires_in' => config('jwt.ttl') * 60, // saniye cinsinden
-                    'user' => [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'email' => $user->email,
-                        'phone' => $user->phone,
-                        'company_id' => $user->company_id,
-                    ]
-                ]);
-            }
+            // JWT token'ı session'a kaydet (mobil uygulama için) - regenerate'den sonra
+            $request->session()->put('jwt_token', $token);
+            $request->session()->forget('phone');
 
             // JWT token'ı cookie'ye set et (web route'larında JWT middleware için)
             // Cookie süresi dakika cinsinden, cookie() helper'ı saniye bekliyor
@@ -211,10 +217,41 @@ class LoginController extends Controller
                     ->exists();
             }
 
-            // Admin ise companies sayfasına, değilse mevcut yönlendirmeye git
-            $redirectRoute = $isAdmin
-                ? route('admin.companies.index')
-                : route('admin.reports.index');
+            // Admin ise companies sayfasına, değilse onboarding kontrolü yap
+            if ($isAdmin) {
+                $redirectRoute = route('admin.companies.index');
+            } else {
+                // Onboarding kontrolü - eğer blok, kat veya oda yoksa onboarding'e yönlendir
+                $companyId = $user->company_id;
+                $hasBlocks = Block::where('company_id', $companyId)->exists();
+                $hasFloors = Floor::where('company_id', $companyId)->exists();
+                $hasRooms = Room::where('company_id', $companyId)->exists();
+
+                if (!$hasBlocks || !$hasFloors || !$hasRooms) {
+                    $redirectRoute = route('admin.onboarding.welcome');
+                } else {
+                    $redirectRoute = route('admin.reports.index');
+                }
+            }
+
+            // API isteği mi kontrol et
+            if ($request->expectsJson() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Başarıyla giriş yaptınız.',
+                    'token' => $token,
+                    'token_type' => 'bearer',
+                    'expires_in' => config('jwt.ttl') * 60, // saniye cinsinden
+                    'redirect_url' => $redirectRoute,
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'phone' => $user->phone,
+                        'company_id' => $user->company_id,
+                    ]
+                ]);
+            }
 
             // AJAX isteği ise JSON döndür
             if ($isAjax) {
@@ -226,7 +263,7 @@ class LoginController extends Controller
                 ])->cookie('jwt_token', $token, $cookieSeconds, '/', null, false, true, false, 'lax');
             }
 
-            return redirect()->intended($redirectRoute)
+            return redirect($redirectRoute)
                 ->with('success', 'Başarıyla giriş yaptınız.')
                 ->with('jwt_token', $token)
                 ->cookie('jwt_token', $token, $cookieSeconds, '/', null, false, true, false, 'lax');

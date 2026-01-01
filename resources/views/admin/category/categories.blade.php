@@ -207,7 +207,7 @@
 															<td>
 																@if($category->users && $category->users->count() > 0)
 																	@foreach($category->users as $user)
-																		<span class="badge badge-light-info me-1 mb-1">{{ $user->name }}</span>
+																		<span class="badge badge-light-info me-1 mb-1">{{ $user->name_surname }}</span>
 																	@endforeach
 																@else
 																	<span class="text-muted">Atanmamış</span>

@@ -77,7 +77,7 @@ class StaffController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name_surname' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
             'phone' => 'required|string|max:50',
             'roles' => 'nullable|array',
@@ -91,7 +91,7 @@ class StaffController extends Controller
                 },
             ],
         ], [
-            'name.required' => 'Ad Soyad gereklidir.',
+            'name_surname.required' => 'Ad Soyad gereklidir.',
             'email.required' => 'E-posta gereklidir.',
             'email.email' => 'Geçerli bir e-posta adresi giriniz.',
             'email.unique' => 'Bu e-posta adresi zaten kullanılıyor.',
@@ -102,7 +102,7 @@ class StaffController extends Controller
         $randomPassword = \Illuminate\Support\Str::random(12);
 
         $user = User::create([
-            'name' => $request->input('name'),
+            'name_surname' => $request->input('name_surname'),
             'email' => $request->input('email'),
             'phone' => $request->input('phone'),
             'password' => Hash::make($randomPassword),
@@ -204,6 +204,53 @@ class StaffController extends Controller
         return redirect()
             ->route('admin.staff.index')
             ->with('success', 'Personel başarıyla güncellendi.');
+    }
+
+    /**
+     * Personele bildirim gönder
+     */
+    public function sendNotification(Request $request, $id)
+    {
+        $user = User::where('company_id', Auth::user()->company_id)
+            ->findOrFail($id);
+
+        // Player ID kontrolü
+        if (empty($user->player_id)) {
+            return redirect()
+                ->route('admin.staff.edit', $id)
+                ->with('error', 'Bu kullanıcının bildirim almak için cihaz kaydı bulunmuyor.');
+        }
+
+        $request->validate([
+            'notification_title' => 'required|string|max:100',
+            'notification_content' => 'required|string|max:500',
+        ], [
+            'notification_title.required' => 'Bildirim başlığı gereklidir.',
+            'notification_title.max' => 'Bildirim başlığı en fazla 100 karakter olabilir.',
+            'notification_content.required' => 'Bildirim içeriği gereklidir.',
+            'notification_content.max' => 'Bildirim içeriği en fazla 500 karakter olabilir.',
+        ]);
+
+        $title = $request->input('notification_title');
+        $content = $request->input('notification_content');
+
+        // OneSignal ile bildirim gönder
+        $result = sendOneSignalNotification(
+            $title,
+            $content,
+            $user->id,
+            [$user->player_id]
+        );
+
+        if (isset($result['error']) && $result['error']) {
+            return redirect()
+                ->route('admin.staff.edit', $id)
+                ->with('error', 'Bildirim gönderilirken bir hata oluştu: ' . ($result['message'] ?? 'Bilinmeyen hata'));
+        }
+
+        return redirect()
+            ->route('admin.staff.edit', $id)
+            ->with('success', 'Bildirim başarıyla gönderildi.');
     }
 }
 

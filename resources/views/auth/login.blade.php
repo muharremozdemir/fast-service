@@ -25,6 +25,10 @@
             justify-content: center;
             position: relative;
         }
+        #phone_input::placeholder {
+            letter-spacing: 1px;
+            opacity: 0.6;
+        }
     </style>
 </head>
 <body id="kt_body" class="app-blank app-blank bgi-size-cover bgi-position-center bgi-no-repeat">
@@ -87,8 +91,8 @@
                         @endif
 
                         <div class="fv-row mb-8">
-                            <input type="text" placeholder="Telefon Numarası" name="phone" autocomplete="off" class="form-control bg-transparent" value="{{ old('phone') }}" required />
-                            <div class="text-muted fs-7 mt-2">Örn: 5423024234 veya 0555 555 55 55</div>
+                            <input type="text" placeholder="(5__) ___ __ __" name="phone" id="phone_input" autocomplete="off" class="form-control bg-transparent" value="{{ old('phone') }}" required maxlength="15" />
+                            <div class="text-muted fs-7 mt-2">Örn: (542) 302 42 34</div>
                         </div>
 
                         <div class="d-grid mb-10">
@@ -167,6 +171,107 @@
             spaceBetween: 0
         });
 
+        // Phone number mask: (5XX) XXX XX XX
+        const phoneInput = document.getElementById('phone_input');
+        
+        function formatPhoneNumber(value) {
+            // Sadece rakamları al
+            let digits = value.replace(/\D/g, '');
+            
+            // İlk karakter 5 değilse, 5 ekle
+            if (digits.length > 0 && digits[0] !== '5') {
+                digits = '5' + digits;
+            }
+            
+            // Maksimum 10 rakam (5 + 9 rakam)
+            if (digits.length > 10) {
+                digits = digits.substring(0, 10);
+            }
+            
+            // Format: (5XX) XXX XX XX
+            let formatted = '';
+            if (digits.length > 0) {
+                formatted = '(' + digits[0]; // 5
+                if (digits.length > 1) {
+                    formatted += digits.substring(1, 3); // XX
+                }
+                if (digits.length > 3) {
+                    formatted += ') ' + digits.substring(3, 6); // XXX
+                }
+                if (digits.length > 6) {
+                    formatted += ' ' + digits.substring(6, 8); // XX
+                }
+                if (digits.length > 8) {
+                    formatted += ' ' + digits.substring(8, 10); // XX
+                }
+            }
+            
+            return formatted;
+        }
+        
+        phoneInput.addEventListener('input', function(e) {
+            const cursorPosition = e.target.selectionStart;
+            const oldValue = e.target.value;
+            const oldLength = oldValue.length;
+            
+            const formatted = formatPhoneNumber(e.target.value);
+            e.target.value = formatted;
+            
+            // Cursor pozisyonunu ayarla
+            const newLength = formatted.length;
+            const lengthDiff = newLength - oldLength;
+            const newCursorPosition = Math.max(0, Math.min(formatted.length, cursorPosition + lengthDiff));
+            
+            e.target.setSelectionRange(newCursorPosition, newCursorPosition);
+        });
+        
+        phoneInput.addEventListener('keydown', function(e) {
+            // Backspace tuşuna basıldığında
+            if (e.key === 'Backspace') {
+                const cursorPosition = e.target.selectionStart;
+                const value = e.target.value;
+            
+                // Eğer cursor parantez veya boşluk üzerindeyse, bir karakter geri git
+                if (cursorPosition > 0 && (value[cursorPosition - 1] === '(' || 
+                    value[cursorPosition - 1] === ')' || 
+                    value[cursorPosition - 1] === ' ')) {
+                    e.preventDefault();
+                    e.target.setSelectionRange(cursorPosition - 1, cursorPosition - 1);
+                    // Tekrar backspace işlemini tetikle
+                    const event = new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true });
+                    e.target.dispatchEvent(event);
+                }
+            }
+        });
+        
+        // Focus olduğunda eğer boşsa (5 ekle
+        phoneInput.addEventListener('focus', function(e) {
+            if (!e.target.value || e.target.value === '') {
+                e.target.value = '(5';
+                e.target.setSelectionRange(2, 2);
+            }
+        });
+        
+        // Paste işlemi için
+        phoneInput.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+            const digits = pastedText.replace(/\D/g, '');
+            
+            // İlk karakter 5 değilse, 5 ekle
+            let value = digits;
+            if (value.length > 0 && value[0] !== '5') {
+                value = '5' + value;
+            }
+            
+            // Maksimum 10 rakam
+            if (value.length > 10) {
+                value = value.substring(0, 10);
+            }
+            
+            e.target.value = formatPhoneNumber(value);
+        });
+
         // OTP Form Submit (AJAX)
         document.getElementById('kt_sign_in_form').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -175,11 +280,15 @@
             const submitButton = form.querySelector('#kt_sign_in_submit');
             const indicator = submitButton.querySelector('.indicator-label');
             const progress = submitButton.querySelector('.indicator-progress');
-            const phone = form.querySelector('input[name="phone"]').value;
+            const phoneInput = form.querySelector('input[name="phone"]');
+            const phoneFormatted = phoneInput.value;
+            
+            // Telefon numarasını temizle (sadece rakamlar)
+            const phone = phoneFormatted.replace(/\D/g, '');
             
             // Form validation
-            if (!phone) {
-                alert('Lütfen telefon numarası girin.');
+            if (!phone || phone.length < 10) {
+                alert('Lütfen geçerli bir telefon numarası girin.');
                 return;
             }
             
@@ -189,8 +298,9 @@
             progress.style.display = 'inline-block';
             submitButton.disabled = true;
             
-            // AJAX request
+            // AJAX request - telefon numarasını temizlenmiş halde gönder
             const formData = new FormData(form);
+            formData.set('phone', phone); // Temizlenmiş telefon numarasını gönder
             formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
             
             fetch(form.action, {
@@ -213,7 +323,25 @@
             .then(data => {
                 if (data.success) {
                     // Show OTP modal
-                    document.getElementById('otp_phone_display').textContent = 'Telefon: ' + (data.phone || phone);
+                    // Telefon numarasını formatla (+90 kısmını kaldır ve formatla)
+                    let displayPhone = String(data.phone || phone);
+                    // Sadece rakamları al
+                    displayPhone = displayPhone.replace(/\D/g, '');
+                    // 90 ile başlıyorsa kaldır (ülke kodu)
+                    displayPhone = displayPhone.replace(/^90/, '');
+                    // Eğer 0 ile başlıyorsa kaldır
+                    displayPhone = displayPhone.replace(/^0/, '');
+                    // Formatla: (5XX) XXX XX XX
+                    if (displayPhone.length === 10) {
+                        displayPhone = '(' + displayPhone.substring(0, 3) + ') ' + 
+                                      displayPhone.substring(3, 6) + ' ' + 
+                                      displayPhone.substring(6, 8) + ' ' + 
+                                      displayPhone.substring(8, 10);
+                    } else if (displayPhone.length > 0) {
+                        // Eğer 10 haneli değilse, olduğu gibi göster
+                        displayPhone = displayPhone;
+                    }
+                    document.getElementById('otp_phone_display').textContent = 'Telefon: ' + displayPhone;
                     const modal = new bootstrap.Modal(document.getElementById('kt_otp_modal'), {
                         backdrop: 'static',
                         keyboard: false

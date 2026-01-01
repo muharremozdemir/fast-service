@@ -285,151 +285,115 @@
                                     --}}
 
                                     @if($isAdmin)
-                                    <!--begin:Menu item-->
-                                    <div class="menu-item">
-                                        <a class="menu-link" href="{{ route('admin.companies.index') }}">
-                                            <span class="menu-icon">
-                                                <i class="ki-duotone ki-abstract-26 fs-2">
-                                                    <span class="path1"></span>
-                                                    <span class="path2"></span>
-                                                </i>
-                                            </span>
-                                            <span class="menu-title">Şirketler</span>
-                                        </a>
-                                    </div>
-                                    <!--end:Menu item-->
+                                        <!--begin:Menu item-->
+                                        <div class="menu-item">
+                                            <a class="menu-link" href="{{ route('admin.companies.index') }}">
+                                                <span class="menu-icon">
+                                                    <i class="ki-duotone ki-abstract-26 fs-2">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                    </i>
+                                                </span>
+                                                <span class="menu-title">Şirketler</span>
+                                            </a>
+                                        </div>
+                                        <!--end:Menu item-->
                                     @else
-                                    <!--begin:Menu item-->
-                                    <div class="menu-item">
-                                        <a class="menu-link" href="{{ route('admin.categories.index') }}">
-                                            <span class="menu-icon">
-                                                <i class="ki-duotone ki-category fs-2">
-                                                    <span class="path1"></span>
-                                                    <span class="path2"></span>
-                                                    <span class="path3"></span>
-                                                    <span class="path4"></span>
-                                                </i>
-                                            </span>
-                                            <span class="menu-title">Kategoriler</span>
-                                        </a>
-                                    </div>
-                                    <!--end:Menu item-->
-
-                                    <!--begin:Menu item-->
-                                    <div class="menu-item">
-                                        <a class="menu-link" href="{{ route('admin.products.index') }}">
-                                            <span class="menu-icon">
-                                                <i class="ki-duotone ki-element-11 fs-2">
-                                                    <span class="path1"></span>
-                                                    <span class="path2"></span>
-                                                </i>
-                                            </span>
-                                            <span class="menu-title">Ürünler</span>
-                                        </a>
-                                    </div>
-                                    <!--end:Menu item-->
-
-                                    <!--begin:Menu item-->
-                                    <div class="menu-item">
-                                        <a class="menu-link" href="{{ route('admin.orders.index') }}">
-                                            <span class="menu-icon">
-                                                <i class="ki-duotone ki-handcart fs-2"></i>
-                                            </span>
-                                            <span class="menu-title">Siparişler</span>
-                                        </a>
-                                    </div>
-                                    <!--end:Menu item-->
-
-                                    <!--begin:Menu item-->
-                                    <div class="menu-item">
-                                        <a class="menu-link" href="{{ route('admin.reports.index') }}">
-                                            <span class="menu-icon">
-                                                <i class="ki-duotone ki-chart fs-2">
-                                                    <span class="path1"></span>
-                                                    <span class="path2"></span>
-                                                </i>
-                                            </span>
-                                            <span class="menu-title">Raporlar</span>
-                                        </a>
-                                    </div>
-                                    <!--end:Menu item-->
-
-                                    <!--begin:Menu item-->
-                                    <div class="menu-item">
-                                        <a class="menu-link" href="{{ route('admin.blocks.index') }}">
+                                        <!--begin:Menu item-->
+                                        <div class="menu-item">
+                                            <a class="menu-link" href="{{ route('admin.blocks.index') }}">
                                             <span class="menu-icon">
                                                 <i class="ki-duotone ki-abstract-14 fs-2">
                                                     <span class="path1"></span>
                                                     <span class="path2"></span>
                                                 </i>
                                             </span>
-                                            <span class="menu-title">Bloklar</span>
-                                        </a>
-                                    </div>
-                                    <!--end:Menu item-->
+                                                <span class="menu-title">Bloklar</span>
+                                            </a>
+                                        </div>
+                                        <!--end:Menu item-->
 
-                                    <!--begin:Menu item-->
-                                    <div class="menu-item">
-                                        <a class="menu-link" href="{{ route('admin.floors.index') }}">
+                                        <!--begin:Menu item-->
+                                        <div class="menu-item">
+                                            <a class="menu-link" href="{{ route('admin.floors.index') }}">
                                             <span class="menu-icon">
                                                 <i class="ki-duotone ki-abstract-44 fs-2">
                                                     <span class="path1"></span>
                                                     <span class="path2"></span>
                                                 </i>
                                             </span>
-                                            <span class="menu-title">Katlar</span>
-                                        </a>
-                                    </div>
-                                    <!--end:Menu item-->
+                                                <span class="menu-title">Katlar</span>
+                                            </a>
+                                        </div>
+                                        <!--end:Menu item-->
 
-                                    <!--begin:Menu item-->
-                                    <div class="menu-item">
-                                        <a class="menu-link" href="{{ route('admin.rooms.index') }}">
+                                        <!--begin:Menu item-->
+                                        <div class="menu-item">
+                                            <a class="menu-link" href="{{ route('admin.rooms.index') }}">
                                             <span class="menu-icon">
                                                 <i class="ki-duotone ki-home-1 fs-2">
                                                     <span class="path1"></span>
                                                     <span class="path2"></span>
                                                 </i>
                                             </span>
-                                            <span class="menu-title">Odalar</span>
-                                        </a>
-                                    </div>
-                                    <!--end:Menu item-->
-
-                                    @if($isHotelAdmin)
+                                                <span class="menu-title">Odalar</span>
+                                            </a>
+                                        </div>
+                                        <!--end:Menu item-->
                                         <!--begin:Menu item-->
                                         <div class="menu-item">
-                                            <a class="menu-link" href="{{ route('admin.staff.index') }}">
+                                            <a class="menu-link" href="{{ route('admin.categories.index') }}">
                                                 <span class="menu-icon">
-                                                    <i class="ki-duotone ki-people fs-2">
+                                                    <i class="ki-duotone ki-category fs-2">
                                                         <span class="path1"></span>
                                                         <span class="path2"></span>
                                                         <span class="path3"></span>
                                                         <span class="path4"></span>
-                                                        <span class="path5"></span>
                                                     </i>
                                                 </span>
-                                                <span class="menu-title">Personel Yönetimi</span>
+                                                <span class="menu-title">Kategoriler</span>
                                             </a>
                                         </div>
                                         <!--end:Menu item-->
-                                    @endif
 
                                         <!--begin:Menu item-->
                                         <div class="menu-item">
-                                            <a class="menu-link" href="{{ route('admin.settings.index') }}">
+                                            <a class="menu-link" href="{{ route('admin.products.index') }}">
                                                 <span class="menu-icon">
-                                                    <i class="ki-duotone ki-setting-2 fs-2">
+                                                    <i class="ki-duotone ki-element-11 fs-2">
                                                         <span class="path1"></span>
                                                         <span class="path2"></span>
-                                                        <span class="path3"></span>
                                                     </i>
                                                 </span>
-                                                <span class="menu-title">Ayarlar</span>
+                                                <span class="menu-title">Ürünler</span>
                                             </a>
                                         </div>
                                         <!--end:Menu item-->
 
+                                        <!--begin:Menu item-->
+                                        <div class="menu-item">
+                                            <a class="menu-link" href="{{ route('admin.orders.index') }}">
+                                                <span class="menu-icon">
+                                                    <i class="ki-duotone ki-handcart fs-2"></i>
+                                                </span>
+                                                <span class="menu-title">Siparişler</span>
+                                            </a>
+                                        </div>
+                                        <!--end:Menu item-->
+
+                                        <!--begin:Menu item-->
+                                        <div class="menu-item">
+                                            <a class="menu-link" href="{{ route('admin.reports.index') }}">
+                                                <span class="menu-icon">
+                                                    <i class="ki-duotone ki-chart fs-2">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                    </i>
+                                                </span>
+                                                <span class="menu-title">Raporlar</span>
+                                            </a>
+                                        </div>
+                                        <!--end:Menu item-->
                                         <!--begin:Menu item-->
                                         <div class="menu-item">
                                             <a class="menu-link" href="{{ route('admin.departments.index') }}">
@@ -443,6 +407,38 @@
                                             </a>
                                         </div>
                                         <!--end:Menu item-->
+                                        <!--begin:Menu item-->
+                                        <div class="menu-item">
+                                            <a class="menu-link" href="{{ route('admin.sliders.index') }}">
+                                                <span class="menu-icon">
+                                                    <i class="ki-duotone ki-picture fs-2">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                    </i>
+                                                </span>
+                                                <span class="menu-title">Slider Yönetimi</span>
+                                            </a>
+                                        </div>
+                                        <!--end:Menu item-->
+
+                                        @if($isHotelAdmin)
+                                            <!--begin:Menu item-->
+                                            <div class="menu-item">
+                                                <a class="menu-link" href="{{ route('admin.staff.index') }}">
+                                                <span class="menu-icon">
+                                                    <i class="ki-duotone ki-people fs-2">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                        <span class="path3"></span>
+                                                        <span class="path4"></span>
+                                                        <span class="path5"></span>
+                                                    </i>
+                                                </span>
+                                                    <span class="menu-title">Personel Yönetimi</span>
+                                                </a>
+                                            </div>
+                                            <!--end:Menu item-->
+                                        @endif
 
                                         @if(auth()->user()->can('reception'))
                                             <!--begin:Menu item-->
@@ -461,9 +457,21 @@
                                             </div>
                                             <!--end:Menu item-->
                                         @endif
-                                    @endif
-
-
+                                        <!--begin:Menu item-->
+                                        <div class="menu-item">
+                                            <a class="menu-link" href="{{ route('admin.settings.index') }}">
+                                                <span class="menu-icon">
+                                                    <i class="ki-duotone ki-setting-2 fs-2">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                        <span class="path3"></span>
+                                                    </i>
+                                                </span>
+                                                <span class="menu-title">Ayarlar</span>
+                                            </a>
+                                        </div>
+                                        <!--end:Menu item-->
+                                   @endif
                                 </div>
                                 <!--end::Menu-->
                             </div>

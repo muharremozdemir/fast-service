@@ -53,4 +53,22 @@ class SettingsController extends Controller
             ->route('admin.settings.index')
             ->with('success', 'Logo başarıyla güncellendi.');
     }
+
+    /**
+     * Primary color ayarlarını güncelle
+     */
+    public function updatePrimaryColor(Request $request)
+    {
+        $request->validate([
+            'primary_color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
+        ]);
+
+        $company = Company::where('id', Auth::user()->company_id)->firstOrFail();
+        $company->primary_color = $request->input('primary_color');
+        $company->save();
+
+        return redirect()
+            ->route('admin.settings.index')
+            ->with('success', 'Ana renk başarıyla güncellendi.');
+    }
 }

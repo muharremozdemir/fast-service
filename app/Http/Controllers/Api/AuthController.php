@@ -93,7 +93,7 @@ class AuthController extends Controller
                 'expires_in' => config('jwt.ttl') * 60, // saniye cinsinden
                 'user' => [
                     'id' => $user->id,
-                    'name' => $user->name,
+                    'name_surname' => $user->name_surname,
                     'email' => $user->email,
                     'phone' => $user->phone,
                     'company_id' => $user->company_id,

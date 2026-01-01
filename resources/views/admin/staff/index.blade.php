@@ -181,12 +181,12 @@
                                         <div class="d-flex align-items-center">
                                             <div class="symbol symbol-50px me-5">
                                                 <div class="symbol-label fs-2 fw-semibold text-primary bg-light-primary">
-                                                    {{ strtoupper(substr($user->name, 0, 1)) }}
+                                                    {{ mb_strtoupper(mb_substr($user->name_surname, 0, 1, 'UTF-8'), 'UTF-8') }}
                                                 </div>
                                             </div>
                                             <div>
                                                 <div class="text-gray-800 text-hover-primary fs-5 fw-bold mb-1">
-                                                    {{ $user->name }}
+                                                    {{ $user->name_surname }}
                                                 </div>
                                             </div>
                                         </div>

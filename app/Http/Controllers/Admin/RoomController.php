@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Room;
 use App\Models\Floor;
+use App\Models\Block;
 use App\Models\User;
 use App\Models\Category;
 use App\Models\QrSticker;
@@ -14,19 +15,41 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class RoomController extends Controller
 {
+    /**
+     * Check if onboarding is needed and redirect if necessary
+     */
+    private function checkOnboarding()
+    {
+        $companyId = Auth::user()->company_id;
+        $hasBlocks = Block::where('company_id', $companyId)->exists();
+        $hasFloors = Floor::where('company_id', $companyId)->exists();
+        $hasRooms = Room::where('company_id', $companyId)->exists();
+
+        if (!$hasBlocks || !$hasFloors || !$hasRooms) {
+            return redirect()->route('admin.onboarding.welcome');
+        }
+
+        return null;
+    }
+
     public function index(Request $request)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $q = $request->input('q');
         $status = $request->input('status');
         $floor_id = $request->input('floor_id');
         $perPage = $request->input('per_page', 10);
-    
+
         // Validate per_page value
         $allowedPerPage = [10, 25, 50, 100, -1]; // -1 means all
         if (!in_array($perPage, $allowedPerPage)) {
             $perPage = 10;
         }
-    
+
         $query = Room::query()
             ->where('company_id', Auth::user()->company_id)
             ->with(['floor', 'users'])
@@ -46,7 +69,7 @@ class RoomController extends Controller
             ->orderBy('floor_id')
             ->orderBy('sort_order')
             ->orderBy('room_number');
-    
+
         // If per_page is -1, get all without pagination
         if ($perPage == -1) {
             $rooms = $query->get();
@@ -61,14 +84,19 @@ class RoomController extends Controller
         } else {
             $rooms = $query->paginate($perPage)->withQueryString();
         }
-    
+
         $floors = Floor::where('is_active', true)->orderBy('floor_number')->get();
-    
+
         return view('admin.room.rooms', compact('rooms', 'floors', 'q', 'status', 'floor_id', 'perPage'));
     }
 
     public function create()
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $companyId = Auth::user()->company_id;
         $floors = Floor::where('company_id', $companyId)->where('is_active', true)->orderBy('floor_number')->get();
         $categories = Category::where('company_id', $companyId)->where('is_active', true)->orderBy('name')->get();
@@ -77,11 +105,16 @@ class RoomController extends Controller
 
     public function edit($id)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $companyId = Auth::user()->company_id;
         $room = Room::where('company_id', $companyId)->with(['floor', 'users'])->findOrFail($id);
         $floors = Floor::where('company_id', $companyId)->where('is_active', true)->orderBy('floor_number')->get();
         $categories = Category::where('company_id', $companyId)->where('is_active', true)->orderBy('name')->get();
-        
+
         // Odaya atanmış kullanıcıları kategori bazında grupla
         $assignedCategoryUsers = [];
         foreach ($room->users as $user) {
@@ -93,12 +126,17 @@ class RoomController extends Controller
                 $assignedCategoryUsers[$categoryId][] = $user->id;
             }
         }
-        
+
         return view('admin.room.edit-room', compact('room', 'floors', 'categories', 'assignedCategoryUsers'));
     }
 
     public function update(Request $request, $id)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $request->validate([
             'floor_id' => 'required|exists:floors,id',
             'room_number' => 'required|string|max:255',
@@ -113,14 +151,14 @@ class RoomController extends Controller
         ]);
 
         $room = Room::where('company_id', Auth::user()->company_id)->findOrFail($id);
-        
+
         // Aynı katta aynı oda numarası kontrolü
         $existingRoom = Room::where('company_id', Auth::user()->company_id)
             ->where('floor_id', $request->input('floor_id'))
             ->where('room_number', $request->input('room_number'))
             ->where('id', '!=', $id)
             ->first();
-            
+
         if ($existingRoom) {
             return redirect()
                 ->back()
@@ -145,7 +183,7 @@ class RoomController extends Controller
         foreach ($categoryUsers as $categoryUser) {
             $categoryId = $categoryUser['category_id'] ?? null;
             $userIds = $categoryUser['user_ids'] ?? [];
-            
+
             if ($categoryId && !empty($userIds)) {
                 foreach ($userIds as $userId) {
                     $room->users()->attach($userId, ['category_id' => $categoryId]);
@@ -160,6 +198,11 @@ class RoomController extends Controller
 
     public function store(Request $request)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $request->validate([
             'floor_id' => 'required|exists:floors,id',
             'room_number' => 'required|string|max:255',
@@ -178,7 +221,7 @@ class RoomController extends Controller
             ->where('floor_id', $request->input('floor_id'))
             ->where('room_number', $request->input('room_number'))
             ->first();
-            
+
         if ($existingRoom) {
             return redirect()
                 ->back()
@@ -202,7 +245,7 @@ class RoomController extends Controller
         foreach ($categoryUsers as $categoryUser) {
             $categoryId = $categoryUser['category_id'] ?? null;
             $userIds = $categoryUser['user_ids'] ?? [];
-            
+
             if ($categoryId && !empty($userIds)) {
                 foreach ($userIds as $userId) {
                     $room->users()->attach($userId, ['category_id' => $categoryId]);
@@ -215,11 +258,16 @@ class RoomController extends Controller
 
     public function destroy(Room $room)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         if ($room->company_id !== Auth::user()->company_id) {
             abort(403, 'Bu odaya erişim yetkiniz yok.');
         }
         $room->delete();
-    
+
         return redirect()
             ->back()
             ->with('success', 'Oda başarıyla silindi.');
@@ -227,13 +275,18 @@ class RoomController extends Controller
 
     public function show($id, Request $request)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $room = Room::where('company_id', Auth::user()->company_id)
             ->with(['floor', 'orders.items.product'])
             ->withCount('orders')
             ->findOrFail($id);
-        
+
         $closed = $request->input('closed');
-        
+
         $orders = $room->orders()
             ->with('items.product')
             ->when($closed === '1', function ($query) {
@@ -245,12 +298,17 @@ class RoomController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->withQueryString();
-    
+
         return view('admin.room.show-room', compact('room', 'orders', 'closed'));
     }
 
     public function bulkAssignStaff(Request $request)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $request->validate([
             'room_ids' => 'required|array',
             'room_ids.*' => 'exists:rooms,id',
@@ -264,8 +322,8 @@ class RoomController extends Controller
         Room::where('company_id', $companyId)->whereIn('id', $roomIds)->update(['user_id' => $userId]);
 
         $count = count($roomIds);
-        $message = $userId 
-            ? "{$count} oda için görevli atandı." 
+        $message = $userId
+            ? "{$count} oda için görevli atandı."
             : "{$count} oda için görevli ataması kaldırıldı.";
 
         return response()->json([
@@ -279,6 +337,11 @@ class RoomController extends Controller
      */
     public function generateQrCode($id)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $room = Room::where('company_id', Auth::user()->company_id)->findOrFail($id);
 
         // Get or create QR sticker for this room
@@ -303,6 +366,11 @@ class RoomController extends Controller
      */
     public function downloadQrCode($id)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $room = Room::where('company_id', Auth::user()->company_id)->findOrFail($id);
 
         // Get or create QR sticker for this room
@@ -331,6 +399,11 @@ class RoomController extends Controller
      */
     public function bulkPrintQr(Request $request)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $request->validate([
             'room_ids' => 'required|array',
             'room_ids.*' => 'exists:rooms,id',
@@ -374,7 +447,7 @@ class RoomController extends Controller
                 $qrCode = QrCode::size(150)
                     ->format('svg')
                     ->generate($qrUrl);
-                
+
                 $qrCodes[] = [
                     'room' => $room,
                     'qrCode' => $qrCode,
@@ -391,6 +464,11 @@ class RoomController extends Controller
      */
     public function getUsersByCategory(Request $request)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $request->validate([
             'category_id' => 'required|exists:categories,id',
         ]);
@@ -404,8 +482,8 @@ class RoomController extends Controller
 
         $users = $category->users()
             ->where('users.company_id', $companyId)
-            ->orderBy('users.name')
-            ->get(['users.id', 'users.name', 'users.email']);
+            ->orderBy('users.name_surname')
+            ->get(['users.id', 'users.name_surname', 'users.email']);
 
         return response()->json([
             'success' => true,

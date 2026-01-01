@@ -15,6 +15,14 @@
     <link rel="stylesheet" href="{{ asset('site/assets/css/responsive-sm.css') }}">
     <link rel="stylesheet" href="{{ asset('site/assets/css/responsive-md.css') }}">
     <link rel="stylesheet" href="{{ asset('site/assets/css/responsive-lg.css') }}">
+    @if($company && $company->primary_color)
+    <style>
+        :root {
+            --primary-color: {{ $company->primary_color }};
+            --primary-color-soft: {{ $company->primary_color }}08;
+        }
+    </style>
+    @endif
 </head>
 <body>
 
@@ -53,7 +61,7 @@
             <div class="col-6">
                 <div class="logo h-100 d-flex align-items-center justify-content-center">
                     <a href="{{ route('site.home') }}">
-                        <img class="logo-img" src="{{ asset('site/assets/img/logo.svg') }}" alt="Logo">
+                        <img class="logo-img" src="{{ asset('site/assets/img/logo.png') }}" alt="Logo">
                     </a>
                 </div>
             </div>

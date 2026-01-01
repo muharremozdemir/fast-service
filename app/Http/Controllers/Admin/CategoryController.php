@@ -10,15 +10,15 @@ use Illuminate\Support\Facades\Auth;
 
 class CategoryController extends Controller
 {
-   
+
     public function index(Request $request)
     {
         $q = $request->input('q');
-        $status = $request->input('status'); 
-    
+        $status = $request->input('status');
+
         $categories = Category::query()
             ->where('company_id', Auth::user()->company_id)
-            ->with(['users'])
+            ->with(['users', 'parent'])
             ->when($q, function ($query, $q) {
                 $query->where(function ($query) use ($q) {
                     $query->where('name', 'like', "%{$q}%")
@@ -29,31 +29,42 @@ class CategoryController extends Controller
             ->when($status !== null, function ($query) use ($status) {
                 $query->where('is_active', $status);
             })
-            ->orderByRaw('CASE WHEN parent_id IS NULL THEN 0 ELSE 1 END') 
-            ->orderBy('sort_order') 
+            ->orderByRaw('CASE WHEN parent_id IS NULL THEN 0 ELSE 1 END')
+            ->orderBy('sort_order')
             ->paginate(10)
             ->withQueryString();
-    
+
         return view('admin.category.categories', compact('categories', 'q', 'status'));
     }
-    
+
 
     public function create()
     {
-        $staff = User::where('company_id', Auth::user()->company_id)->orderBy('name')->get();
-        return view('admin.category.add-category', compact('staff'));
+        $staff = User::where('company_id', Auth::user()->company_id)->orderBy('name_surname')->get();
+        $parentCategories = Category::where('company_id', Auth::user()->company_id)
+            ->whereNull('parent_id')
+            ->orderBy('name')
+            ->get();
+        return view('admin.category.add-category', compact('staff', 'parentCategories'));
     }
 
     public function edit($id)
     {
         $category = Category::where('company_id', Auth::user()->company_id)->with('users')->findOrFail($id);
-        $staff = User::where('company_id', Auth::user()->company_id)->orderBy('name')->get();
-        return view('admin.category.edit-category', compact('category', 'staff'));
+        $staff = User::where('company_id', Auth::user()->company_id)->orderBy('name_surname')->get();
+        // Üst kategori seçenekleri: Kendisi ve alt kategorileri hariç
+        $parentCategories = Category::where('company_id', Auth::user()->company_id)
+            ->whereNull('parent_id')
+            ->where('id', '!=', $id)
+            ->orderBy('name')
+            ->get();
+        return view('admin.category.edit-category', compact('category', 'staff', 'parentCategories'));
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
+            'parent_id' => 'nullable|exists:categories,id',
             'category_name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'sort_order' => 'nullable|integer',
@@ -64,6 +75,21 @@ class CategoryController extends Controller
         ]);
 
         $category = Category::where('company_id', Auth::user()->company_id)->findOrFail($id);
+
+        // Üst kategori kontrolü: kendi şirketine ait olmalı ve kendisi olmamalı
+        $parentId = $request->input('parent_id');
+        if (!empty($parentId)) {
+            $parentCategory = Category::where('company_id', Auth::user()->company_id)
+                ->where('id', $parentId)
+                ->first();
+            if (!$parentCategory || $parentId == $id) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Geçersiz üst kategori seçildi.');
+            }
+        } else {
+            $parentId = null; // Ana kategori
+        }
 
         // Seçilen kullanıcıların şirkete ait olduğunu kontrol et
         $userIds = $request->input('user_ids', []);
@@ -80,6 +106,7 @@ class CategoryController extends Controller
 
         $category->name = $request->input('category_name');
         $category->slug = \Str::slug($category->name);
+        $category->parent_id = $parentId;
         $category->description = $request->input('description');
         $category->is_active = (int) $request->input('is_active', 0);
         $category->sort_order = (int) $request->input('sort_order', 0);
@@ -106,6 +133,7 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'parent_id' => 'nullable|exists:categories,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'sort_order' => 'nullable|integer',
@@ -114,6 +142,21 @@ class CategoryController extends Controller
             'user_ids.*' => 'exists:users,id',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
+
+        // Üst kategori kontrolü: kendi şirketine ait olmalı
+        $parentId = $request->input('parent_id');
+        if (!empty($parentId)) {
+            $parentCategory = Category::where('company_id', Auth::user()->company_id)
+                ->where('id', $parentId)
+                ->first();
+            if (!$parentCategory) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Geçersiz üst kategori seçildi.');
+            }
+        } else {
+            $parentId = null; // Ana kategori
+        }
 
         // Seçilen kullanıcıların şirkete ait olduğunu kontrol et
         $userIds = $request->input('user_ids', []);
@@ -131,6 +174,7 @@ class CategoryController extends Controller
         $category = new Category();
         $category->name = $request->input('name');
         $category->slug = \Str::slug($category->name);
+        $category->parent_id = $parentId;
         $category->description = $request->input('description');
         $category->sort_order = (int) $request->input('sort_order', 0);
         $category->is_active = (int) $request->input('is_active');
@@ -159,7 +203,7 @@ class CategoryController extends Controller
             abort(403, 'Bu kategoriye erişim yetkiniz yok.');
         }
         $category->delete();
-    
+
         return redirect()
             ->back()
             ->with('success', 'Kategori başarıyla silindi.');

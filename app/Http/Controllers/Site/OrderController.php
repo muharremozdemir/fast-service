@@ -7,8 +7,10 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Room;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
 class OrderController extends Controller
@@ -39,8 +41,11 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
 
+            // Get cart items with product and category
+            $cartItems = $cart->items()->with('product.category')->get();
+
             // Calculate total
-            $total = $cart->items()->with('product')->get()->sum(function ($item) {
+            $total = $cartItems->sum(function ($item) {
                 return $item->quantity * $item->product->price;
             });
 
@@ -49,30 +54,48 @@ class OrderController extends Controller
                 ->where('is_active', true)
                 ->first();
 
+            if (!$room) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Oda bulunamadı.'
+                ], 400);
+            }
+
             // Create order
             $order = Order::create([
-                'room_id' => $room ? $room->id : null,
+                'room_id' => $room->id,
                 'room_number' => $roomNumber,
                 'order_number' => Order::generateOrderNumber(),
                 'status' => 'pending',
                 'total' => $total,
                 'notes' => $request->input('notes'),
+                'company_id' => $room->company_id,
             ]);
 
-            // Create order items
-            foreach ($cart->items()->with('product')->get() as $cartItem) {
+            // Create order items and collect category IDs
+            $categoryIds = [];
+            foreach ($cartItems as $cartItem) {
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $cartItem->product_id,
                     'quantity' => $cartItem->quantity,
                     'price' => $cartItem->product->price,
                 ]);
+
+                // Collect category IDs for notifications
+                if ($cartItem->product->category_id) {
+                    $categoryIds[] = $cartItem->product->category_id;
+                }
             }
 
             // Clear cart
             $cart->items()->delete();
 
             DB::commit();
+
+            // Send notifications to category responsible staff (after commit)
+            $this->sendNotificationsToCategoryStaff($order, array_unique($categoryIds));
 
             return response()->json([
                 'success' => true,
@@ -82,11 +105,67 @@ class OrderController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Sipariş oluşturulurken hata: ' . $e->getMessage());
             
             return response()->json([
                 'success' => false,
                 'message' => 'Sipariş oluşturulurken bir hata oluştu.'
             ], 500);
+        }
+    }
+
+    /**
+     * Send notifications to staff assigned to categories
+     * Only sends to users with availability_status = 'busy'
+     */
+    private function sendNotificationsToCategoryStaff(Order $order, array $categoryIds)
+    {
+        if (empty($categoryIds)) {
+            return;
+        }
+
+        try {
+            // Get categories with their assigned users (only busy users with player_id)
+            $categories = Category::whereIn('id', $categoryIds)
+                ->with(['users' => function ($query) {
+                    $query->whereNotNull('player_id')
+                        ->where('player_id', '!=', '')
+                        ->where('availability_status', 'busy');
+                }])
+                ->get();
+
+            foreach ($categories as $category) {
+                // Get player IDs of users assigned to this category
+                $playerIds = $category->users->pluck('player_id')->filter()->values()->toArray();
+
+                if (empty($playerIds)) {
+                    Log::info("Kategori '{$category->name}' için müsait (busy) personel bulunamadı veya player_id yok.");
+                    continue;
+                }
+
+                // Send notification
+                $title = "Yeni Sipariş - {$category->name}";
+                $message = "Oda {$order->room_number} - Sipariş #{$order->order_number}";
+
+                $result = sendOneSignalNotification(
+                    $title,
+                    $message,
+                    $order->id,
+                    $playerIds
+                );
+
+                Log::info("Bildirim gönderildi - Kategori: {$category->name}", [
+                    'order_id' => $order->id,
+                    'player_ids' => $playerIds,
+                    'result' => $result
+                ]);
+            }
+        } catch (\Exception $e) {
+            // Log error but don't fail the order
+            Log::error('Bildirim gönderilirken hata: ' . $e->getMessage(), [
+                'order_id' => $order->id,
+                'category_ids' => $categoryIds
+            ]);
         }
     }
 

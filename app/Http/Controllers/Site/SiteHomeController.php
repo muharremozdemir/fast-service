@@ -7,6 +7,7 @@ use App\Mail\DemoRequestMail;
 use App\Models\Category;
 use App\Models\QrSticker;
 use App\Models\Room;
+use App\Models\Slider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
@@ -30,15 +31,22 @@ class SiteHomeController extends Controller
 
         // Company bilgisini al (room_number'dan)
         $company = null;
+        $sliders = collect();
         $roomNumber = Session::get('room_number');
         if ($roomNumber) {
             $room = Room::where('room_number', $roomNumber)->first();
             if ($room && $room->company) {
                 $company = $room->company;
+                // Company'ye ait aktif slider'ları çek
+                $sliders = Slider::where('company_id', $company->id)
+                    ->where('is_active', 1)
+                    ->orderBy('sort_order')
+                    ->orderBy('created_at', 'desc')
+                    ->get();
             }
         }
 
-        return view('site.index', compact('categories', 'company'));
+        return view('site.index', compact('categories', 'company', 'sliders'));
     }
 
     /**

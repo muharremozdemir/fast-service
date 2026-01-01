@@ -41,6 +41,18 @@
         <!--end::Page title-->
         <!--begin::Actions-->
         <div class="d-flex align-items-center gap-2 gap-lg-3">
+            @if($user->player_id)
+            <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#sendNotificationModal">
+                <i class="ki-duotone ki-notification-on fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                    <span class="path4"></span>
+                    <span class="path5"></span>
+                </i>
+                Bildirim Gönder
+            </button>
+            @endif
             <a href="{{ route('admin.staff.index') }}" class="btn btn-sm btn-light">
                 <i class="ki-duotone ki-arrow-left fs-2">
                     <span class="path1"></span>
@@ -59,6 +71,28 @@
 <div id="kt_app_content" class="app-content flex-column-fluid">
     <!--begin::Content container-->
     <div id="kt_app_content_container" class="app-container container-xxl">
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show mb-5" role="alert">
+                <i class="ki-duotone ki-check-circle fs-2 text-success me-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                </i>
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show mb-5" role="alert">
+                <i class="ki-duotone ki-cross-circle fs-2 text-danger me-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                </i>
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         <!--begin::Form-->
         <form id="kt_staff_form" class="form" action="{{ route('admin.staff.update', $user->id) }}" method="POST">
             @csrf
@@ -301,9 +335,88 @@
 </div>
 <!--end::Content-->
 
+@if($user->player_id)
+<!--begin::Notification Modal-->
+<div class="modal fade" id="sendNotificationModal" tabindex="-1" aria-labelledby="sendNotificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title fw-bold" id="sendNotificationModalLabel">
+                    <i class="ki-duotone ki-notification-on fs-2 text-info me-2">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                        <span class="path4"></span>
+                        <span class="path5"></span>
+                    </i>
+                    Bildirim Gönder
+                </h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="sendNotificationForm" action="{{ route('admin.staff.sendNotification', $user->id) }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-5">
+                        <div class="d-flex align-items-center mb-5">
+                            <div class="symbol symbol-50px me-4">
+                                <div class="symbol-label fs-2 fw-semibold text-primary bg-light-primary">
+                                    {{ mb_strtoupper(mb_substr($user->name_surname, 0, 1, 'UTF-8'), 'UTF-8') }}
+                                </div>
+                            </div>
+                            <div>
+                                <div class="fw-bold text-gray-800 fs-5">{{ $user->name_surname }}</div>
+                                <div class="text-muted fs-7">{{ $user->email }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-5">
+                        <label class="required form-label fw-semibold fs-6 mb-2">Bildirim Başlığı</label>
+                        <input type="text" name="notification_title" class="form-control form-control-solid" placeholder="Bildirim başlığını yazın..." required maxlength="100" />
+                    </div>
+                    
+                    <div class="mb-5">
+                        <label class="required form-label fw-semibold fs-6 mb-2">Bildirim İçeriği</label>
+                        <textarea name="notification_content" class="form-control form-control-solid" rows="4" placeholder="Bildirim içeriğini yazın..." required maxlength="500"></textarea>
+                        <div class="form-text">Maksimum 500 karakter</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-info" id="sendNotificationBtn">
+                        <span class="indicator-label">
+                            <i class="ki-duotone ki-send fs-2">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                            Gönder
+                        </span>
+                        <span class="indicator-progress">
+                            Gönderiliyor... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--end::Notification Modal-->
+@endif
+
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Notification form submit
+        const notificationForm = document.getElementById('sendNotificationForm');
+        const sendNotificationBtn = document.getElementById('sendNotificationBtn');
+        
+        if (notificationForm && sendNotificationBtn) {
+            notificationForm.addEventListener('submit', function() {
+                sendNotificationBtn.setAttribute('data-kt-indicator', 'on');
+                sendNotificationBtn.disabled = true;
+            });
+        }
+
         // Role search functionality
         const roleSearch = document.getElementById('role_search');
         const roleItems = document.querySelectorAll('.role-item');

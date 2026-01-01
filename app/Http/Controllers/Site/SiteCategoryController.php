@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Cart;
+use App\Models\Room;
 use Illuminate\Support\Facades\Session;
 
 class SiteCategoryController extends Controller
@@ -33,9 +34,15 @@ class SiteCategoryController extends Controller
 
       // Sepetteki ürünleri ve miktarlarını çek
       $cartItems = collect();
+      $company = null;
       $roomNumber = Session::get('room_number');
       
       if ($roomNumber) {
+          $room = Room::where('room_number', $roomNumber)->first();
+          if ($room && $room->company) {
+              $company = $room->company;
+          }
+          
           $cart = Cart::where('room_number', $roomNumber)->first();
           if ($cart) {
               $cartItems = $cart->items()
@@ -51,7 +58,8 @@ class SiteCategoryController extends Controller
           'currentParent',
           'currentChild',
           'products',
-          'cartItems'
+          'cartItems',
+          'company'
       ));
   }
 }

@@ -39,6 +39,13 @@ class CartController extends Controller
             return redirect()->route('site.home')->with('error', 'Lütfen önce oda numaranızı girin.');
         }
 
+        // Company bilgisini al
+        $company = null;
+        $room = Room::where('room_number', $roomNumber)->first();
+        if ($room && $room->company) {
+            $company = $room->company;
+        }
+
         $cart = Cart::where('room_number', $roomNumber)->first();
         
         if (!$cart) {
@@ -51,7 +58,7 @@ class CartController extends Controller
             });
         }
 
-        return view('site.cart', compact('cartItems', 'total', 'roomNumber'));
+        return view('site.cart', compact('cartItems', 'total', 'roomNumber', 'company'));
     }
 
     /**

@@ -20,6 +20,7 @@ class Company extends Model
         'license_expires_at',
         'logo_path',
         'logo_type',
+        'primary_color',
     ];
 
     protected $casts = [
@@ -60,6 +61,11 @@ class Company extends Model
     public function departments()
     {
         return $this->hasMany(Department::class);
+    }
+
+    public function sliders()
+    {
+        return $this->hasMany(Slider::class);
     }
 
     /**

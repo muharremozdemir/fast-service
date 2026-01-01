@@ -4,13 +4,37 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Block;
+use App\Models\Floor;
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class BlockController extends Controller
 {
+    /**
+     * Check if onboarding is needed and redirect if necessary
+     */
+    private function checkOnboarding()
+    {
+        $companyId = Auth::user()->company_id;
+        $hasBlocks = Block::where('company_id', $companyId)->exists();
+        $hasFloors = Floor::where('company_id', $companyId)->exists();
+        $hasRooms = Room::where('company_id', $companyId)->exists();
+
+        if (!$hasBlocks || !$hasFloors || !$hasRooms) {
+            return redirect()->route('admin.onboarding.welcome');
+        }
+
+        return null;
+    }
+
     public function index(Request $request)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $q = $request->input('q');
         $status = $request->input('status');
     
@@ -36,17 +60,32 @@ class BlockController extends Controller
 
     public function create()
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         return view('admin.block.add-block');
     }
 
     public function edit($id)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $block = Block::where('company_id', Auth::user()->company_id)->findOrFail($id);
         return view('admin.block.edit-block', compact('block'));
     }
 
     public function update(Request $request, $id)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'block_code' => 'nullable|string|max:50|unique:blocks,block_code,' . $id,
@@ -71,6 +110,11 @@ class BlockController extends Controller
 
     public function store(Request $request)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'block_code' => 'nullable|string|max:50|unique:blocks,block_code',
@@ -94,6 +138,11 @@ class BlockController extends Controller
 
     public function destroy(Block $block)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         if ($block->company_id !== Auth::user()->company_id) {
             abort(403, 'Bu bloka erişim yetkiniz yok.');
         }

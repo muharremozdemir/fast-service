@@ -16,6 +16,8 @@ use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\RoleController as AdminRoleController;
 use App\Http\Controllers\Admin\StaffController as AdminStaffController;
 use App\Http\Controllers\Admin\DepartmentController as AdminDepartmentController;
+use App\Http\Controllers\Admin\OnboardingController as AdminOnboardingController;
+use App\Http\Controllers\Admin\SliderController as AdminSliderController;
 
 // Site
 use App\Http\Controllers\Site\SiteHomeController;
@@ -79,6 +81,16 @@ Route::get('/admin/license/suspended', [\App\Http\Controllers\Admin\LicenseContr
     ->middleware(\App\Http\Middleware\AdminAuth::class);
 
 Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAuth::class)->group(function () {
+
+    // Onboarding routes
+    Route::get('/onboarding', [AdminOnboardingController::class, 'welcome'])->name('onboarding.welcome');
+    Route::get('/onboarding/step1', [AdminOnboardingController::class, 'step1'])->name('onboarding.step1');
+    Route::post('/onboarding/step1', [AdminOnboardingController::class, 'storeBlock'])->name('onboarding.storeBlock');
+    Route::get('/onboarding/step2', [AdminOnboardingController::class, 'step2'])->name('onboarding.step2');
+    Route::post('/onboarding/step2', [AdminOnboardingController::class, 'storeFloor'])->name('onboarding.storeFloor');
+    Route::get('/onboarding/step3', [AdminOnboardingController::class, 'step3'])->name('onboarding.step3');
+    Route::post('/onboarding/step3', [AdminOnboardingController::class, 'storeRoom'])->name('onboarding.storeRoom');
+    Route::get('/onboarding/complete', [AdminOnboardingController::class, 'complete'])->name('onboarding.complete');
 
     Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories.index');
     Route::get('/categories/create', [AdminCategoryController::class, 'create'])->name('categories.create');
@@ -144,6 +156,7 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAut
     // Settings (Ayarlar) - Sadece hotel yöneticisi için
     Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings/logo', [AdminSettingsController::class, 'updateLogo'])->name('settings.updateLogo');
+    Route::post('/settings/primary-color', [AdminSettingsController::class, 'updatePrimaryColor'])->name('settings.updatePrimaryColor');
 
     // Roles (Kullanıcı Rolleri)
     Route::get('/roles', [AdminRoleController::class, 'index'])->name('roles.index');
@@ -159,6 +172,7 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAut
     Route::post('/staff/store', [AdminStaffController::class, 'store'])->name('staff.store');
     Route::get('/staff/edit/{id}', [AdminStaffController::class, 'edit'])->name('staff.edit');
     Route::put('/staff/update/{id}', [AdminStaffController::class, 'update'])->name('staff.update');
+    Route::post('/staff/{id}/send-notification', [AdminStaffController::class, 'sendNotification'])->name('staff.sendNotification');
 
     // Departments (Departmanlar)
     Route::get('/departments', [AdminDepartmentController::class, 'index'])->name('departments.index');
@@ -167,6 +181,14 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAut
     Route::get('/departments/edit/{id}', [AdminDepartmentController::class, 'edit'])->name('departments.edit');
     Route::put('/departments/update/{id}', [AdminDepartmentController::class, 'update'])->name('departments.update');
     Route::delete('/departments/{id}', [AdminDepartmentController::class, 'destroy'])->name('departments.destroy');
+
+    // Sliders (Slider Yönetimi)
+    Route::get('/sliders', [AdminSliderController::class, 'index'])->name('sliders.index');
+    Route::get('/sliders/create', [AdminSliderController::class, 'create'])->name('sliders.create');
+    Route::post('/sliders/store', [AdminSliderController::class, 'store'])->name('sliders.store');
+    Route::get('/sliders/edit/{id}', [AdminSliderController::class, 'edit'])->name('sliders.edit');
+    Route::put('/sliders/update/{id}', [AdminSliderController::class, 'update'])->name('sliders.update');
+    Route::delete('/sliders/{id}', [AdminSliderController::class, 'destroy'])->name('sliders.destroy');
 
 });
 

@@ -38,6 +38,14 @@
     <link rel="stylesheet" href="{{ asset('site/assets/css/responsive-sm.css') }}">
     <link rel="stylesheet" href="{{ asset('site/assets/css/responsive-md.css') }}">
     <link rel="stylesheet" href="{{ asset('site/assets/css/responsive-lg.css') }}">
+    @if($company && $company->primary_color)
+    <style>
+        :root {
+            --primary-color: {{ $company->primary_color }};
+            --primary-color-soft: {{ $company->primary_color }}08;
+        }
+    </style>
+    @endif
 </head>
 <body>
 
@@ -149,23 +157,25 @@
 
 
 <!-- Slider -->
+@if($sliders && $sliders->count() > 0)
 <div class="container">
     <div class="swiper">
         <div class="swiper-wrapper">
-            @for ($i = 0; $i < 3; $i++)
+            @foreach($sliders as $slider)
             <div class="swiper-slide">
                 <div class="slide">
-                    <img class="slide-img" src="{{ asset('site/assets/img/slide-img-1.jpg') }}" alt="slide">
+                    <img class="slide-img" src="{{ $slider->image_path ? asset('storage/' . $slider->image_path) : asset('site/assets/img/slide-img-1.jpg') }}" alt="{{ $slider->title }}">
                     <div class="slide-text-wrapper">
-                        <p class="slide-text">Yerli alkollerde %50 indirim!</p>
+                        <p class="slide-text">{{ $slider->title }}</p>
                     </div>
                 </div>
             </div>
-            @endfor
+            @endforeach
         </div>
         <div class="swiper-pagination"></div>
     </div>
 </div>
+@endif
 <!-- Kategoriler -->
 <div class="container">
     <div class="row category-row">

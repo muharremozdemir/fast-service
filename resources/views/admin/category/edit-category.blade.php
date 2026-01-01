@@ -78,6 +78,24 @@
                     <!--begin::Card body-->
                     <div class="card-body pt-0">
                         <div class="row mb-10">
+                            <!--begin::Üst Kategori-->
+                            <div class="col-md-6 fv-row mb-7">
+                                <label class="form-label fw-semibold fs-6 mb-2">Üst Kategori</label>
+                                <select name="parent_id" id="parent_id" class="form-select form-select-solid @error('parent_id') is-invalid @enderror">
+                                    <option value="" {{ old('parent_id', $category->parent_id) == null ? 'selected' : '' }}>Ana Kategori</option>
+                                    @foreach($parentCategories as $parentCategory)
+                                        <option value="{{ $parentCategory->id }}" {{ old('parent_id', $category->parent_id) == $parentCategory->id ? 'selected' : '' }}>
+                                            {{ $parentCategory->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('parent_id')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                                <div class="form-text">Bu kategorinin bağlı olacağı üst kategoriyi seçin. Ana Kategori seçilirse bu kategori üst kategori olmadan oluşturulur.</div>
+                            </div>
+                            <!--end::Üst Kategori-->
+
                             <!--begin::Kategori Adı-->
                             <div class="col-md-6 fv-row mb-7">
                                 <label class="required form-label fw-semibold fs-6 mb-2">Kategori Adı</label>
@@ -88,7 +106,9 @@
                                 <div class="form-text">Kategori adı müşteriler tarafından görüntülenecektir.</div>
                             </div>
                             <!--end::Kategori Adı-->
+                        </div>
 
+                        <div class="row mb-10">
                             <!--begin::Sıralama-->
                             <div class="col-md-6 fv-row mb-7">
                                 <label class="form-label fw-semibold fs-6 mb-2">Sıralama</label>
@@ -209,7 +229,7 @@
                                 <select name="user_ids[]" id="user_ids" class="form-select form-select-solid @error('user_ids') is-invalid @enderror" data-control="select2" data-placeholder="Personel seçin (Birden fazla seçebilirsiniz)" multiple>
                                     @foreach($staff as $user)
                                         <option value="{{ $user->id }}" {{ (old('user_ids') ? in_array($user->id, old('user_ids')) : $category->users->contains($user->id)) ? 'selected' : '' }}>
-                                            {{ $user->name }}
+                                            {{ $user->name_surname }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -235,7 +255,7 @@
                                         @if($selectedUsers->count() > 0)
                                             <div class="d-flex flex-wrap gap-2">
                                                 @foreach($selectedUsers as $user)
-                                                    <span class="badge badge-light-primary">{{ $user->name }}</span>
+                                                    <span class="badge badge-light-primary">{{ $user->name_surname }}</span>
                                                 @endforeach
                                             </div>
                                         @else
@@ -326,12 +346,12 @@
 @push('scripts')
 <script>
     "use strict";
-    
+
     document.addEventListener('DOMContentLoaded', function() {
         // Form validation ve submit işlemi
         const form = document.getElementById('kt_category_form');
         const submitButton = document.getElementById('kt_category_submit');
-        
+
         if (form) {
             form.addEventListener('submit', function(e) {
                 if (!form.checkValidity()) {
@@ -344,11 +364,25 @@
                 form.classList.add('was-validated');
             });
         }
-        
+
         // Select2 çoklu seçim için özelleştirme
         $('#user_ids').select2({
             placeholder: 'Personel seçin (Birden fazla seçebilirsiniz)',
             allowClear: true,
+            width: '100%',
+            language: {
+                noResults: function() {
+                    return "Sonuç bulunamadı";
+                },
+                searching: function() {
+                    return "Aranıyor...";
+                }
+            }
+        });
+
+        // Üst kategori Select2
+        $('#parent_id').select2({
+            allowClear: false,
             width: '100%',
             language: {
                 noResults: function() {
@@ -380,13 +414,13 @@
 
         userSelect.on('change', updateSelectedStaffSummary);
         updateSelectedStaffSummary();
-        
+
         // Görsel önizleme
         const imageInput = document.getElementById('image_input');
         const imagePreview = document.getElementById('image_preview');
         const previewImg = document.getElementById('preview_img');
         const removeImageBtn = document.getElementById('remove_image');
-        
+
         if (imageInput) {
             imageInput.addEventListener('change', function(e) {
                 const file = e.target.files[0];
@@ -403,7 +437,7 @@
                 }
             });
         }
-        
+
         if (removeImageBtn) {
             removeImageBtn.addEventListener('click', function() {
                 imageInput.value = '';

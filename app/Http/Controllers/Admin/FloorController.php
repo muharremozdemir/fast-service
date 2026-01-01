@@ -6,13 +6,36 @@ use App\Http\Controllers\Controller;
 use App\Models\Floor;
 use App\Models\User;
 use App\Models\Block;
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class FloorController extends Controller
 {
+    /**
+     * Check if onboarding is needed and redirect if necessary
+     */
+    private function checkOnboarding()
+    {
+        $companyId = Auth::user()->company_id;
+        $hasBlocks = Block::where('company_id', $companyId)->exists();
+        $hasFloors = Floor::where('company_id', $companyId)->exists();
+        $hasRooms = Room::where('company_id', $companyId)->exists();
+
+        if (!$hasBlocks || !$hasFloors || !$hasRooms) {
+            return redirect()->route('admin.onboarding.welcome');
+        }
+
+        return null;
+    }
+
     public function index(Request $request)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $q = $request->input('q');
         $status = $request->input('status');
     
@@ -39,6 +62,11 @@ class FloorController extends Controller
 
     public function create()
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $companyId = Auth::user()->company_id;
         $staff = User::where('company_id', $companyId)->orderBy('name')->get();
         $blocks = Block::where('company_id', $companyId)->where('is_active', true)->orderBy('sort_order')->orderBy('name')->get();
@@ -47,6 +75,11 @@ class FloorController extends Controller
 
     public function edit($id)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $companyId = Auth::user()->company_id;
         $floor = Floor::where('company_id', $companyId)->findOrFail($id);
         $staff = User::where('company_id', $companyId)->orderBy('name')->get();
@@ -56,6 +89,11 @@ class FloorController extends Controller
 
     public function update(Request $request, $id)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'block_id' => 'required|exists:blocks,id',
@@ -97,6 +135,11 @@ class FloorController extends Controller
 
     public function store(Request $request)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'block_id' => 'required|exists:blocks,id',
@@ -135,6 +178,11 @@ class FloorController extends Controller
 
     public function destroy(Floor $floor)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         if ($floor->company_id !== Auth::user()->company_id) {
             abort(403, 'Bu kata erişim yetkiniz yok.');
         }
@@ -147,6 +195,11 @@ class FloorController extends Controller
 
     public function bulkAssignStaff(Request $request)
     {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
         $request->validate([
             'floor_ids' => 'required|array',
             'floor_ids.*' => 'exists:floors,id',

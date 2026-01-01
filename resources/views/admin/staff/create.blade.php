@@ -80,8 +80,8 @@
                             <!--begin::Ad Soyad-->
                             <div class="col-md-6 fv-row mb-7">
                                 <label class="required form-label fw-semibold fs-6 mb-2">Adı Soyadı</label>
-                                <input type="text" name="name" class="form-control form-control-solid @error('name') is-invalid @enderror" placeholder="Kullanıcının adı soyadı" value="{{ old('name') }}" required />
-                                @error('name')
+                                <input type="text" name="name_surname" class="form-control form-control-solid @error('name_surname') is-invalid @enderror" placeholder="Kullanıcının adı soyadı" value="{{ old('name') }}" required />
+                                @error('name_surname')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -295,7 +295,7 @@
         // Role search functionality
         const roleSearch = document.getElementById('role_search');
         const roleItems = document.querySelectorAll('.role-item');
-        
+
         if (roleSearch) {
             roleSearch.addEventListener('input', function(e) {
                 const searchTerm = e.target.value.toLowerCase();
