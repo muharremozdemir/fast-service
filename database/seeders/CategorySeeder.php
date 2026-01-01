@@ -15,18 +15,14 @@ class CategorySeeder extends Seeder
     {
         $faker = Faker::create('tr_TR');
 
-        // Test firmasını bul veya oluştur
-        $company = Company::firstOrCreate(
-            ['name' => 'Test Şirketi'],
-            [
-                'email' => 'info@testfirma.com',
-                'phone' => '0212 555 12 34',
-                'address' => 'İstanbul, Türkiye',
-                'tax_number' => '1234567890',
-                'tax_office' => 'Kadıköy Vergi Dairesi',
-                'is_active' => true,
-            ]
-        );
+        // Company ID'yi sabitle
+        $companyId = 5;
+
+        // Mevcut ürünleri sil (sadece company_id=5 olanlar, kategorilerden önce silinmeli çünkü foreign key var)
+        Product::where('company_id', $companyId)->delete();
+        
+        // Mevcut kategorileri sil (sadece company_id=5 olanlar)
+        Category::where('company_id', $companyId)->delete();
 
         // 5 Ana kategori
         $mainCategories = [
@@ -48,7 +44,7 @@ class CategorySeeder extends Seeder
                 'sort_order' => $mainCat['sort_order'],
                 'is_active' => true,
                 'parent_id' => null,
-                'company_id' => $company->id,
+                'company_id' => $companyId,
                 'description' => $faker->sentence(10),
             ]);
         }
@@ -189,7 +185,7 @@ class CategorySeeder extends Seeder
                     'sort_order' => $subIndex + 1,
                     'is_active' => true,
                     'parent_id' => $parentMap[$mainSlug]->id,
-                    'company_id' => $company->id,
+                    'company_id' => $companyId,
                     'description' => $faker->sentence(8),
                 ]);
 
@@ -220,7 +216,7 @@ class CategorySeeder extends Seeder
                         'description' => $faker->sentence(12),
                         'is_active' => true,
                         'category_id' => $childCategory->id,
-                        'company_id' => $company->id,
+                        'company_id' => $companyId,
                         'type' => $type,
                     ]);
                 }
