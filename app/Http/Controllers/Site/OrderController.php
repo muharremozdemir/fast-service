@@ -76,16 +76,24 @@ class OrderController extends Controller
             // Create order items and collect category IDs
             $categoryIds = [];
             foreach ($cartItems as $cartItem) {
-                OrderItem::create([
+                $orderItem = OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $cartItem->product_id,
                     'quantity' => $cartItem->quantity,
                     'price' => $cartItem->product->price,
+                    'status' => 'pending', // Default status: Talep Alındı
                 ]);
 
                 // Collect category IDs for notifications
                 if ($cartItem->product->category_id) {
                     $categoryIds[] = $cartItem->product->category_id;
+                    
+                    // Get users assigned to this category and attach them to order item
+                    $category = Category::with('users')->find($cartItem->product->category_id);
+                    if ($category && $category->users->isNotEmpty()) {
+                        $userIds = $category->users->pluck('id')->toArray();
+                        $orderItem->notifiedUsers()->attach($userIds);
+                    }
                 }
             }
 

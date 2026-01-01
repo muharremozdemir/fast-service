@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class OrderItem extends Model
 {
@@ -12,6 +13,7 @@ class OrderItem extends Model
         'product_id',
         'quantity',
         'price',
+        'status',
     ];
 
     protected $casts = [
@@ -26,5 +28,24 @@ class OrderItem extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function notifiedUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'order_item_user')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get status label in Turkish
+     */
+    public function getStatusLabelAttribute(): string
+    {
+        return match($this->status) {
+            'pending' => 'Talep Alındı',
+            'in_progress' => 'Talep Karşılanıyor',
+            'completed' => 'Tamamlandı',
+            default => 'Bilinmeyen',
+        };
     }
 }
