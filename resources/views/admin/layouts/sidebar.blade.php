@@ -248,7 +248,7 @@
                                     <div class="menu-item">
                                         <a class="menu-link" href="{{ route('admin.dashboard.index') }}">
                                             <span class="menu-icon">
-                                                <i class="ki-duotone ki-element-screen fs-2">
+                                                <i class="ki-duotone ki-chart fs-2">
                                                     <span class="path1"></span>
                                                     <span class="path2"></span>
                                                     <span class="path3"></span>

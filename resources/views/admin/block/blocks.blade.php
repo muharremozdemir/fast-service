@@ -62,20 +62,21 @@
                             <span class="path2"></span>
                         </i>
                         <form method="GET" action="{{ route('admin.blocks.index') }}">
-                            <input type="text" name="q" value="{{ request('q') }}" class="form-control form-control-solid w-250px ps-12" placeholder="Blok ara..." />
+                            <input type="text" name="q" value="{{ request('q') }}" class="form-control form-control-solid w-100 w-md-250px ps-12" placeholder="Blok ara..." />
                         </form>
                     </div>
                 </div>
             </div>
             <div class="card-body pt-0">
+                <div class="table-responsive">
                 <table class="table align-middle table-row-dashed fs-6 gy-5">
                     <thead>
                         <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
-                            <th class="min-w-250px">Blok Adı</th>
-                            <th class="min-w-100px">Blok Kodu</th>
-                            <th class="min-w-100px">Kat Sayısı</th>
-                            <th class="min-w-100px">Durum</th>
-                            <th class="text-end min-w-70px">İşlemler</th>
+                            <th class="min-w-150px min-w-md-250px">Blok Adı</th>
+                            <th class="min-w-80px min-w-md-100px">Blok Kodu</th>
+                            <th class="min-w-80px min-w-md-100px">Kat Sayısı</th>
+                            <th class="min-w-80px min-w-md-100px">Durum</th>
+                            <th class="text-end min-w-100px min-w-md-150px">İşlemler</th>
                         </tr>
                     </thead>
                     <tbody class="fw-semibold text-gray-600">
@@ -83,8 +84,8 @@
                             <tr>
                                 <td>
                                     <div class="d-flex">
-                                        <div class="ms-5">
-                                            <a href="{{ route('admin.blocks.edit', $block) }}" class="text-gray-800 text-hover-primary fs-5 fw-bold mb-1">
+                                        <div class="ms-2 ms-md-5">
+                                            <a href="{{ route('admin.blocks.edit', $block) }}" class="text-gray-800 text-hover-primary fs-6 fs-md-5 fw-bold mb-1">
                                                 {{ $block->name }}
                                             </a>
                                             @if($block->description)
@@ -109,15 +110,26 @@
                                     </div>
                                 </td>
                                 <td class="text-end">
-                                    <div class="d-inline-flex">
-                                        <a href="{{ route('admin.blocks.edit', $block) }}" class="btn btn-sm btn-light btn-active-light-primary me-2">
-                                            Düzenle
+                                    <div class="d-inline-flex flex-wrap gap-2">
+                                        <a href="{{ route('admin.blocks.edit', $block) }}" class="btn btn-sm btn-light btn-active-light-primary">
+                                            <span class="d-none d-md-inline">Düzenle</span>
+                                            <i class="ki-duotone ki-notepad-edit d-md-none fs-5">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i>
                                         </a>
-                                        <form action="{{ route('admin.blocks.destroy', $block->id) }}" method="POST" onsubmit="return confirm('Silinsin mi?')">
+                                        <form action="{{ route('admin.blocks.destroy', $block->id) }}" method="POST" onsubmit="return confirm('Silinsin mi?')" class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-light btn-active-light-danger">
-                                                Sil
+                                                <span class="d-none d-md-inline">Sil</span>
+                                                <i class="ki-duotone ki-trash d-md-none fs-5">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                    <span class="path3"></span>
+                                                    <span class="path4"></span>
+                                                    <span class="path5"></span>
+                                                </i>
                                             </button>
                                         </form>
                                     </div>
@@ -130,12 +142,14 @@
                         @endforelse
                     </tbody>
                 </table>
+                </div>
                 
                 @if ($blocks->hasPages())
-                <div class="d-flex justify-content-between align-items-center mt-5">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-5 gap-3">
                     <div>
-                        <span class="text-muted">
-                            {{ $blocks->firstItem() }} - {{ $blocks->lastItem() }} arası gösteriliyor / Toplam: {{ $blocks->total() }}
+                        <span class="text-muted fs-7">
+                            <span class="d-none d-md-inline">{{ $blocks->firstItem() }} - {{ $blocks->lastItem() }} arası gösteriliyor / Toplam: {{ $blocks->total() }}</span>
+                            <span class="d-md-none">Toplam: {{ $blocks->total() }}</span>
                         </span>
                     </div>
                     <div>
