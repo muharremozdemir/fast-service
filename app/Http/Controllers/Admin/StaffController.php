@@ -243,8 +243,7 @@ class StaffController extends Controller
         $content = $request->input('notification_content');
 
         // OneSignal ile bildirim gönder
-
-        $result = $this->oneSignalService->sendNotification($title, $content, $id);
+        $result = $this->oneSignalService->sendNotification($title, $content, $user->player_id);
 
         if (isset($result['error']) && $result['error']) {
             return redirect()
