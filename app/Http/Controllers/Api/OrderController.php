@@ -212,7 +212,7 @@ class OrderController extends Controller
         // Eğer sipariş içindeki tüm ürünler tamamlandı durumunda ise siparişin ana durumunu da tamamlandı yap
         $order = $orderItem->order;
         $allItemsCompleted = $order->items()->where('status', '!=', 'completed')->doesntExist();
-        
+
         if ($allItemsCompleted) {
             $order->status = 'completed';
             $order->save();
@@ -225,6 +225,7 @@ class OrderController extends Controller
                 'id' => $orderItem->id,
                 'status' => $orderItem->status,
                 'status_label' => $orderItem->status_label,
+                'order_status' => $order->refresh()->status,
             ],
         ]);
     }
