@@ -283,8 +283,18 @@ class OrderController extends Controller
         $title = "Hatırlatma - {$productName}";
         $message = "Oda {$order->room_number} - Sipariş #{$order->order_number} için hatırlatma";
 
+        // Flutter tarafında deep linking için data ekle
+        $data = [
+            'type' => 'order_item',
+            'order_id' => $order->id,
+            'order_number' => $order->order_number,
+            'order_item_id' => $orderItem->id,
+            'room_number' => $order->room_number,
+            'action' => 'open_order',
+        ];
+
         // Bildirim gönder
-        $result = $this->oneSignalService->sendNotification($title, $message, $playerIds, [], 'tr');
+        $result = $this->oneSignalService->sendNotification($title, $message, $playerIds, $data, 'tr');
 
         Log::info("Hatırlatma bildirimi gönderildi", [
             'order_item_id' => $orderItem->id,
