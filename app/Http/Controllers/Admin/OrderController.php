@@ -221,6 +221,15 @@ class OrderController extends Controller
         $orderItem->status = $request->status;
         $orderItem->save();
 
+        // Eğer sipariş içindeki tüm ürünler tamamlandı durumunda ise siparişin ana durumunu da tamamlandı yap
+        $order = $orderItem->order;
+        $allItemsCompleted = $order->items()->where('status', '!=', 'completed')->doesntExist();
+        
+        if ($allItemsCompleted) {
+            $order->status = 'completed';
+            $order->save();
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Ürün durumu güncellendi.',
