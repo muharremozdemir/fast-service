@@ -115,8 +115,8 @@
                             <!--begin::Ad Soyad-->
                             <div class="col-md-6 fv-row mb-7">
                                 <label class="required form-label fw-semibold fs-6 mb-2">Adı Soyadı</label>
-                                <input type="text" name="name" class="form-control form-control-solid @error('name') is-invalid @enderror" placeholder="Kullanıcının adı soyadı" value="{{ old('name', $user->name) }}" required />
-                                @error('name')
+                                <input type="text" name="name_surname" class="form-control form-control-solid @error('name_surname') is-invalid @enderror" placeholder="Kullanıcının adı soyadı" value="{{ old('name', $user->name_surname) }}" required />
+                                @error('name_surname')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -369,12 +369,12 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="mb-5">
                         <label class="required form-label fw-semibold fs-6 mb-2">Bildirim Başlığı</label>
                         <input type="text" name="notification_title" class="form-control form-control-solid" placeholder="Bildirim başlığını yazın..." required maxlength="100" />
                     </div>
-                    
+
                     <div class="mb-5">
                         <label class="required form-label fw-semibold fs-6 mb-2">Bildirim İçeriği</label>
                         <textarea name="notification_content" class="form-control form-control-solid" rows="4" placeholder="Bildirim içeriğini yazın..." required maxlength="500"></textarea>
@@ -409,7 +409,7 @@
         // Notification form submit
         const notificationForm = document.getElementById('sendNotificationForm');
         const sendNotificationBtn = document.getElementById('sendNotificationBtn');
-        
+
         if (notificationForm && sendNotificationBtn) {
             notificationForm.addEventListener('submit', function() {
                 sendNotificationBtn.setAttribute('data-kt-indicator', 'on');
@@ -420,7 +420,7 @@
         // Role search functionality
         const roleSearch = document.getElementById('role_search');
         const roleItems = document.querySelectorAll('.role-item');
-        
+
         if (roleSearch) {
             roleSearch.addEventListener('input', function(e) {
                 const searchTerm = e.target.value.toLowerCase();
