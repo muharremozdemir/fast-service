@@ -64,6 +64,11 @@
                         <i class="fas fa-info-circle" style="font-size: 16px;"></i>
                     </button>
                     @endif
+                    @if($company && $company->phone)
+                    <a href="tel:{{ $company->phone }}" class="btn btn-light btn-fastservice">
+                        <i class="fas fa-phone" style="font-size: 16px;"></i>
+                    </a>
+                    @endif
                 </div>
             </div>
             <div class="col-6">

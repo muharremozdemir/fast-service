@@ -57,6 +57,11 @@
                             <li><a class="dropdown-item" href="#">Ipsum</a></li>
                         </ul>
                     </div>
+                    @if($company && $company->phone)
+                    <a href="tel:{{ $company->phone }}" class="btn btn-light btn-fastservice">
+                        <i class="fas fa-phone" style="font-size: 16px;"></i>
+                    </a>
+                    @endif
                 </div>
             </div>
             <div class="col-6">
