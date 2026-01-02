@@ -54,7 +54,10 @@ class CartController extends Controller
         } else {
             $cartItems = $cart->items()->with('product')->get();
             $total = $cartItems->sum(function ($item) {
-                return $item->quantity * $item->product->price;
+                if ($item->product->type === 'sale') {
+                    return $item->quantity * $item->product->price;
+                }
+                return 0;
             });
         }
 
@@ -132,12 +135,20 @@ class CartController extends Controller
 
         $cart = $cartItem->cart;
         $total = $cart->items()->with('product')->get()->sum(function ($item) {
-            return $item->quantity * $item->product->price;
+            if ($item->product->type === 'sale') {
+                return $item->quantity * $item->product->price;
+            }
+            return 0;
         });
+
+        $itemTotal = 0;
+        if ($cartItem->product->type === 'sale') {
+            $itemTotal = $cartItem->quantity * $cartItem->product->price;
+        }
 
         return response()->json([
             'success' => true,
-            'item_total' => $cartItem->quantity * $cartItem->product->price,
+            'item_total' => $itemTotal,
             'total' => $total,
         ]);
     }
@@ -160,7 +171,10 @@ class CartController extends Controller
         $cartItem->delete();
 
         $total = $cart->items()->with('product')->get()->sum(function ($item) {
-            return $item->quantity * $item->product->price;
+            if ($item->product->type === 'sale') {
+                return $item->quantity * $item->product->price;
+            }
+            return 0;
         });
 
         return response()->json([

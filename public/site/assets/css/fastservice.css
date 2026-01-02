@@ -401,6 +401,44 @@ a {
     right: 4px;
 }
 
+.product-card-request-service {
+    background-color: rgba(79, 70, 229, 0.1);
+    border: 1px solid var(--primary-color);
+    border-radius: 8px;
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    transition: all 0.2s ease;
+}
+
+.product-card-request-service:hover {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    transform: scale(1.05);
+}
+
+.product-card-service-added {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(40, 167, 69, 0.1);
+    border: 1px solid #28a745;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.product-card-service-added:hover {
+    background-color: rgba(40, 167, 69, 0.2);
+    transform: scale(1.05);
+}
+
 .product-card-quantity-controls {
     display: flex;
     flex-direction: row;

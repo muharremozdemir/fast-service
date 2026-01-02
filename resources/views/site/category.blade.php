@@ -156,6 +156,15 @@
                     <div>
                         <a class="product-card" href="{{ route('site.product.show', $product->slug) }}">
                             @if($isInCart)
+                                @if($product->type === 'service')
+                                <div class="product-card-service-added" 
+                                     data-product-id="{{ $product->id }}"
+                                     data-cart-item-id="{{ $cartItem->id }}"
+                                     onclick="event.preventDefault(); event.stopPropagation(); removeProductFromCart({{ $cartItem->id }}, this);"
+                                     title="Hizmet talebini kaldır">
+                                    <i class="fas fa-check-circle" style="font-size: 24px; color: #28a745;"></i>
+                                </div>
+                                @else
                                 <div class="product-card-quantity-controls" 
                                      data-product-id="{{ $product->id }}"
                                      data-cart-item-id="{{ $cartItem->id }}"
@@ -188,12 +197,22 @@
                                         </svg>
                                     </button>
                                 </div>
+                                @endif
                             @else
+                                @if($product->type === 'service')
+                                <span class="btn product-card-add-to-cart product-card-request-service" 
+                                      data-product-id="{{ $product->id }}"
+                                      onclick="event.preventDefault(); event.stopPropagation(); addToCart({{ $product->id }}, this);"
+                                      title="Hizmet Talep Et">
+                                    <i class="fas fa-clipboard-list" style="font-size: 20px;"></i>
+                                </span>
+                                @else
                                 <span class="btn product-card-add-to-cart" 
                                       data-product-id="{{ $product->id }}"
                                       onclick="event.preventDefault(); event.stopPropagation(); addToCart({{ $product->id }}, this);">
                                     <img width="24" height="24" src="{{ asset('site/assets/img/plus-icon.svg') }}" alt="">
                                 </span>
+                                @endif
                             @endif
                             <img class="product-card-image"
                                  src="{{ $product->image_url ?? asset('site/assets/img/product-img-1.jpg') }}"
@@ -201,7 +220,9 @@
 
                             <h3 class="product-card-title">{{ $product->name }}</h3>
                             <p class="product-card-text">{{ $product->short_description }}</p>
+                            @if($product->type === 'sale')
                             <span class="product-card-price">{{ number_format($product->price, 2) }}₺</span>
+                            @endif
                         </a>
                     </div>
                 </div>
@@ -234,12 +255,17 @@
 
 <script src="{{ asset('site/assets/js/bootstrap.bundle.min.js') }}"></script>
 <script src="{{ asset('site/assets/js/swiper-bundle.min.js') }}"></script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function addToCart(productId, button) {
         // Disable button
         button.disabled = true;
         const originalHTML = button.innerHTML;
         button.innerHTML = '<span style="color: green;">✓</span>';
+
+        // Check if it's a service type product
+        const isService = button.classList.contains('product-card-request-service');
 
         fetch('{{ route("site.cart.add") }}', {
             method: 'POST',
@@ -258,47 +284,80 @@
                     el.textContent = data.cart_count || 0;
                 });
                 
-                // Replace + button with quantity controls
-                @if($company && $company->primary_color)
-                const primaryColor = '{{ $company->primary_color }}';
-                @else
-                const primaryColor = '#FE531F';
-                @endif
-                const quantityControlsHTML = `
-                    <div class="product-card-quantity-controls" 
-                         data-product-id="${productId}"
-                         data-cart-item-id="${data.cart_item_id}"
-                         onclick="event.preventDefault(); event.stopPropagation();">
-                        <button class="btn product-card-quantity-btn product-card-quantity-decrease" 
-                                onclick="event.preventDefault(); event.stopPropagation(); updateProductQuantity(${data.cart_item_id}, ${data.quantity - 1}, this);">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <g clip-path="url(#clip0_15_1556)">
-                                    <path d="M14.1667 5.00002H18.3334V6.66669H16.6667V17.5C16.6667 17.9603 16.2937 18.3334 15.8334 18.3334H4.16675C3.70651 18.3334 3.33341 17.9603 3.33341 17.5V6.66669H1.66675V5.00002H5.83341V2.50002C5.83341 2.03979 6.20651 1.66669 6.66675 1.66669H13.3334C13.7937 1.66669 14.1667 2.03979 14.1667 2.50002V5.00002ZM15.0001 6.66669H5.00008V16.6667H15.0001V6.66669ZM11.1786 11.6664L12.6517 13.1396L11.4732 14.3181L10.0001 12.8449L8.52691 14.3181L7.34843 13.1396L8.82158 11.6664L7.34843 10.1934L8.52691 9.01485L10.0001 10.4879L11.4732 9.01485L12.6517 10.1934L11.1786 11.6664ZM7.50008 3.33335V5.00002H12.5001V3.33335H7.50008Z" fill="${primaryColor}"/>
-                                </g>
-                                <defs>
-                                    <clipPath id="clip0_15_1556">
-                                        <rect width="20" height="20" fill="white"/>
-                                    </clipPath>
-                                </defs>
-                            </svg>
-                        </button>
-                        <span class="product-card-quantity-number">${data.quantity}</span>
-                        <button class="btn product-card-quantity-btn product-card-quantity-increase" 
-                                onclick="event.preventDefault(); event.stopPropagation(); updateProductQuantity(${data.cart_item_id}, ${data.quantity + 1}, this);">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <g clip-path="url(#clip0_15_1569)">
-                                    <path d="M9.16675 9.16669V4.16669H10.8334V9.16669H15.8334V10.8334H10.8334V15.8334H9.16675V10.8334H4.16675V9.16669H9.16675Z" fill="${primaryColor}"/>
-                                </g>
-                                <defs>
-                                    <clipPath id="clip0_15_1569">
-                                        <rect width="20" height="20" fill="white"/>
-                                    </clipPath>
-                                </defs>
-                            </svg>
-                        </button>
-                    </div>
-                `;
-                button.outerHTML = quantityControlsHTML;
+                // For service type, show check icon instead of quantity controls
+                if (isService) {
+                    const serviceAddedHTML = `
+                        <div class="product-card-service-added" 
+                             data-product-id="${productId}"
+                             data-cart-item-id="${data.cart_item_id}"
+                             onclick="event.preventDefault(); event.stopPropagation(); removeProductFromCart(${data.cart_item_id}, this);"
+                             title="Hizmet talebini kaldır">
+                            <i class="fas fa-check-circle" style="font-size: 24px; color: #28a745;"></i>
+                        </div>
+                    `;
+                    button.outerHTML = serviceAddedHTML;
+                    
+                    // Show SweetAlert notification for service type
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Hizmet Talebi Alındı',
+                            text: 'Sepet onaylandığında yetkili kişiye talep iletilecektir.',
+                            confirmButtonText: 'Tamam',
+                            confirmButtonColor: '#28a745',
+                            timer: 3000,
+                            timerProgressBar: true,
+                            showClass: {
+                                popup: 'animate__animated animate__fadeInDown'
+                            },
+                            hideClass: {
+                                popup: 'animate__animated animate__fadeOutUp'
+                            }
+                        });
+                    }
+                } else {
+                    // Replace + button with quantity controls for sale products
+                    @if($company && $company->primary_color)
+                    const primaryColor = '{{ $company->primary_color }}';
+                    @else
+                    const primaryColor = '#FE531F';
+                    @endif
+                    const quantityControlsHTML = `
+                        <div class="product-card-quantity-controls" 
+                             data-product-id="${productId}"
+                             data-cart-item-id="${data.cart_item_id}"
+                             onclick="event.preventDefault(); event.stopPropagation();">
+                            <button class="btn product-card-quantity-btn product-card-quantity-decrease" 
+                                    onclick="event.preventDefault(); event.stopPropagation(); updateProductQuantity(${data.cart_item_id}, ${data.quantity - 1}, this);">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <g clip-path="url(#clip0_15_1556)">
+                                        <path d="M14.1667 5.00002H18.3334V6.66669H16.6667V17.5C16.6667 17.9603 16.2937 18.3334 15.8334 18.3334H4.16675C3.70651 18.3334 3.33341 17.9603 3.33341 17.5V6.66669H1.66675V5.00002H5.83341V2.50002C5.83341 2.03979 6.20651 1.66669 6.66675 1.66669H13.3334C13.7937 1.66669 14.1667 2.03979 14.1667 2.50002V5.00002ZM15.0001 6.66669H5.00008V16.6667H15.0001V6.66669ZM11.1786 11.6664L12.6517 13.1396L11.4732 14.3181L10.0001 12.8449L8.52691 14.3181L7.34843 13.1396L8.82158 11.6664L7.34843 10.1934L8.52691 9.01485L10.0001 10.4879L11.4732 9.01485L12.6517 10.1934L11.1786 11.6664ZM7.50008 3.33335V5.00002H12.5001V3.33335H7.50008Z" fill="${primaryColor}"/>
+                                    </g>
+                                    <defs>
+                                        <clipPath id="clip0_15_1556">
+                                            <rect width="20" height="20" fill="white"/>
+                                        </clipPath>
+                                    </defs>
+                                </svg>
+                            </button>
+                            <span class="product-card-quantity-number">${data.quantity}</span>
+                            <button class="btn product-card-quantity-btn product-card-quantity-increase" 
+                                    onclick="event.preventDefault(); event.stopPropagation(); updateProductQuantity(${data.cart_item_id}, ${data.quantity + 1}, this);">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <g clip-path="url(#clip0_15_1569)">
+                                        <path d="M9.16675 9.16669V4.16669H10.8334V9.16669H15.8334V10.8334H10.8334V15.8334H9.16675V10.8334H4.16675V9.16669H9.16675Z" fill="${primaryColor}"/>
+                                    </g>
+                                    <defs>
+                                        <clipPath id="clip0_15_1569">
+                                            <rect width="20" height="20" fill="white"/>
+                                        </clipPath>
+                                    </defs>
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+                    button.outerHTML = quantityControlsHTML;
+                }
             } else {
                 alert(data.message || 'Bir hata oluştu. Lütfen önce oda numaranızı girin.');
                 button.innerHTML = originalHTML;
@@ -353,10 +412,36 @@
     }
 
     function removeProductFromCart(cartItemId, button) {
-        if (!confirm('Bu ürünü sepetten çıkarmak istediğinize emin misiniz?')) {
-            return;
+        const isService = button.classList.contains('product-card-service-added');
+        const title = isService ? 'Hizmet Talebini Kaldır' : 'Ürünü Sepetten Çıkar';
+        const text = isService ? 'Bu hizmet talebini kaldırmak istediğinize emin misiniz?' : 'Bu ürünü sepetten çıkarmak istediğinize emin misiniz?';
+        const confirmButtonText = isService ? 'Evet, Kaldır' : 'Evet, Çıkar';
+        
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: confirmButtonText,
+                cancelButtonText: 'İptal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    performRemoveFromCart(cartItemId, button, isService);
+                }
+            });
+        } else {
+            // Fallback to confirm if SweetAlert is not available
+            if (confirm(text)) {
+                performRemoveFromCart(cartItemId, button, isService);
+            }
         }
+    }
 
+    function performRemoveFromCart(cartItemId, button, isService) {
         fetch(`/sepet/item/${cartItemId}`, {
             method: 'DELETE',
             headers: {
@@ -367,29 +452,74 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                const controls = button.closest('.product-card-quantity-controls');
-                const productCard = controls.closest('.product-card');
-                const productId = controls.getAttribute('data-product-id');
+                const productId = button.getAttribute('data-product-id');
                 
-                // Replace quantity controls with + button
-                const addButtonHTML = `
-                    <span class="btn product-card-add-to-cart" 
-                          data-product-id="${productId}"
-                          onclick="event.preventDefault(); addToCart(${productId}, this);">
-                        <img width="24" height="24" src="{{ asset('site/assets/img/plus-icon.svg') }}" alt="">
-                    </span>
-                `;
-                controls.outerHTML = addButtonHTML;
+                if (isService) {
+                    // Replace service added icon with request button
+                    const requestButtonHTML = `
+                        <span class="btn product-card-add-to-cart product-card-request-service" 
+                              data-product-id="${productId}"
+                              onclick="event.preventDefault(); event.stopPropagation(); addToCart(${productId}, this);"
+                              title="Hizmet Talep Et">
+                            <i class="fas fa-clipboard-list" style="font-size: 20px;"></i>
+                        </span>
+                    `;
+                    button.outerHTML = requestButtonHTML;
+                    
+                    // Show success message
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Hizmet Talebi Kaldırıldı',
+                            text: 'Hizmet talebi sepetten kaldırıldı.',
+                            confirmButtonText: 'Tamam',
+                            confirmButtonColor: '#28a745',
+                            timer: 2000,
+                            timerProgressBar: true
+                        });
+                    }
+                } else {
+                    const controls = button.closest('.product-card-quantity-controls');
+                    // Replace quantity controls with + button
+                    const addButtonHTML = `
+                        <span class="btn product-card-add-to-cart" 
+                              data-product-id="${productId}"
+                              onclick="event.preventDefault(); event.stopPropagation(); addToCart(${productId}, this);">
+                            <img width="24" height="24" src="{{ asset('site/assets/img/plus-icon.svg') }}" alt="">
+                        </span>
+                    `;
+                    controls.outerHTML = addButtonHTML;
+                }
                 
                 // Update cart count
                 updateCartCount();
             } else {
-                alert('Bir hata oluştu.');
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata',
+                        text: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+                        confirmButtonText: 'Tamam',
+                        confirmButtonColor: '#d33'
+                    });
+                } else {
+                    alert('Bir hata oluştu.');
+                }
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Bir hata oluştu.');
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata',
+                    text: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+                    confirmButtonText: 'Tamam',
+                    confirmButtonColor: '#d33'
+                });
+            } else {
+                alert('Bir hata oluştu.');
+            }
         });
     }
 

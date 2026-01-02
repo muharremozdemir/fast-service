@@ -133,9 +133,11 @@
                         <div class="cart-item-content">
                             <div class="cart-item-title">{{ $cartItem->product->name }}</div>
                             <div class="cart-item-text">{{ $cartItem->product->description ?? $cartItem->product->short_description }}</div>
+                            @if($cartItem->product->type === 'sale')
                             <div class="cart-item-price" data-item-price="{{ $cartItem->product->price }}">
                                 {{ number_format($cartItem->quantity * $cartItem->product->price, 2) }}₺
                             </div>
+                            @endif
                         </div>
                         <div class="cart-item-buttons">
                             <button class="btn cart-item-number-btn-left" onclick="updateQuantity({{ $cartItem->id }}, {{ $cartItem->quantity - 1 }})">
@@ -210,10 +212,11 @@
                 const cartItem = document.querySelector(`[data-cart-id="${cartItemId}"]`);
                 const quantityDisplay = cartItem.querySelector('.quantity-display');
                 const priceDisplay = cartItem.querySelector('.cart-item-price');
-                const itemPrice = parseFloat(priceDisplay.getAttribute('data-item-price'));
                 
                 quantityDisplay.textContent = newQuantity;
-                priceDisplay.textContent = data.item_total.toFixed(2) + '₺';
+                if (priceDisplay) {
+                    priceDisplay.textContent = data.item_total.toFixed(2) + '₺';
+                }
                 
                 // Update buttons
                 const decreaseBtn = cartItem.querySelector('.cart-item-number-btn-left');

@@ -119,11 +119,17 @@
                 <p class="product-detail-page-description">
                     {{ $product->description ?? $product->short_description }}
                 </p>
+                @if($product->type === 'sale')
                 <p class="product-detail-page-price d-none d-md-flex">
                     {{ number_format($product->price, 2) }}₺
                 </p>
+                @endif
                 <button class="btn btn-primary d-none d-md-flex add-to-cart-button" data-product-id="{{ $product->id }}">
-                    Sepete Ekle
+                    @if($product->type === 'service')
+                        <i class="fas fa-clipboard-list me-2"></i>Hizmet Talep Et
+                    @else
+                        Sepete Ekle
+                    @endif
                 </button>
             </div>
         </div>
@@ -131,11 +137,17 @@
 </div>
 
 <div class="mobile-add-to-cart">
+    @if($product->type === 'sale')
     <div class="mobile-add-to-cart-price">
         {{ number_format($product->price, 2) }}₺
     </div>
+    @endif
     <button class="btn btn-primary add-to-cart-button mobile-add-to-cart-button" data-product-id="{{ $product->id }}">
-        Sepete Ekle
+        @if($product->type === 'service')
+            <i class="fas fa-clipboard-list me-2"></i>Hizmet Talep Et
+        @else
+            Sepete Ekle
+        @endif
     </button>
 </div>
 
