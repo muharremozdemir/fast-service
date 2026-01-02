@@ -205,6 +205,62 @@
             </div>
         </div>
         <!--end::Hotel Info Settings-->
+
+        <!--begin::WiFi & Phone Settings-->
+        <div class="card card-flush mt-5">
+            <div class="card-header">
+                <div class="card-title">
+                    <h2>WiFi ve Telefon Ayarları</h2>
+                </div>
+            </div>
+            <div class="card-body pt-0">
+                <form method="POST" action="{{ route('admin.settings.updateWifiAndPhone') }}">
+                    @csrf
+
+                    <div class="mb-7">
+                        <h3 class="fs-5 fw-bold mb-5">WiFi Şifresi ve Telefon</h3>
+
+                        <div class="fv-row mb-7">
+                            <label class="fs-6 fw-semibold mb-2">WiFi Şifresi</label>
+                            <input type="text"
+                                   class="form-control form-control-solid"
+                                   name="wifi_password"
+                                   id="wifi_password_input"
+                                   value="{{ old('wifi_password', $company->wifi_password ?? '') }}"
+                                   placeholder="WiFi şifresini girin" />
+                            <div class="form-text">Bu şifre, site üzerinde oda numarasının yanında görüntülenecektir.</div>
+                            @error('wifi_password')
+                                <div class="text-danger fs-7 mt-2">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="fv-row mb-7">
+                            <label class="fs-6 fw-semibold mb-2">Telefon</label>
+                            <input type="text"
+                                   class="form-control form-control-solid"
+                                   name="phone"
+                                   id="phone_input"
+                                   value="{{ old('phone', $company->phone ?? '') }}"
+                                   placeholder="Telefon numarasını girin (örn: +90 555 123 45 67)" />
+                            <div class="form-text">Bu telefon numarası, site üzerinde otel bilgileri butonunun yanında görüntülenecektir.</div>
+                            @error('phone')
+                                <div class="text-danger fs-7 mt-2">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="indicator-label">Kaydet</span>
+                            <span class="indicator-progress">Lütfen bekleyin...
+                                <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!--end::WiFi & Phone Settings-->
     </div>
 </div>
 <!--end::Content-->

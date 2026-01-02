@@ -89,4 +89,24 @@ class SettingsController extends Controller
             ->route('admin.settings.index')
             ->with('success', 'Otel bilgileri başarıyla güncellendi.');
     }
+
+    /**
+     * WiFi şifresi ve telefon bilgilerini güncelle
+     */
+    public function updateWifiAndPhone(Request $request)
+    {
+        $request->validate([
+            'wifi_password' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:50',
+        ]);
+
+        $company = Company::where('id', Auth::user()->company_id)->firstOrFail();
+        $company->wifi_password = $request->input('wifi_password');
+        $company->phone = $request->input('phone');
+        $company->save();
+
+        return redirect()
+            ->route('admin.settings.index')
+            ->with('success', 'WiFi şifresi ve telefon bilgileri başarıyla güncellendi.');
+    }
 }

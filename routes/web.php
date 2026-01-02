@@ -167,6 +167,7 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAut
     Route::post('/settings/logo', [AdminSettingsController::class, 'updateLogo'])->name('settings.updateLogo');
     Route::post('/settings/primary-color', [AdminSettingsController::class, 'updatePrimaryColor'])->name('settings.updatePrimaryColor');
     Route::post('/settings/hotel-info', [AdminSettingsController::class, 'updateHotelInfo'])->name('settings.updateHotelInfo');
+    Route::post('/settings/wifi-phone', [AdminSettingsController::class, 'updateWifiAndPhone'])->name('settings.updateWifiAndPhone');
 
     // Roles (Kullanıcı Rolleri)
     Route::get('/roles', [AdminRoleController::class, 'index'])->name('roles.index');

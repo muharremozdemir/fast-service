@@ -22,6 +22,7 @@ class Company extends Model
         'logo_type',
         'primary_color',
         'hotel_info',
+        'wifi_password',
     ];
 
     protected $casts = [

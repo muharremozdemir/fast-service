@@ -136,6 +136,43 @@ a {
     border-bottom-right-radius: 8px;
 }
 
+.wifi-password-container {
+    -webkit-box-shadow: var(--primary-shadow);
+    -moz-box-shadow: var(--primary-shadow);
+    box-shadow: var(--primary-shadow);
+}
+
+.wifi-password-container .wifi-password-text {
+    font-size: 12px;
+    line-height: 12px;
+    background-color: #ffffff;
+    color: var(--primary-color);
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.wifi-password-container .wifi-password-text:hover {
+    background-color: var(--primary-color-soft);
+    transform: scale(1.02);
+}
+
+.wifi-password-container .wifi-password-text:active {
+    transform: scale(0.98);
+}
+
+/* Mobilde "WiFi:" yazısını gizle */
+@media (max-width: 768px) {
+    .wifi-label {
+        display: none;
+    }
+}
+
 
 .slide {
     -webkit-box-shadow: var(--primary-shadow);

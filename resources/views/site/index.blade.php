@@ -79,6 +79,11 @@
                         <i class="fas fa-info-circle" style="font-size: 16px;"></i>
                     </button>
                     @endif
+                    @if($company && $company->phone)
+                    <a href="tel:{{ $company->phone }}" class="btn btn-light btn-fastservice">
+                        <i class="fas fa-phone" style="font-size: 16px;"></i>
+                    </a>
+                    @endif
                 </div>
             </div>
             <div class="col-6 d-flex align-items-center justify-content-center">
@@ -124,7 +129,20 @@
             </div>
         </div>
         <div class="col-4 col-md-6">
-            <div class="d-flex align-items-center justify-content-end">
+            <div class="d-flex align-items-center justify-content-end gap-3">
+                @if($company && $company->wifi_password)
+                <div class="wifi-password-container d-flex align-items-center">
+                    <div class="wifi-password-text d-flex align-items-center justify-content-center" 
+                         data-wifi-password="{{ $company->wifi_password }}"
+                         style="cursor: pointer;"
+                         onclick="copyWifiPassword(this)"
+                         title="WiFi şifresini kopyalamak için tıklayın">
+                        <i class="fas fa-wifi me-2" style="font-size: 14px;"></i>
+                        <span class="wifi-label">WiFi: </span>
+                        <span class="wifi-password-value">{{ $company->wifi_password }}</span>
+                    </div>
+                </div>
+                @endif
                 <div class="room-number-container d-flex align-items-center">
                     <div class="room-number-text d-flex align-items-center justify-content-center">Oda Numaranız</div>
                     <div class="room-number d-flex align-items-center justify-content-center" id="room-number-display">
@@ -485,6 +503,67 @@
                     el.textContent = data.count || 0;
                 });
             });
+    }
+
+    // Copy WiFi password to clipboard
+    function copyWifiPassword(element) {
+        const wifiPassword = element.getAttribute('data-wifi-password');
+        
+        if (!wifiPassword) {
+            return;
+        }
+
+        // Modern clipboard API
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(wifiPassword).then(function() {
+                showCopyFeedback(element);
+            }).catch(function(err) {
+                // Fallback for older browsers
+                fallbackCopyTextToClipboard(wifiPassword, element);
+            });
+        } else {
+            // Fallback for older browsers
+            fallbackCopyTextToClipboard(wifiPassword, element);
+        }
+    }
+
+    // Fallback copy method for older browsers
+    function fallbackCopyTextToClipboard(text, element) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                showCopyFeedback(element);
+            }
+        } catch (err) {
+            console.error('Fallback: Oops, unable to copy', err);
+        }
+        
+        document.body.removeChild(textArea);
+    }
+
+    // Show copy feedback
+    function showCopyFeedback(element) {
+        const originalText = element.innerHTML;
+        const originalBg = element.style.backgroundColor;
+        
+        element.innerHTML = '<i class="fas fa-check me-2" style="font-size: 14px;"></i><span>Kopyalandı!</span>';
+        element.style.backgroundColor = '#d4edda';
+        element.style.color = '#155724';
+        
+        setTimeout(function() {
+            element.innerHTML = originalText;
+            element.style.backgroundColor = originalBg;
+            element.style.color = '';
+        }, 2000);
     }
 
     // Update cart count on page load
