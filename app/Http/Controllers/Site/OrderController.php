@@ -99,10 +99,10 @@ class OrderController extends Controller
                 if ($cartItem->product->category_id) {
                     $categoryIds[] = $cartItem->product->category_id;
 
-                    // Get users assigned to this category and attach them to order item
-                    $category = Category::with('users')->find($cartItem->product->category_id);
-                    if ($category && $category->users->isNotEmpty()) {
-                        $userIds = $category->users->pluck('id')->toArray();
+                    // Get users assigned to this room AND category combination
+                    $roomUsers = $room->usersByCategory($cartItem->product->category_id)->get();
+                    if ($roomUsers->isNotEmpty()) {
+                        $userIds = $roomUsers->pluck('id')->toArray();
                         $orderItem->notifiedUsers()->attach($userIds);
                     }
                 }
@@ -134,8 +134,8 @@ class OrderController extends Controller
     }
 
     /**
-     * Send notifications to staff assigned to categories
-     * Only sends to users with availability_status = 'busy'
+     * Send notifications to staff assigned to room and category combination
+     * Only sends to users with availability_status = 'available' and valid player_id
      */
     private function sendNotificationsToCategoryStaff(Order $order, array $categoryIds)
     {
@@ -144,21 +144,39 @@ class OrderController extends Controller
         }
 
         try {
-            // Get categories with their assigned users (only busy users with player_id)
-            $categories = Category::whereIn('id', $categoryIds)
-                ->with(['users' => function ($query) {
-                    $query->whereNotNull('player_id')
-                        ->where('player_id', '!=', '')
-                        ->where('availability_status', 'available');
-                }])
-                ->get();
+            // Get room with its relationships
+            $room = Room::find($order->room_id);
+            
+            if (!$room) {
+                Log::warning("Sipariş için oda bulunamadı", ['order_id' => $order->id]);
+                return;
+            }
+
+            // Get unique category IDs
+            $uniqueCategoryIds = array_unique($categoryIds);
+            
+            // Get categories
+            $categories = Category::whereIn('id', $uniqueCategoryIds)->get();
 
             foreach ($categories as $category) {
-                // Get player IDs of users assigned to this category
-                $playerIds = $category->users->pluck('player_id')->filter()->values()->toArray();
+                // Get users assigned to this room AND category combination
+                // Filter only available users with player_id
+                $roomUsers = $room->usersByCategory($category->id)
+                    ->whereNotNull('player_id')
+                    ->where('player_id', '!=', '')
+                    ->where('availability_status', 'available')
+                    ->get();
+
+                if ($roomUsers->isEmpty()) {
+                    Log::info("Oda {$order->room_number} - Kategori '{$category->name}' için müsait personel bulunamadı veya player_id yok.");
+                    continue;
+                }
+
+                // Get player IDs of users assigned to this room-category combination
+                $playerIds = $roomUsers->pluck('player_id')->filter()->values()->toArray();
 
                 if (empty($playerIds)) {
-                    Log::info("Kategori '{$category->name}' için müsait (busy) personel bulunamadı veya player_id yok.");
+                    Log::info("Oda {$order->room_number} - Kategori '{$category->name}' için geçerli player_id bulunamadı.");
                     continue;
                 }
 
@@ -168,9 +186,12 @@ class OrderController extends Controller
 
                 $result = $this->oneSignalService->sendNotification($title, $message, $playerIds);
 
-                Log::info("Bildirim gönderildi - Kategori: {$category->name}", [
+                Log::info("Bildirim gönderildi - Oda: {$order->room_number}, Kategori: {$category->name}", [
                     'order_id' => $order->id,
+                    'room_id' => $room->id,
+                    'category_id' => $category->id,
                     'player_ids' => $playerIds,
+                    'user_count' => count($playerIds),
                     'result' => $result
                 ]);
             }
@@ -178,7 +199,9 @@ class OrderController extends Controller
             // Log error but don't fail the order
             Log::error('Bildirim gönderilirken hata: ' . $e->getMessage(), [
                 'order_id' => $order->id,
-                'category_ids' => $categoryIds
+                'room_id' => $order->room_id,
+                'category_ids' => $categoryIds,
+                'trace' => $e->getTraceAsString()
             ]);
         }
     }
