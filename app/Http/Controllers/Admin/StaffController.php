@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\OneSignalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +13,13 @@ use Spatie\Permission\Models\Role;
 
 class StaffController extends Controller
 {
+    private OneSignalService $oneSignalService;
+
+    public function __construct(OneSignalService $oneSignalService)
+    {
+        $this->oneSignalService = $oneSignalService;
+    }
+
     /**
      * Personel listesi
      */
@@ -235,12 +243,8 @@ class StaffController extends Controller
         $content = $request->input('notification_content');
 
         // OneSignal ile bildirim gönder
-        $result = sendOneSignalNotification(
-            $title,
-            $content,
-            $user->id,
-            [$user->player_id]
-        );
+
+        $result = $this->oneSignalService->sendNotification($title, $content, [$id]);
 
         if (isset($result['error']) && $result['error']) {
             return redirect()
