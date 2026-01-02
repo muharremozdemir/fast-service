@@ -121,7 +121,7 @@
                 </p>
                 @if($product->type === 'sale')
                 <p class="product-detail-page-price d-none d-md-flex">
-                    {{ number_format($product->price, 2) }}₺
+                    {{ displayPrice($product->price) }}
                 </p>
                 @endif
                 <button class="btn btn-primary d-none d-md-flex add-to-cart-button" data-product-id="{{ $product->id }}">
@@ -139,7 +139,7 @@
 <div class="mobile-add-to-cart">
     @if($product->type === 'sale')
     <div class="mobile-add-to-cart-price">
-        {{ number_format($product->price, 2) }}₺
+        {{ displayPrice($product->price) }}
     </div>
     @endif
     <button class="btn btn-primary add-to-cart-button mobile-add-to-cart-button" data-product-id="{{ $product->id }}">

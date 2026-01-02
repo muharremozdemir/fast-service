@@ -28,6 +28,7 @@ use App\Http\Controllers\Site\ProductController;
 use App\Http\Controllers\Site\CartController;
 use App\Http\Controllers\Site\OrderController;
 use App\Http\Controllers\Site\AnnouncementController as SiteAnnouncementController;
+use App\Http\Controllers\Site\CurrencyController;
 use App\Http\Controllers\Auth\LoginController;
 
 /*
@@ -60,10 +61,12 @@ Route::post('/demo-request', [SiteHomeController::class, 'submitDemoRequest'])->
 Route::get('/{uuid}', [SiteHomeController::class, 'qrScan'])->name('site.qr.scan')
     ->where('uuid', '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}');
 
-Route::get('/room', [SiteHomeController::class, 'index'])->name('site.home');
+Route::get('/room', [SiteHomeController::class, 'index'])->name('site.home')
+    ->middleware('currency');
 
 Route::get('/kategori/{parent:slug}/{child:slug?}', [SiteCategoryController::class, 'show'])
-    ->name('site.category');
+    ->name('site.category')
+    ->middleware('currency');
 Route::get('sms-test', function () {
     netGsmSendSms(["5423024234"], "Deneme");
 });
@@ -212,21 +215,39 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAut
 
 });
 
-Route::get('/urun/{product:slug}', [ProductController::class, 'show'])->name('site.product.show');
+Route::get('/urun/{product:slug}', [ProductController::class, 'show'])->name('site.product.show')
+    ->middleware('currency');
 
 // Cart routes
-Route::get('/sepet', [CartController::class, 'index'])->name('site.cart');
-Route::post('/sepet/ekle', [CartController::class, 'add'])->name('site.cart.add');
-Route::put('/sepet/item/{cartItem}', [CartController::class, 'update'])->name('site.cart.update');
-Route::delete('/sepet/item/{cartItem}', [CartController::class, 'remove'])->name('site.cart.remove');
-Route::delete('/sepet/temizle', [CartController::class, 'clear'])->name('site.cart.clear');
-Route::post('/oda-numarasi', [CartController::class, 'setRoomNumber'])->name('site.room.set');
-Route::get('/odalar', [CartController::class, 'getRooms'])->name('site.rooms.get');
-Route::get('/sepet/sayisi', [CartController::class, 'getCount'])->name('site.cart.count');
+Route::get('/sepet', [CartController::class, 'index'])->name('site.cart')
+    ->middleware('currency');
+Route::post('/sepet/ekle', [CartController::class, 'add'])->name('site.cart.add')
+    ->middleware('currency');
+Route::put('/sepet/item/{cartItem}', [CartController::class, 'update'])->name('site.cart.update')
+    ->middleware('currency');
+Route::delete('/sepet/item/{cartItem}', [CartController::class, 'remove'])->name('site.cart.remove')
+    ->middleware('currency');
+Route::delete('/sepet/temizle', [CartController::class, 'clear'])->name('site.cart.clear')
+    ->middleware('currency');
+Route::post('/oda-numarasi', [CartController::class, 'setRoomNumber'])->name('site.room.set')
+    ->middleware('currency');
+Route::get('/odalar', [CartController::class, 'getRooms'])->name('site.rooms.get')
+    ->middleware('currency');
+Route::get('/sepet/sayisi', [CartController::class, 'getCount'])->name('site.cart.count')
+    ->middleware('currency');
 
 // Order routes
-Route::post('/siparis-olustur', [OrderController::class, 'store'])->name('site.order.store');
-Route::get('/siparis-tamamlandi/{orderNumber}', [OrderController::class, 'complete'])->name('site.order.complete');
+Route::post('/siparis-olustur', [OrderController::class, 'store'])->name('site.order.store')
+    ->middleware('currency');
+Route::get('/siparis-tamamlandi/{orderNumber}', [OrderController::class, 'complete'])->name('site.order.complete')
+    ->middleware('currency');
 
 // Announcement routes
-Route::get('/duyurular', [SiteAnnouncementController::class, 'index'])->name('site.announcements.index');
+Route::get('/duyurular', [SiteAnnouncementController::class, 'index'])->name('site.announcements.index')
+    ->middleware('currency');
+
+// Currency routes
+Route::get('/currency/switch/{currency}', [CurrencyController::class, 'switch'])->name('site.currency.switch')
+    ->middleware('currency');
+Route::get('/currency/active', [CurrencyController::class, 'getActive'])->name('site.currency.active')
+    ->middleware('currency');

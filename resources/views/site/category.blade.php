@@ -221,7 +221,7 @@
                             <h3 class="product-card-title">{{ $product->name }}</h3>
                             <p class="product-card-text">{{ $product->short_description }}</p>
                             @if($product->type === 'sale')
-                            <span class="product-card-price">{{ number_format($product->price, 2) }}₺</span>
+                            <span class="product-card-price">{{ displayPrice($product->price) }}</span>
                             @endif
                         </a>
                     </div>

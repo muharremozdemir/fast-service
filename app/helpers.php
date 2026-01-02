@@ -522,3 +522,37 @@ function sendOneSignalNotification($title, $message, $id, $playerIds)
         ];
     }
 }
+
+// Currency Helper Functions - Service üzerinden çalışır
+
+/**
+ * TRY fiyatını seçili para birimine dönüştür
+ */
+function convertPrice($amount, $fromCurrency = 'TRY', $toCurrency = null)
+{
+    return app(\App\Services\CurrencyService::class)->convertPrice($amount, $fromCurrency, $toCurrency);
+}
+
+/**
+ * Fiyatı formatla (para birimi sembolü ile)
+ */
+function formatPrice($amount, $currencyCode = null)
+{
+    return app(\App\Services\CurrencyService::class)->formatPrice($amount, $currencyCode);
+}
+
+/**
+ * Mevcut para birimini getir
+ */
+function getCurrentCurrency()
+{
+    return app(\App\Services\CurrencyService::class)->getCurrentCurrency();
+}
+
+/**
+ * TRY fiyatını mevcut para birimine dönüştür ve formatla
+ */
+function displayPrice($tryAmount)
+{
+    return app(\App\Services\CurrencyService::class)->displayPrice($tryAmount);
+}

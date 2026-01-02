@@ -61,4 +61,28 @@ class Product extends Model
         }
         return '';
     }
+
+    /**
+     * Get the converted price (TRY'den seçili para birimine dönüştürülmüş)
+     */
+    public function getConvertedPriceAttribute()
+    {
+        return convertPrice($this->price, 'TRY');
+    }
+
+    /**
+     * Get the formatted price (para birimi sembolü ile)
+     */
+    public function getFormattedPriceAttribute()
+    {
+        return formatPrice($this->converted_price);
+    }
+
+    /**
+     * Get the raw price in TRY (admin için)
+     */
+    public function getRawPriceAttribute()
+    {
+        return $this->price;
+    }
 }

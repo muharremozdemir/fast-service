@@ -146,10 +146,18 @@ class CartController extends Controller
             $itemTotal = $cartItem->quantity * $cartItem->product->price;
         }
 
+        // Fiyatları seçili para birimine dönüştür
+        $convertedItemTotal = convertPrice($itemTotal, 'TRY');
+        $convertedTotal = convertPrice($total, 'TRY');
+        $currentCurrency = getCurrentCurrency();
+
         return response()->json([
             'success' => true,
-            'item_total' => $itemTotal,
-            'total' => $total,
+            'item_total' => $convertedItemTotal,
+            'item_total_formatted' => formatPrice($convertedItemTotal),
+            'total' => $convertedTotal,
+            'total_formatted' => formatPrice($convertedTotal),
+            'currency_symbol' => $currentCurrency ? $currentCurrency->symbol : '₺',
         ]);
     }
 
@@ -177,9 +185,15 @@ class CartController extends Controller
             return 0;
         });
 
+        // Fiyatı seçili para birimine dönüştür
+        $convertedTotal = convertPrice($total, 'TRY');
+        $currentCurrency = getCurrentCurrency();
+
         return response()->json([
             'success' => true,
-            'total' => $total,
+            'total' => $convertedTotal,
+            'total_formatted' => formatPrice($convertedTotal),
+            'currency_symbol' => $currentCurrency ? $currentCurrency->symbol : '₺',
         ]);
     }
 

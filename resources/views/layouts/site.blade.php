@@ -22,7 +22,36 @@
     <div class="container">
         <div class="row">
             <div class="col-3">
-                <div>
+                <div class="d-flex gap-2">
+                    {{-- Kur Seçici --}}
+                    @php
+                        $currentCurrency = getCurrentCurrency();
+                        $activeCurrencies = \App\Models\Currency::getActive();
+                    @endphp
+                    @if($activeCurrencies->count() > 0)
+                    <div class="dropdown">
+                        <button class="btn btn-light btn-fastservice dropdown-toggle currency-button" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 4px;">
+                                <path d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm.5-9H7v2H6v1h1v3h1V8h1V7H8.5V5zm0 0V4h-1v1h1z" fill="currentColor"/>
+                            </svg>
+                            <span>{{ $currentCurrency ? $currentCurrency->code : 'TRY' }}</span>
+                            @if($currentCurrency)
+                                <span class="ms-1">{{ $currentCurrency->symbol }}</span>
+                            @endif
+                        </button>
+                        <ul class="dropdown-menu">
+                            @foreach($activeCurrencies as $currency)
+                                <li>
+                                    <a class="dropdown-item {{ session('currency') === $currency->code ? 'active' : '' }}" 
+                                       href="{{ route('site.currency.switch', $currency->code) }}">
+                                        <strong>{{ $currency->code }}</strong> - {{ $currency->name }} ({{ $currency->symbol }})
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
+                    {{-- Dil Seçici (şimdilik pasif) --}}
                     <div class="dropdown">
                         <button class="btn btn-light btn-fastservice dropdown-toggle lang-button" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -39,8 +68,6 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="#">Türkçe</a></li>
                             <li><a class="dropdown-item" href="#">English</a></li>
-                            <li><a class="dropdown-item" href="#">Lorem</a></li>
-                            <li><a class="dropdown-item" href="#">Ipsum</a></li>
                         </ul>
                     </div>
                 </div>

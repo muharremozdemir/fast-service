@@ -135,7 +135,7 @@
                             <div class="cart-item-text">{{ $cartItem->product->description ?? $cartItem->product->short_description }}</div>
                             @if($cartItem->product->type === 'sale')
                             <div class="cart-item-price" data-item-price="{{ $cartItem->product->price }}">
-                                {{ number_format($cartItem->quantity * $cartItem->product->price, 2) }}₺
+                                {{ displayPrice($cartItem->quantity * $cartItem->product->price) }}
                             </div>
                             @endif
                         </div>
@@ -182,7 +182,7 @@
 
 <div class="mobile-add-to-cart">
     <div class="mobile-add-to-cart-price" id="mobile-total-price">
-        {{ number_format($total ?? 0, 2) }}₺
+        {{ displayPrice($total ?? 0) }}
     </div>
     <button class="btn btn-primary mobile-add-to-cart-button" id="place-order-btn">
         Sipariş Ver
@@ -215,7 +215,7 @@
                 
                 quantityDisplay.textContent = newQuantity;
                 if (priceDisplay) {
-                    priceDisplay.textContent = data.item_total.toFixed(2) + '₺';
+                    priceDisplay.textContent = data.item_total_formatted || (data.item_total.toFixed(2) + ' ' + (data.currency_symbol || '₺'));
                 }
                 
                 // Update buttons
@@ -225,7 +225,7 @@
                 increaseBtn.setAttribute('onclick', `updateQuantity(${cartItemId}, ${newQuantity + 1})`);
                 
                 // Update total
-                document.getElementById('mobile-total-price').textContent = data.total.toFixed(2) + '₺';
+                document.getElementById('mobile-total-price').textContent = data.total_formatted || (data.total.toFixed(2) + ' ' + (data.currency_symbol || '₺'));
                 
                 // Update cart count
                 updateCartCount();
@@ -258,7 +258,7 @@
                 cartItem.remove();
                 
                 // Update total
-                document.getElementById('mobile-total-price').textContent = data.total.toFixed(2) + '₺';
+                document.getElementById('mobile-total-price').textContent = data.total_formatted || (data.total.toFixed(2) + ' ' + (data.currency_symbol || '₺'));
                 
                 // Update cart count
                 updateCartCount();
@@ -297,7 +297,7 @@
             if (data.success) {
                 document.getElementById('cart-items-container').innerHTML = 
                     '<div class="text-center py-5"><p>Sepetiniz boş.</p><a href="{{ route("site.home") }}" class="btn btn-primary">Alışverişe Başla</a></div>';
-                document.getElementById('mobile-total-price').textContent = '0.00₺';
+                document.getElementById('mobile-total-price').textContent = '0,00 ₺';
                 updateCartCount();
             } else {
                 alert('Bir hata oluştu.');
