@@ -218,7 +218,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <span class="text-gray-800">{{ $user->created_at->format('d.m.Y H:i') }}</span>
+                                        <span class="text-gray-800">{{ \Carbon\Carbon::parse($user->created_at)->format('d.m.Y H:i') }}</span>
                                     </td>
                                     <td class="text-end">
                                         <a href="#" class="btn btn-sm btn-light btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
@@ -259,7 +259,7 @@
                     </table>
                 </div>
                 <!--end::Table-->
-                
+
                 <!--begin::Pagination-->
                 <div class="d-flex flex-stack flex-wrap pt-5">
                     <div class="d-flex align-items-center">
