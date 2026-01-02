@@ -288,7 +288,7 @@ class RoomController extends Controller
         $closed = $request->input('closed');
 
         $orders = $room->orders()
-            ->with('items.product')
+            ->with(['items.product', 'items.notifiedUsers'])
             ->when($closed === '1', function ($query) {
                 $query->closed();
             })

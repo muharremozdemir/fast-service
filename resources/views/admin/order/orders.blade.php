@@ -290,7 +290,7 @@
 							return '<div class="d-flex justify-content-end flex-shrink-0">' +
 								closeBtn +
 								reopenBtn +
-								'<a href="#" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1" title="Detay">' +
+								'<a href="/admin/orders/' + row.id + '" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1" title="Detay">' +
 								'<i class="ki-duotone ki-eye fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>' +
 								'</a>' +
 								'</div>';

@@ -4,11 +4,21 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\OrderItem;
+use App\Services\OneSignalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
+    private OneSignalService $oneSignalService;
+
+    public function __construct(OneSignalService $oneSignalService)
+    {
+        $this->oneSignalService = $oneSignalService;
+    }
+
     public function index(Request $request)
     {
         // Datatable için JSON response
@@ -100,6 +110,24 @@ class OrderController extends Controller
         return view('admin.order.orders');
     }
 
+    public function show(Order $order)
+    {
+        // Yetki kontrolü
+        if ($order->company_id !== Auth::user()->company_id) {
+            abort(403, 'Bu siparişe erişim yetkiniz yok.');
+        }
+
+        // Sipariş detaylarını yükle
+        $order->load([
+            'items.product',
+            'items.notifiedUsers',
+            'room.floor',
+            'company'
+        ]);
+
+        return view('admin.order.show', compact('order'));
+    }
+
     public function updateStatus(Request $request, Order $order)
     {
         if ($order->company_id !== Auth::user()->company_id) {
@@ -168,6 +196,101 @@ class OrderController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Sipariş başarıyla yeniden açıldı.',
+        ]);
+    }
+
+    public function updateItemStatus(Request $request, OrderItem $orderItem)
+    {
+        // Yetki kontrolü - siparişin company_id'si kontrol edilir
+        if ($orderItem->order->company_id !== Auth::user()->company_id) {
+            abort(403, 'Bu sipariş kalemine erişim yetkiniz yok.');
+        }
+
+        // Kapalı siparişlerin ürün durumu değiştirilemez
+        if ($orderItem->order->isClosed()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kapalı siparişlerin ürün durumu değiştirilemez.',
+            ], 403);
+        }
+
+        $request->validate([
+            'status' => 'required|in:pending,in_progress,completed',
+        ]);
+
+        $orderItem->status = $request->status;
+        $orderItem->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Ürün durumu güncellendi.',
+            'status' => $orderItem->status,
+            'status_label' => $orderItem->status_label,
+        ]);
+    }
+
+    public function sendItemReminder(OrderItem $orderItem)
+    {
+        // Yetki kontrolü - siparişin company_id'si kontrol edilir
+        if ($orderItem->order->company_id !== Auth::user()->company_id) {
+            abort(403, 'Bu sipariş kalemine erişim yetkiniz yok.');
+        }
+
+        // OrderItem'ı notifiedUsers ile yükle
+        $orderItem->load(['notifiedUsers', 'product', 'order']);
+
+        if ($orderItem->notifiedUsers->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bu ürün için atanmış kullanıcı bulunmamaktadır.',
+            ], 400);
+        }
+
+        // Sadece player_id'si olan ve müsait olan kullanıcıları filtrele
+        $usersToNotify = $orderItem->notifiedUsers
+            ->whereNotNull('player_id')
+            ->where('player_id', '!=', '')
+            ->where('availability_status', 'available');
+
+        if ($usersToNotify->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bildirim gönderebilecek müsait kullanıcı bulunmamaktadır.',
+            ], 400);
+        }
+
+        $playerIds = $usersToNotify->pluck('player_id')->filter()->values()->toArray();
+
+        if (empty($playerIds)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Geçerli player_id bulunamadı.',
+            ], 400);
+        }
+
+        // Bildirim mesajı oluştur
+        $order = $orderItem->order;
+        $productName = $orderItem->product->name ?? 'Ürün';
+        $title = "Hatırlatma - {$productName}";
+        $message = "Oda {$order->room_number} - Sipariş #{$order->order_number} için hatırlatma";
+
+        // Bildirim gönder
+        $result = $this->oneSignalService->sendNotification($title, $message, $playerIds, [], 'tr');
+
+        Log::info("Hatırlatma bildirimi gönderildi", [
+            'order_item_id' => $orderItem->id,
+            'order_id' => $order->id,
+            'product_name' => $productName,
+            'room_number' => $order->room_number,
+            'player_ids' => $playerIds,
+            'user_count' => count($playerIds),
+            'result' => $result
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Hatırlatma bildirimi başarıyla gönderildi.',
+            'notified_count' => count($playerIds),
         ]);
     }
 

@@ -244,6 +244,22 @@
                                         }
                                     @endphp
 
+                                    <!--begin:Menu item-->
+                                    <div class="menu-item">
+                                        <a class="menu-link" href="{{ route('admin.dashboard.index') }}">
+                                            <span class="menu-icon">
+                                                <i class="ki-duotone ki-element-screen fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                    <span class="path3"></span>
+                                                    <span class="path4"></span>
+                                                </i>
+                                            </span>
+                                            <span class="menu-title">Gösterge Paneli</span>
+                                        </a>
+                                    </div>
+                                    <!--end:Menu item-->
+
                                     {{-- Alt menü örneği (yorum satırı) --}}
                                     {{--
                                     <!--begin:Menu item with submenu-->

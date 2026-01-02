@@ -189,13 +189,43 @@
                                     <td colspan="7" class="pt-0 pb-5">
                                         <div class="ps-10">
                                             <div class="text-muted fs-7 mb-2">Ürünler:</div>
-                                            <div class="d-flex flex-wrap gap-2">
+                                            <div class="d-flex flex-wrap gap-2 align-items-center">
                                                 @foreach($order->items as $item)
-                                                    <span class="badge badge-light">
-                                                        {{ $item->product->name ?? 'Ürün bulunamadı' }} 
-                                                        ({{ $item->quantity }}x) - 
-                                                        {{ number_format($item->price * $item->quantity, 2, ',', '.') }} ₺
-                                                    </span>
+                                                    <div class="d-inline-flex align-items-center gap-1">
+                                                        <span class="badge badge-light">
+                                                            {{ $item->product->name ?? 'Ürün bulunamadı' }} 
+                                                            ({{ $item->quantity }}x) - 
+                                                            {{ number_format($item->price * $item->quantity, 2, ',', '.') }} ₺
+                                                        </span>
+                                                        @php
+                                                            $statusLabel = $item->status_label;
+                                                            $usersList = '';
+                                                            $assignmentTime = '';
+                                                            
+                                                            if($item->notifiedUsers && $item->notifiedUsers->count() > 0) {
+                                                                $usersList = $item->notifiedUsers->map(function($user) {
+                                                                    return $user->name_surname;
+                                                                })->join(', ');
+                                                                
+                                                                // Pivot tablosundan en eski created_at bilgisini al (ilk atanma zamanı)
+                                                                $firstAssignment = $item->notifiedUsers->sortBy(function($user) {
+                                                                    return $user->pivot->created_at ?? now();
+                                                                })->first();
+                                                                
+                                                                if($firstAssignment && $firstAssignment->pivot && isset($firstAssignment->pivot->created_at)) {
+                                                                    $assignmentTime = \Carbon\Carbon::parse($firstAssignment->pivot->created_at)->format('d.m.Y H:i');
+                                                                }
+                                                            }
+                                                        @endphp
+                                                        <i class="ki-duotone ki-information-5 fs-7 text-muted cursor-pointer product-info-icon" 
+                                                           style="margin-left: 4px;"
+                                                           data-status="{{ $statusLabel }}"
+                                                           data-users="{{ $usersList }}"
+                                                           data-assignment-time="{{ $assignmentTime }}">
+                                                            <span class="path1"></span>
+                                                            <span class="path2"></span>
+                                                        </i>
+                                                    </div>
                                                 @endforeach
                                             </div>
                                         </div>
@@ -381,6 +411,36 @@
             complete: function() {
                 btn.prop('disabled', false);
             }
+        });
+    });
+
+    // Initialize tooltips
+    $(document).ready(function() {
+        // Product info tooltips with HTML content
+        $('.product-info-icon').each(function() {
+            var $icon = $(this);
+            var status = $icon.data('status') || '';
+            var users = $icon.data('users') || '';
+            var assignmentTime = $icon.data('assignment-time') || '';
+            
+            var tooltipHtml = '<div class="text-start" style="min-width: 200px;">';
+            tooltipHtml += '<div class="fw-bold mb-2">Durum: <span class="text-primary">' + status + '</span></div>';
+            
+            if (users) {
+                tooltipHtml += '<div class="mb-2">Atanan Kullanıcı: <span class="fw-semibold">' + users + '</span></div>';
+                if (assignmentTime) {
+                    tooltipHtml += '<div class="text-muted fs-7">Atanma Saati: ' + assignmentTime + '</div>';
+                }
+            } else {
+                tooltipHtml += '<div class="text-muted fs-7">Atanan kullanıcı yok</div>';
+            }
+            tooltipHtml += '</div>';
+            
+            new bootstrap.Tooltip($icon[0], {
+                html: true,
+                placement: 'top',
+                title: tooltipHtml
+            });
         });
     });
 </script>

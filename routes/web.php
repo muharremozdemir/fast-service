@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\DepartmentController as AdminDepartmentController
 use App\Http\Controllers\Admin\OnboardingController as AdminOnboardingController;
 use App\Http\Controllers\Admin\SliderController as AdminSliderController;
 use App\Http\Controllers\Admin\AnnouncementController as AdminAnnouncementController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 
 // Site
 use App\Http\Controllers\Site\SiteHomeController;
@@ -94,6 +95,9 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAut
     Route::post('/onboarding/step3', [AdminOnboardingController::class, 'storeRoom'])->name('onboarding.storeRoom');
     Route::get('/onboarding/complete', [AdminOnboardingController::class, 'complete'])->name('onboarding.complete');
 
+    // Dashboard
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard.index');
+
     Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories.index');
     Route::get('/categories/create', [AdminCategoryController::class, 'create'])->name('categories.create');
     Route::post('/categories/store', [AdminCategoryController::class, 'store'])->name('categories.store');
@@ -109,7 +113,10 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAut
     Route::delete('/products/{product}', [AdminProductController::class, 'destroy'])->name('products.destroy');
 
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::put('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    Route::put('/orders/items/{orderItem}/status', [AdminOrderController::class, 'updateItemStatus'])->name('orders.items.updateStatus');
+    Route::post('/orders/items/{orderItem}/send-reminder', [AdminOrderController::class, 'sendItemReminder'])->name('orders.items.sendReminder');
     Route::post('/orders/{order}/close', [AdminOrderController::class, 'close'])->name('orders.close');
     Route::post('/orders/{order}/reopen', [AdminOrderController::class, 'reopen'])->name('orders.reopen');
 
