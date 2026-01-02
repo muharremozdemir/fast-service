@@ -80,7 +80,7 @@ Route::prefix('user/availability')->middleware('auth:api')->group(function () {
 });
 
 // Order Routes
-Route::prefix('orders')->group(function () {
+Route::prefix('orders')->middleware('auth:api')->group(function () {
     Route::get('/', [\App\Http\Controllers\Api\OrderController::class, 'index']);
     Route::get('/{id}', [\App\Http\Controllers\Api\OrderController::class, 'show']);
     Route::put('/items/{orderItemId}/status', [\App\Http\Controllers\Api\OrderController::class, 'updateItemStatus']);

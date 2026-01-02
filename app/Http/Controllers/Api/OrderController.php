@@ -18,7 +18,6 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $user = User::query()->find(5);
 
         if (!$user) {
             return response()->json([
