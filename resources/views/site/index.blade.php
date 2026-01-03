@@ -79,11 +79,6 @@
                         <i class="fas fa-info-circle" style="font-size: 16px;"></i>
                     </button>
                     @endif
-                    @if($company && $company->phone)
-                    <a href="tel:{{ $company->phone }}" class="btn btn-light btn-fastservice">
-                        <i class="fas fa-phone" style="font-size: 16px;"></i>
-                    </a>
-                    @endif
                 </div>
             </div>
             <div class="col-6 d-flex align-items-center justify-content-center">
@@ -130,19 +125,6 @@
         </div>
         <div class="col-4 col-md-6">
             <div class="d-flex align-items-center justify-content-end gap-3">
-                @if($company && $company->wifi_password)
-                <div class="wifi-password-container d-flex align-items-center">
-                    <div class="wifi-password-text d-flex align-items-center justify-content-center" 
-                         data-wifi-password="{{ $company->wifi_password }}"
-                         style="cursor: pointer;"
-                         onclick="copyWifiPassword(this)"
-                         title="WiFi şifresini kopyalamak için tıklayın">
-                        <i class="fas fa-wifi me-2" style="font-size: 14px;"></i>
-                        <span class="wifi-label">WiFi: </span>
-                        <span class="wifi-password-value">{{ $company->wifi_password }}</span>
-                    </div>
-                </div>
-                @endif
                 <div class="room-number-container d-flex align-items-center">
                     <div class="room-number-text d-flex align-items-center justify-content-center">Oda Numaranız</div>
                     <div class="room-number d-flex align-items-center justify-content-center" id="room-number-display">
@@ -552,17 +534,19 @@
 
     // Show copy feedback
     function showCopyFeedback(element) {
-        const originalText = element.innerHTML;
+        const originalIcon = element.innerHTML;
         const originalBg = element.style.backgroundColor;
+        const originalColor = element.style.color;
         
-        element.innerHTML = '<i class="fas fa-check me-2" style="font-size: 14px;"></i><span>Kopyalandı!</span>';
-        element.style.backgroundColor = '#d4edda';
-        element.style.color = '#155724';
+        // Change icon to check mark and update colors
+        element.innerHTML = '<i class="fas fa-check"></i>';
+        element.style.backgroundColor = '#28a745';
+        element.style.color = '#ffffff';
         
         setTimeout(function() {
-            element.innerHTML = originalText;
+            element.innerHTML = originalIcon;
             element.style.backgroundColor = originalBg;
-            element.style.color = '';
+            element.style.color = originalColor;
         }, 2000);
     }
 
@@ -644,5 +628,23 @@
             });
     }
 </script>
+
+<!-- Float Action Buttons -->
+<div class="float-action-buttons">
+    @if($company && $company->wifi_password)
+    <button class="fab-btn fab-btn-wifi" 
+            data-wifi-password="{{ $company->wifi_password }}"
+            onclick="copyWifiPassword(this)"
+            title="WiFi şifresini kopyalamak için tıklayın">
+        <i class="fas fa-wifi"></i>
+    </button>
+    @endif
+    @if($company && $company->phone)
+    <a href="tel:{{ $company->phone }}" class="fab-btn fab-btn-phone" title="Ara">
+        <i class="fas fa-phone"></i>
+    </a>
+    @endif
+</div>
+
 </body>
 </html>
