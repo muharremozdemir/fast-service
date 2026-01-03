@@ -78,14 +78,18 @@ class RoomController extends Controller
 
         // If per_page is -1, get all without pagination
         if ($perPage == -1) {
-            $rooms = $query->get();
+            $allRooms = $query->get();
+            $total = $allRooms->count();
             // Create a custom paginator-like object for compatibility
             $rooms = new \Illuminate\Pagination\LengthAwarePaginator(
-                $rooms,
-                $rooms->count(),
-                $rooms->count(),
+                $allRooms,
+                $total,
+                $total > 0 ? $total : 1,
                 1,
-                ['path' => $request->url(), 'query' => $request->query()]
+                [
+                    'path' => $request->url(),
+                    'query' => $request->query()
+                ]
             );
         } else {
             $rooms = $query->paginate($perPage)->withQueryString();
@@ -587,7 +591,7 @@ class RoomController extends Controller
 
         try {
             $rows = Excel::toArray([], $request->file('file'));
-            
+
             if (empty($rows) || empty($rows[0])) {
                 return redirect()
                     ->back()
@@ -696,7 +700,7 @@ class RoomController extends Controller
 
         try {
             $rows = Excel::toArray([], $request->file('file'));
-            
+
             if (empty($rows) || empty($rows[0])) {
                 return response()->json([
                     'error' => 'Excel dosyası boş veya geçersiz.'
@@ -705,7 +709,7 @@ class RoomController extends Controller
 
             $data = $rows[0];
             $headerRow = array_shift($data); // İlk satırı (başlıkları) çıkar
-            
+
             // Boş satırları filtrele
             $validRows = array_filter($data, function($row) {
                 return !empty(array_filter($row));

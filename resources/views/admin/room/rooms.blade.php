@@ -120,12 +120,18 @@
             <div class="card-header align-items-center py-5 gap-2 gap-md-5">
                 <div class="card-title">
                     <div class="d-flex align-items-center position-relative my-1">
-                        <i class="ki-duotone ki-magnifier fs-3 position-absolute ms-4">
+                        <i class="ki-duotone ki-magnifier fs-3 position-absolute ms-4" style="z-index: 1;">
                             <span class="path1"></span>
                             <span class="path2"></span>
                         </i>
-                        <form method="GET" action="{{ route('admin.rooms.index') }}" class="d-flex align-items-center gap-2">
-                            <input type="text" name="q" value="{{ request('q') }}" class="form-control form-control-solid w-250px ps-12" placeholder="Oda ara..." />
+                        <form method="GET" action="{{ route('admin.rooms.index') }}" class="d-flex align-items-center gap-2 position-relative" id="searchForm">
+                            <input type="text" name="q" id="searchInput" value="{{ request('q') }}" class="form-control form-control-solid w-250px ps-12 pe-10" placeholder="Oda ara..." />
+                            <button type="button" class="btn btn-icon btn-sm btn-active-light-primary position-absolute end-0 me-2" id="clearSearchBtn" style="z-index: 2; {{ request('q') ? '' : 'display: none;' }}">
+                                <i class="ki-duotone ki-cross fs-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                            </button>
                             @if(request('status') !== null)
                                 <input type="hidden" name="status" value="{{ request('status') }}" />
                             @endif
@@ -249,11 +255,15 @@
                     </tbody>
                 </table>
 
-                @if ($rooms->hasPages())
+                @if ($rooms->total() > 0)
                 <div class="d-flex justify-content-between align-items-center mt-5">
                     <div>
                         <span class="text-muted">
-                            {{ $rooms->firstItem() }} - {{ $rooms->lastItem() }} arası gösteriliyor / Toplam: {{ $rooms->total() }}
+                            @if($perPage == -1)
+                                Toplam: {{ $rooms->total() }} kayıt gösteriliyor
+                            @else
+                                {{ $rooms->firstItem() ?? 0 }} - {{ $rooms->lastItem() ?? 0 }} arası gösteriliyor / Toplam: {{ $rooms->total() }}
+                            @endif
                         </span>
                     </div>
                     <div>
@@ -333,6 +343,40 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Search input clear button functionality
+        const searchInput = document.getElementById('searchInput');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+        const searchForm = document.getElementById('searchForm');
+
+        if (searchInput) {
+            // Show/hide clear button based on input value
+            function toggleClearButton() {
+                if (clearSearchBtn) {
+                    if (searchInput.value.trim() !== '') {
+                        clearSearchBtn.style.display = 'block';
+                    } else {
+                        clearSearchBtn.style.display = 'none';
+                    }
+                }
+            }
+
+            // Initial state
+            toggleClearButton();
+
+            // Listen to input changes
+            searchInput.addEventListener('input', toggleClearButton);
+
+            // Clear button click handler
+            if (clearSearchBtn) {
+                clearSearchBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    searchInput.value = '';
+                    toggleClearButton();
+                    searchForm.submit();
+                });
+            }
+        }
+
         // SweetAlert for success messages
         @if(session('success'))
             Swal.fire({
