@@ -64,11 +64,6 @@
                         <i class="fas fa-info-circle" style="font-size: 16px;"></i>
                     </button>
                     @endif
-                    @if($company && $company->phone)
-                    <a href="tel:{{ $company->phone }}" class="btn btn-light btn-fastservice">
-                        <i class="fas fa-phone" style="font-size: 16px;"></i>
-                    </a>
-                    @endif
                 </div>
             </div>
             <div class="col-6">
@@ -864,5 +859,139 @@
         </div>
     </div>
 </div>
+
+<!-- Float Action Buttons -->
+<div class="float-action-buttons">
+    @if($company && $company->wifi_password)
+    <button class="fab-btn fab-btn-wifi" 
+            data-wifi-password="{{ $company->wifi_password }}"
+            onclick="copyWifiPassword(this)"
+            title="WiFi şifresini kopyalamak için tıklayın">
+        <i class="fas fa-wifi"></i>
+    </button>
+    @endif
+    @if($company && $company->phone)
+    <a href="tel:{{ $company->phone }}" class="fab-btn fab-btn-phone" title="Ara">
+        <i class="fas fa-phone"></i>
+    </a>
+    @endif
+</div>
+
+<script>
+    // Copy WiFi password to clipboard
+    function copyWifiPassword(element) {
+        const wifiPassword = element.getAttribute('data-wifi-password');
+        
+        if (!wifiPassword) {
+            return;
+        }
+
+        // Modern clipboard API
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(wifiPassword).then(function() {
+                showCopyFeedback(element);
+            }).catch(function(err) {
+                // Fallback for older browsers
+                fallbackCopyTextToClipboard(wifiPassword, element);
+            });
+        } else {
+            // Fallback for older browsers
+            fallbackCopyTextToClipboard(wifiPassword, element);
+        }
+    }
+
+    // Fallback copy method for older browsers
+    function fallbackCopyTextToClipboard(text, element) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                showCopyFeedback(element);
+            }
+        } catch (err) {
+            console.error('Fallback: Oops, unable to copy', err);
+        }
+        
+        document.body.removeChild(textArea);
+    }
+
+    // Show copy feedback
+    function showCopyFeedback(element) {
+        const originalIcon = element.innerHTML;
+        const originalBg = element.style.backgroundColor;
+        const originalColor = element.style.color;
+        
+        // Change icon to check mark and update colors
+        element.innerHTML = '<i class="fas fa-check"></i>';
+        element.style.backgroundColor = '#28a745';
+        element.style.color = '#ffffff';
+        
+        // Show toast notification
+        showToastNotification('WiFi şifresi kopyalandı', 'success');
+        
+        setTimeout(function() {
+            element.innerHTML = originalIcon;
+            element.style.backgroundColor = originalBg;
+            element.style.color = originalColor;
+        }, 2000);
+    }
+
+    // Show toast notification
+    function showToastNotification(message, type) {
+        // Create toast container if it doesn't exist
+        let toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toast-container';
+            toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+            toastContainer.style.zIndex = '9999';
+            document.body.appendChild(toastContainer);
+        }
+
+        // Create toast element
+        const toastId = 'toast-' + Date.now();
+        const toast = document.createElement('div');
+        toast.id = toastId;
+        toast.className = 'toast';
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        
+        const bgColor = type === 'success' ? '#28a745' : '#dc3545';
+        toast.innerHTML = `
+            <div class="toast-header" style="background-color: ${bgColor}; color: #ffffff;">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                <strong class="me-auto">Bildirim</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" style="background-color: #ffffff;">
+                ${message}
+            </div>
+        `;
+        
+        toastContainer.appendChild(toast);
+        
+        // Initialize and show toast
+        const bsToast = new bootstrap.Toast(toast, {
+            autohide: true,
+            delay: 3000
+        });
+        bsToast.show();
+        
+        // Remove toast element after it's hidden
+        toast.addEventListener('hidden.bs.toast', function() {
+            toast.remove();
+        });
+    }
+</script>
+
 </body>
 </html>

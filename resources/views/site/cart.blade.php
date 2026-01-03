@@ -8,6 +8,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <link rel="stylesheet" href="{{ asset('site/assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('site/assets/css/swiper-bundle.min.css') }}">
@@ -57,11 +60,6 @@
                             <li><a class="dropdown-item" href="#">Ipsum</a></li>
                         </ul>
                     </div>
-                    @if($company && $company->phone)
-                    <a href="tel:{{ $company->phone }}" class="btn btn-light btn-fastservice">
-                        <i class="fas fa-phone" style="font-size: 16px;"></i>
-                    </a>
-                    @endif
                 </div>
             </div>
             <div class="col-6">
@@ -362,6 +360,7 @@
         });
         @endif
     });
-</script>
+
+
 </body>
 </html>

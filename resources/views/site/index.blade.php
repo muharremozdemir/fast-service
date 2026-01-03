@@ -543,11 +543,62 @@
         element.style.backgroundColor = '#28a745';
         element.style.color = '#ffffff';
         
+        // Show toast notification
+        showToastNotification('WiFi şifresi kopyalandı', 'success');
+        
         setTimeout(function() {
             element.innerHTML = originalIcon;
             element.style.backgroundColor = originalBg;
             element.style.color = originalColor;
         }, 2000);
+    }
+
+    // Show toast notification
+    function showToastNotification(message, type) {
+        // Create toast container if it doesn't exist
+        let toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toast-container';
+            toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+            toastContainer.style.zIndex = '9999';
+            document.body.appendChild(toastContainer);
+        }
+
+        // Create toast element
+        const toastId = 'toast-' + Date.now();
+        const toast = document.createElement('div');
+        toast.id = toastId;
+        toast.className = 'toast';
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        
+        const bgColor = type === 'success' ? '#28a745' : '#dc3545';
+        toast.innerHTML = `
+            <div class="toast-header" style="background-color: ${bgColor}; color: #ffffff;">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                <strong class="me-auto">Bildirim</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" style="background-color: #ffffff;">
+                ${message}
+            </div>
+        `;
+        
+        toastContainer.appendChild(toast);
+        
+        // Initialize and show toast
+        const bsToast = new bootstrap.Toast(toast, {
+            autohide: true,
+            delay: 3000
+        });
+        bsToast.show();
+        
+        // Remove toast element after it's hidden
+        toast.addEventListener('hidden.bs.toast', function() {
+            toast.remove();
+        });
     }
 
     // Update cart count on page load
