@@ -12,6 +12,12 @@ use App\Models\QrSticker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Concerns\FromArray;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class RoomController extends Controller
 {
@@ -489,5 +495,233 @@ class RoomController extends Controller
             'success' => true,
             'users' => $users,
         ]);
+    }
+
+    /**
+     * Download Excel template for room import
+     */
+    public function downloadTemplate()
+    {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
+        $companyId = Auth::user()->company_id;
+        $floors = Floor::where('company_id', $companyId)
+            ->where('is_active', true)
+            ->orderBy('floor_number')
+            ->get();
+
+        // Örnek veri
+        $sampleData = [
+            [
+                'floor_name' => $floors->first() ? $floors->first()->name : 'Örnek Kat',
+                'room_number' => '101',
+                'name' => 'Örnek Oda 1',
+                'description' => 'Örnek açıklama',
+                'is_active' => '1',
+                'sort_order' => '1',
+            ],
+            [
+                'floor_name' => $floors->first() ? $floors->first()->name : 'Örnek Kat',
+                'room_number' => '102',
+                'name' => 'Örnek Oda 2',
+                'description' => '',
+                'is_active' => '1',
+                'sort_order' => '2',
+            ],
+        ];
+
+        $template = new class($sampleData) implements FromArray, WithHeadings, WithStyles, ShouldAutoSize {
+            protected $data;
+
+            public function __construct($data)
+            {
+                $this->data = $data;
+            }
+
+            public function array(): array
+            {
+                return $this->data;
+            }
+
+            public function headings(): array
+            {
+                return [
+                    'Kat Adı',
+                    'Oda Numarası',
+                    'Oda Adı (Opsiyonel)',
+                    'Açıklama (Opsiyonel)',
+                    'Aktif (1 veya 0)',
+                    'Sıralama (Opsiyonel)',
+                ];
+            }
+
+            public function styles(Worksheet $sheet)
+            {
+                return [
+                    1 => ['font' => ['bold' => true]],
+                ];
+            }
+        };
+
+        return Excel::download($template, 'oda_import_sablonu.xlsx');
+    }
+
+    /**
+     * Import rooms from Excel file
+     */
+    public function import(Request $request)
+    {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return $onboardingCheck;
+        }
+
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls|max:2048',
+        ]);
+
+        $companyId = Auth::user()->company_id;
+
+        try {
+            $rows = Excel::toArray([], $request->file('file'));
+            
+            if (empty($rows) || empty($rows[0])) {
+                return redirect()
+                    ->back()
+                    ->with('error', 'Excel dosyası boş veya geçersiz.');
+            }
+
+            $data = $rows[0];
+            $headers = array_shift($data); // İlk satırı (başlıkları) çıkar
+
+            $imported = 0;
+            $updated = 0;
+            $errors = [];
+
+            foreach ($data as $index => $row) {
+                $rowNumber = $index + 2; // Excel satır numarası (başlık + 1)
+
+                // Satır boşsa atla
+                if (empty(array_filter($row))) {
+                    continue;
+                }
+
+                // Veriyi parse et
+                $floorName = $row[0] ?? null;
+                $roomNumber = $row[1] ?? null;
+                $name = $row[2] ?? null;
+                $description = $row[3] ?? null;
+                $isActive = isset($row[4]) ? (($row[4] == '1' || $row[4] == 1 || strtolower($row[4]) == 'true') ? 1 : 0) : 1;
+                $sortOrder = isset($row[5]) && is_numeric($row[5]) ? (int)$row[5] : 0;
+
+                // Validasyon
+                if (empty($floorName) || empty($roomNumber)) {
+                    $errors[] = "Satır {$rowNumber}: Kat adı ve oda numarası zorunludur.";
+                    continue;
+                }
+
+                // Katı bul
+                $floor = Floor::where('company_id', $companyId)
+                    ->where('name', $floorName)
+                    ->where('is_active', true)
+                    ->first();
+
+                if (!$floor) {
+                    $errors[] = "Satır {$rowNumber}: '{$floorName}' adında aktif bir kat bulunamadı.";
+                    continue;
+                }
+
+                // Aynı katta aynı oda numarası kontrolü
+                $existingRoom = Room::where('company_id', $companyId)
+                    ->where('floor_id', $floor->id)
+                    ->where('room_number', $roomNumber)
+                    ->first();
+
+                if ($existingRoom) {
+                    // Güncelle
+                    $existingRoom->name = $name ?: $existingRoom->name;
+                    $existingRoom->description = $description ?: $existingRoom->description;
+                    $existingRoom->is_active = $isActive;
+                    $existingRoom->sort_order = $sortOrder;
+                    $existingRoom->save();
+                    $updated++;
+                } else {
+                    // Yeni oda oluştur
+                    Room::create([
+                        'company_id' => $companyId,
+                        'floor_id' => $floor->id,
+                        'room_number' => $roomNumber,
+                        'name' => $name,
+                        'description' => $description,
+                        'is_active' => $isActive,
+                        'sort_order' => $sortOrder,
+                    ]);
+                    $imported++;
+                }
+            }
+
+            $message = "İçe aktarma tamamlandı. {$imported} yeni oda eklendi, {$updated} oda güncellendi.";
+            if (!empty($errors)) {
+                $message .= " " . count($errors) . " hata oluştu.";
+                session()->flash('import_errors', $errors);
+            }
+
+            return redirect()
+                ->back()
+                ->with('success', $message);
+
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'İçe aktarma sırasında bir hata oluştu: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Preview Excel file and get row count
+     */
+    public function previewExcel(Request $request)
+    {
+        $onboardingCheck = $this->checkOnboarding();
+        if ($onboardingCheck) {
+            return response()->json(['error' => 'Yetki hatası'], 403);
+        }
+
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls|max:2048',
+        ]);
+
+        try {
+            $rows = Excel::toArray([], $request->file('file'));
+            
+            if (empty($rows) || empty($rows[0])) {
+                return response()->json([
+                    'error' => 'Excel dosyası boş veya geçersiz.'
+                ], 400);
+            }
+
+            $data = $rows[0];
+            $headerRow = array_shift($data); // İlk satırı (başlıkları) çıkar
+            
+            // Boş satırları filtrele
+            $validRows = array_filter($data, function($row) {
+                return !empty(array_filter($row));
+            });
+
+            $rowCount = count($validRows);
+
+            return response()->json([
+                'success' => true,
+                'row_count' => $rowCount,
+                'total_rows' => count($data) + 1, // +1 for header
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Dosya okuma hatası: ' . $e->getMessage()
+            ], 400);
+        }
     }
 }

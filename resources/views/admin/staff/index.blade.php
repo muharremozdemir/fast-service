@@ -34,6 +34,28 @@
         <!--end::Page title-->
         <!--begin::Actions-->
         <div class="d-flex align-items-center gap-2 gap-lg-3">
+            <div class="m-0">
+                <a href="#" class="btn btn-sm btn-flex btn-success fw-bold" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                    <i class="ki-duotone ki-file-up fs-6 text-white me-1">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i>Excel İşlemleri</a>
+                <div class="menu menu-sub menu-sub-dropdown w-250px" data-kt-menu="true">
+                    <div class="px-7 py-5">
+                        <div class="fs-5 text-gray-900 fw-bold mb-7">Excel İşlemleri</div>
+                        <div class="d-flex flex-column gap-2">
+                            <a href="{{ route('admin.staff.excel.template') }}" class="btn btn-sm btn-light-primary">
+                                <i class="fas fa-download me-2"></i>
+                                Şablon İndir
+                            </a>
+                            <button type="button" class="btn btn-sm btn-light-info" data-bs-toggle="modal" data-bs-target="#excelImportModal">
+                                <i class="fas fa-upload me-2"></i>
+                                Excel İçe Aktar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!--begin::Primary button-->
             <a href="{{ route('admin.staff.create') }}" class="btn btn-sm fw-bold btn-primary">+ Yeni Personel</a>
             <!--end::Primary button-->
@@ -48,19 +70,6 @@
 <div id="kt_app_content" class="app-content flex-column-fluid">
     <!--begin::Content container-->
     <div id="kt_app_content_container" class="app-container container-xxl">
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
 
         <!--begin::Summary Cards-->
         <div class="row g-5 g-xl-8 mb-5">
@@ -280,4 +289,276 @@
     <!--end::Content container-->
 </div>
 <!--end::Content-->
+
+<!-- Excel İçe Aktarma Modal -->
+<div class="modal fade" id="excelImportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered mw-650px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="fw-bold">Excel İçe Aktar</h2>
+                <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal">
+                    <i class="ki-duotone ki-cross fs-1">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i>
+                </div>
+            </div>
+            <form id="excelImportForm" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-5">
+                        <label class="form-label fw-semibold">Excel Dosyası Seçin:</label>
+                        <input type="file" name="file" id="excelFileInput" class="form-control form-control-solid" accept=".xlsx,.xls" required>
+                        <div class="form-text">Lütfen .xlsx veya .xls formatında bir dosya seçin. Önce şablonu indirerek doğru formatta doldurun.</div>
+                        <div id="fileInfo" class="mt-3" style="display: none;">
+                            <div class="alert alert-primary d-flex align-items-center p-4">
+                                <i class="ki-duotone ki-information-5 fs-2hx text-primary me-4">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                <div class="d-flex flex-column">
+                                    <span class="fw-bold" id="staffCountText">0 personel bulundu</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="uploadProgress" class="mb-5" style="display: none;">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="text-gray-700 fw-semibold me-2">Yükleniyor:</span>
+                            <span class="text-primary fw-bold" id="progressText">0% (0/0)</span>
+                        </div>
+                        <div class="progress" style="height: 25px;">
+                            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                <span id="progressBarText" class="fw-bold">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert alert-info d-flex align-items-center p-5">
+                        <i class="ki-duotone ki-information-5 fs-2hx text-info me-4">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                        <div class="d-flex flex-column">
+                            <h4 class="mb-1 text-dark">Bilgi</h4>
+                            <span>Excel dosyasında aynı e-posta adresi varsa personel güncellenir, yoksa yeni personel oluşturulur. Roller virgülle ayrılmış olarak yazılabilir.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" id="importSubmitBtn" class="btn btn-primary">İçe Aktar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // SweetAlert for success messages
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Başarılı!',
+                text: '{{ session('success') }}',
+                confirmButtonText: 'Tamam',
+                confirmButtonColor: '#50cd89',
+                timer: 3000,
+                timerProgressBar: true
+            });
+        @endif
+
+        // SweetAlert for error messages
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Hata!',
+                text: '{{ session('error') }}',
+                confirmButtonText: 'Tamam',
+                confirmButtonColor: '#f1416c'
+            });
+        @endif
+
+        // SweetAlert for import errors
+        @if(session('import_errors'))
+            const errors = @json(session('import_errors'));
+            let errorList = '<ul style="text-align: left; margin-top: 10px;">';
+            errors.forEach(function(error) {
+                errorList += '<li>' + error + '</li>';
+            });
+            errorList += '</ul>';
+            
+            Swal.fire({
+                icon: 'warning',
+                title: 'İçe Aktarma Uyarıları',
+                html: errorList,
+                confirmButtonText: 'Tamam',
+                confirmButtonColor: '#ffc700',
+                width: '600px'
+            });
+        @endif
+
+        // Excel Import Modal Handling
+        const excelFileInput = document.getElementById('excelFileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const staffCountText = document.getElementById('staffCountText');
+        const excelImportForm = document.getElementById('excelImportForm');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const progressBar = document.getElementById('progressBar');
+        const progressBarText = document.getElementById('progressBarText');
+        const progressText = document.getElementById('progressText');
+        const importSubmitBtn = document.getElementById('importSubmitBtn');
+        let totalStaff = 0;
+
+        // File input change event
+        if (excelFileInput) {
+            excelFileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) {
+                    fileInfo.style.display = 'none';
+                    return;
+                }
+
+                // Show loading
+                fileInfo.style.display = 'block';
+                staffCountText.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Dosya kontrol ediliyor...';
+
+                // Create FormData
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('_token', '{{ csrf_token() }}');
+
+                // Send preview request
+                fetch('{{ route("admin.staff.excel.preview") }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        totalStaff = data.row_count;
+                        staffCountText.innerHTML = `<strong>${data.row_count}</strong> personel bulundu`;
+                        fileInfo.style.display = 'block';
+                    } else {
+                        staffCountText.innerHTML = '<span class="text-danger">Hata: ' + (data.error || 'Dosya okunamadı') + '</span>';
+                        fileInfo.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    staffCountText.innerHTML = '<span class="text-danger">Dosya okuma hatası</span>';
+                    fileInfo.style.display = 'block';
+                });
+            });
+        }
+
+        // Form submit event
+        if (excelImportForm) {
+            excelImportForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const fileInput = document.getElementById('excelFileInput');
+                if (!fileInput.files[0]) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata!',
+                        text: 'Lütfen bir dosya seçin.',
+                        confirmButtonText: 'Tamam',
+                        confirmButtonColor: '#f1416c'
+                    });
+                    return;
+                }
+
+                // Disable submit button
+                importSubmitBtn.disabled = true;
+                importSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Yükleniyor...';
+
+                // Show progress bar
+                uploadProgress.style.display = 'block';
+                progressBar.style.width = '0%';
+                progressBarText.textContent = '0%';
+                progressText.textContent = '0% (0/' + totalStaff + ')';
+
+                // Create FormData
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                formData.append('_token', '{{ csrf_token() }}');
+
+                // Create XMLHttpRequest for progress tracking
+                const xhr = new XMLHttpRequest();
+
+                // Progress event
+                xhr.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                        const percentComplete = Math.round((e.loaded / e.total) * 100);
+                        progressBar.style.width = percentComplete + '%';
+                        progressBarText.textContent = percentComplete + '%';
+                        progressText.textContent = percentComplete + '% (Yükleniyor...)';
+                    }
+                });
+
+                // Load event
+                xhr.addEventListener('load', function() {
+                    if (xhr.status === 200) {
+                        progressBar.style.width = '100%';
+                        progressBarText.textContent = '100%';
+                        progressText.textContent = '100% (' + totalStaff + '/' + totalStaff + ')';
+                        
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 500);
+                    } else {
+                        importSubmitBtn.disabled = false;
+                        importSubmitBtn.innerHTML = 'İçe Aktar';
+                        uploadProgress.style.display = 'none';
+                        
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Hata!',
+                            text: 'İçe aktarma sırasında bir hata oluştu.',
+                            confirmButtonText: 'Tamam',
+                            confirmButtonColor: '#f1416c'
+                        });
+                    }
+                });
+
+                // Error event
+                xhr.addEventListener('error', function() {
+                    importSubmitBtn.disabled = false;
+                    importSubmitBtn.innerHTML = 'İçe Aktar';
+                    uploadProgress.style.display = 'none';
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata!',
+                        text: 'Bağlantı hatası oluştu.',
+                        confirmButtonText: 'Tamam',
+                        confirmButtonColor: '#f1416c'
+                    });
+                });
+
+                // Open and send request
+                xhr.open('POST', '{{ route("admin.staff.excel.import") }}');
+                xhr.send(formData);
+            });
+        }
+
+        // Reset modal when closed
+        const excelImportModal = document.getElementById('excelImportModal');
+        if (excelImportModal) {
+            excelImportModal.addEventListener('hidden.bs.modal', function() {
+                excelImportForm.reset();
+                fileInfo.style.display = 'none';
+                uploadProgress.style.display = 'none';
+                importSubmitBtn.disabled = false;
+                importSubmitBtn.innerHTML = 'İçe Aktar';
+                progressBar.style.width = '0%';
+                progressBarText.textContent = '0%';
+                totalStaff = 0;
+            });
+        }
+    });
+</script>
+@endpush
 @endsection

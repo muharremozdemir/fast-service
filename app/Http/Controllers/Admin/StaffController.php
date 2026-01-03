@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Concerns\FromArray;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class StaffController extends Controller
 {
@@ -254,6 +260,236 @@ class StaffController extends Controller
         return redirect()
             ->route('admin.staff.edit', $id)
             ->with('success', 'Bildirim başarıyla gönderildi.');
+    }
+
+    /**
+     * Download Excel template for staff import
+     */
+    public function downloadTemplate()
+    {
+        $companyId = Auth::user()->company_id;
+        $roles = Role::where('company_id', $companyId)
+            ->orderBy('name')
+            ->get();
+
+        // Örnek veri
+        $sampleData = [
+            [
+                'name_surname' => 'Ahmet Yılmaz',
+                'email' => 'ahmet.yilmaz@example.com',
+                'phone' => '05551234567',
+                'roles' => $roles->first() ? $roles->first()->name : 'Örnek Rol',
+            ],
+            [
+                'name_surname' => 'Ayşe Demir',
+                'email' => 'ayse.demir@example.com',
+                'phone' => '05559876543',
+                'roles' => '',
+            ],
+        ];
+
+        $template = new class($sampleData) implements FromArray, WithHeadings, WithStyles, ShouldAutoSize {
+            protected $data;
+
+            public function __construct($data)
+            {
+                $this->data = $data;
+            }
+
+            public function array(): array
+            {
+                return $this->data;
+            }
+
+            public function headings(): array
+            {
+                return [
+                    'Ad Soyad',
+                    'E-posta',
+                    'Telefon',
+                    'Roller (Opsiyonel - Virgülle Ayrılmış)',
+                ];
+            }
+
+            public function styles(Worksheet $sheet)
+            {
+                return [
+                    1 => ['font' => ['bold' => true]],
+                ];
+            }
+        };
+
+        return Excel::download($template, 'personel_import_sablonu.xlsx');
+    }
+
+    /**
+     * Preview Excel file and get row count
+     */
+    public function previewExcel(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls|max:2048',
+        ]);
+
+        try {
+            $rows = Excel::toArray([], $request->file('file'));
+            
+            if (empty($rows) || empty($rows[0])) {
+                return response()->json([
+                    'error' => 'Excel dosyası boş veya geçersiz.'
+                ], 400);
+            }
+
+            $data = $rows[0];
+            $headerRow = array_shift($data); // İlk satırı (başlıkları) çıkar
+            
+            // Boş satırları filtrele
+            $validRows = array_filter($data, function($row) {
+                return !empty(array_filter($row));
+            });
+
+            $rowCount = count($validRows);
+
+            return response()->json([
+                'success' => true,
+                'row_count' => $rowCount,
+                'total_rows' => count($data) + 1, // +1 for header
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Dosya okuma hatası: ' . $e->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
+     * Import staff from Excel file
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls|max:2048',
+        ]);
+
+        $companyId = Auth::user()->company_id;
+
+        try {
+            $rows = Excel::toArray([], $request->file('file'));
+            
+            if (empty($rows) || empty($rows[0])) {
+                return redirect()
+                    ->back()
+                    ->with('error', 'Excel dosyası boş veya geçersiz.');
+            }
+
+            $data = $rows[0];
+            $headers = array_shift($data); // İlk satırı (başlıkları) çıkar
+
+            $imported = 0;
+            $updated = 0;
+            $errors = [];
+
+            foreach ($data as $index => $row) {
+                $rowNumber = $index + 2; // Excel satır numarası (başlık + 1)
+
+                // Satır boşsa atla
+                if (empty(array_filter($row))) {
+                    continue;
+                }
+
+                // Veriyi parse et
+                $nameSurname = trim($row[0] ?? '');
+                $email = trim($row[1] ?? '');
+                $phone = trim($row[2] ?? '');
+                $rolesString = trim($row[3] ?? '');
+
+                // Validasyon
+                if (empty($nameSurname) || empty($email) || empty($phone)) {
+                    $errors[] = "Satır {$rowNumber}: Ad Soyad, E-posta ve Telefon zorunludur.";
+                    continue;
+                }
+
+                // Email format kontrolü
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $errors[] = "Satır {$rowNumber}: Geçersiz e-posta formatı: {$email}";
+                    continue;
+                }
+
+                // Telefon format kontrolü (basit)
+                if (strlen($phone) < 10) {
+                    $errors[] = "Satır {$rowNumber}: Geçersiz telefon numarası: {$phone}";
+                    continue;
+                }
+
+                // Kullanıcıyı bul veya oluştur
+                $user = User::where('email', $email)
+                    ->where('company_id', $companyId)
+                    ->first();
+
+                if ($user) {
+                    // Güncelle
+                    $user->name_surname = $nameSurname;
+                    $user->phone = $phone;
+                    $user->save();
+                    $updated++;
+                } else {
+                    // Yeni kullanıcı oluştur
+                    $randomPassword = \Illuminate\Support\Str::random(12);
+                    
+                    $user = User::create([
+                        'company_id' => $companyId,
+                        'name_surname' => $nameSurname,
+                        'email' => $email,
+                        'phone' => $phone,
+                        'password' => Hash::make($randomPassword),
+                    ]);
+                    $imported++;
+                }
+
+                // Rolleri işle
+                if (!empty($rolesString)) {
+                    setPermissionsTeamId($companyId);
+                    
+                    // Virgülle ayrılmış rolleri al
+                    $roleNames = array_map('trim', explode(',', $rolesString));
+                    
+                    // Mevcut rolleri kaldır
+                    $user->roles()->detach();
+                    
+                    // Rolleri ata
+                    foreach ($roleNames as $roleName) {
+                        if (empty($roleName)) {
+                            continue;
+                        }
+                        
+                        $role = Role::where('company_id', $companyId)
+                            ->where('name', $roleName)
+                            ->first();
+                        
+                        if ($role) {
+                            $user->assignRole($role);
+                        } else {
+                            $errors[] = "Satır {$rowNumber}: '{$roleName}' adında bir rol bulunamadı.";
+                        }
+                    }
+                }
+            }
+
+            $message = "İçe aktarma tamamlandı. {$imported} yeni personel eklendi, {$updated} personel güncellendi.";
+            if (!empty($errors)) {
+                $message .= " " . count($errors) . " hata oluştu.";
+                session()->flash('import_errors', $errors);
+            }
+
+            return redirect()
+                ->back()
+                ->with('success', $message);
+
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'İçe aktarma sırasında bir hata oluştu: ' . $e->getMessage());
+        }
     }
 }
 

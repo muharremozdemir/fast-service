@@ -150,6 +150,9 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAut
     Route::post('/rooms/update/{id}', [AdminRoomController::class, 'update'])->name('rooms.update');
     Route::get('/rooms/{id}', [AdminRoomController::class, 'show'])->name('rooms.show');
     Route::delete('/rooms/{room}', [AdminRoomController::class, 'destroy'])->name('rooms.destroy');
+    Route::get('/rooms/excel/template', [AdminRoomController::class, 'downloadTemplate'])->name('rooms.excel.template');
+    Route::post('/rooms/excel/preview', [AdminRoomController::class, 'previewExcel'])->name('rooms.excel.preview');
+    Route::post('/rooms/excel/import', [AdminRoomController::class, 'import'])->name('rooms.excel.import');
 
     // Reports (Raporlar)
     Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
@@ -184,6 +187,9 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAut
     Route::get('/staff/edit/{id}', [AdminStaffController::class, 'edit'])->name('staff.edit');
     Route::put('/staff/update/{id}', [AdminStaffController::class, 'update'])->name('staff.update');
     Route::post('/staff/{id}/send-notification', [AdminStaffController::class, 'sendNotification'])->name('staff.sendNotification');
+    Route::get('/staff/excel/template', [AdminStaffController::class, 'downloadTemplate'])->name('staff.excel.template');
+    Route::post('/staff/excel/preview', [AdminStaffController::class, 'previewExcel'])->name('staff.excel.preview');
+    Route::post('/staff/excel/import', [AdminStaffController::class, 'import'])->name('staff.excel.import');
 
     // Departments (Departmanlar)
     Route::get('/departments', [AdminDepartmentController::class, 'index'])->name('departments.index');
