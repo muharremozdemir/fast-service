@@ -155,7 +155,7 @@ class CompanyController extends Controller
         $company = new Company();
         $company->name = $request->input('name');
         $company->email = $request->input('email');
-        $company->phone = "+9".str_replace(" ", "", $request->input('phone'));
+        $company->phone = "+90".str_replace(" ", "", $request->input('phone'));
         $company->address = $request->input('address');
         $company->tax_number = $request->input('tax_number');
         $company->tax_office = $request->input('tax_office');
@@ -167,7 +167,7 @@ class CompanyController extends Controller
         $admin = new User();
         $admin->name_surname = $request->input('admin_name');
         $admin->email = $request->input('admin_email');
-        $admin->phone = "+9".str_replace(" ", "", $request->input('admin_phone'));
+        $admin->phone = "+90".str_replace(" ", "", $request->input('admin_phone'));
         $admin->company_id = $company->id;
         // Rastgele şifre oluştur (12 karakter, büyük/küçük harf, rakam ve özel karakter)
         $admin->password = \Illuminate\Support\Str::random(12);
