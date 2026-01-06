@@ -7,6 +7,7 @@ use App\Models\Floor;
 use App\Models\User;
 use App\Models\Block;
 use App\Models\Room;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -41,7 +42,7 @@ class FloorController extends Controller
 
         $floors = Floor::query()
             ->where('company_id', Auth::user()->company_id)
-            ->with(['user', 'block'])
+            ->with(['block', 'users'])
             ->withCount('rooms')
             ->when($q, function ($query, $q) {
                 $query->where(function ($query) use ($q) {
@@ -68,9 +69,9 @@ class FloorController extends Controller
         }
 
         $companyId = Auth::user()->company_id;
-        $staff = User::where('company_id', $companyId)->orderBy('name_surname')->get();
         $blocks = Block::where('company_id', $companyId)->where('is_active', true)->orderBy('sort_order')->orderBy('name')->get();
-        return view('admin.floor.add-floor', compact('staff', 'blocks'));
+        $categories = Category::where('company_id', $companyId)->where('is_active', true)->orderBy('name')->get();
+        return view('admin.floor.add-floor', compact('blocks', 'categories'));
     }
 
     public function edit($id)
@@ -81,10 +82,23 @@ class FloorController extends Controller
         }
 
         $companyId = Auth::user()->company_id;
-        $floor = Floor::where('company_id', $companyId)->findOrFail($id);
-        $staff = User::where('company_id', $companyId)->orderBy('name_surname')->get();
+        $floor = Floor::where('company_id', $companyId)->with(['users'])->findOrFail($id);
         $blocks = Block::where('company_id', $companyId)->where('is_active', true)->orderBy('sort_order')->orderBy('name')->get();
-        return view('admin.floor.edit-floor', compact('floor', 'staff', 'blocks'));
+        $categories = Category::where('company_id', $companyId)->where('is_active', true)->orderBy('name')->get();
+
+        // Kata atanmış kullanıcıları kategori bazında grupla
+        $assignedCategoryUsers = [];
+        foreach ($floor->users as $user) {
+            $categoryId = $user->pivot->category_id;
+            if ($categoryId) {
+                if (!isset($assignedCategoryUsers[$categoryId])) {
+                    $assignedCategoryUsers[$categoryId] = [];
+                }
+                $assignedCategoryUsers[$categoryId][] = $user->id;
+            }
+        }
+
+        return view('admin.floor.edit-floor', compact('floor', 'blocks', 'categories', 'assignedCategoryUsers'));
     }
 
     public function update(Request $request, $id)
@@ -114,7 +128,10 @@ class FloorController extends Controller
             'description' => 'nullable|string',
             'sort_order' => 'nullable|integer',
             'is_active' => 'required|boolean',
-            'user_id' => 'nullable|exists:users,id',
+            'category_users' => 'nullable|array',
+            'category_users.*.category_id' => 'required|exists:categories,id',
+            'category_users.*.user_ids' => 'nullable|array',
+            'category_users.*.user_ids.*' => 'exists:users,id',
         ]);
 
         $floor = Floor::where('company_id', Auth::user()->company_id)->findOrFail($id);
@@ -124,9 +141,24 @@ class FloorController extends Controller
         $floor->description = $request->input('description');
         $floor->is_active = $request->input('is_active', 0);
         $floor->sort_order = $request->input('sort_order', 0);
-        $floor->user_id = $request->input('user_id');
 
         $floor->save();
+
+        // Tüm kategori bazlı kullanıcı atamalarını kaldır
+        $floor->users()->detach();
+
+        // Yeni kategori bazlı kullanıcı atamalarını yap
+        $categoryUsers = $request->input('category_users', []);
+        foreach ($categoryUsers as $categoryUser) {
+            $categoryId = $categoryUser['category_id'] ?? null;
+            $userIds = $categoryUser['user_ids'] ?? [];
+
+            if ($categoryId && !empty($userIds)) {
+                foreach ($userIds as $userId) {
+                    $floor->users()->attach($userId, ['category_id' => $categoryId]);
+                }
+            }
+        }
 
         return redirect()
             ->route('admin.floors.edit', $floor->id)
@@ -159,7 +191,10 @@ class FloorController extends Controller
             'description' => 'nullable|string',
             'sort_order' => 'nullable|integer',
             'is_active' => 'required|boolean',
-            'user_id' => 'nullable|exists:users,id',
+            'category_users' => 'nullable|array',
+            'category_users.*.category_id' => 'required|exists:categories,id',
+            'category_users.*.user_ids' => 'nullable|array',
+            'category_users.*.user_ids.*' => 'exists:users,id',
         ]);
 
         $floor = new Floor();
@@ -169,9 +204,22 @@ class FloorController extends Controller
         $floor->description = $request->input('description');
         $floor->sort_order = $request->input('sort_order', 0);
         $floor->is_active = $request->input('is_active');
-        $floor->user_id = $request->input('user_id');
+        $floor->company_id = Auth::user()->company_id;
 
         $floor->save();
+
+        // Kategori bazlı kullanıcı atamalarını yap
+        $categoryUsers = $request->input('category_users', []);
+        foreach ($categoryUsers as $categoryUser) {
+            $categoryId = $categoryUser['category_id'] ?? null;
+            $userIds = $categoryUser['user_ids'] ?? [];
+
+            if ($categoryId && !empty($userIds)) {
+                foreach ($userIds as $userId) {
+                    $floor->users()->attach($userId, ['category_id' => $categoryId]);
+                }
+            }
+        }
 
         return redirect()->route('admin.floors.index')->with('success', 'Kat başarıyla eklendi.');
     }
@@ -193,7 +241,11 @@ class FloorController extends Controller
             ->with('success', 'Kat başarıyla silindi.');
     }
 
-    public function bulkAssignStaff(Request $request)
+
+    /**
+     * Get users by category ID
+     */
+    public function getUsersByCategory(Request $request)
     {
         $onboardingCheck = $this->checkOnboarding();
         if ($onboardingCheck) {
@@ -201,25 +253,24 @@ class FloorController extends Controller
         }
 
         $request->validate([
-            'floor_ids' => 'required|array',
-            'floor_ids.*' => 'exists:floors,id',
-            'user_id' => 'nullable|exists:users,id',
+            'category_id' => 'required|exists:categories,id',
         ]);
 
-        $floorIds = $request->input('floor_ids');
-        $userId = $request->input('user_id');
         $companyId = Auth::user()->company_id;
+        $categoryId = $request->input('category_id');
 
-        Floor::where('company_id', $companyId)->whereIn('id', $floorIds)->update(['user_id' => $userId]);
+        // Kategoriye ait kullanıcıları getir
+        $category = Category::where('company_id', $companyId)
+            ->findOrFail($categoryId);
 
-        $count = count($floorIds);
-        $message = $userId
-            ? "{$count} kat için görevli atandı."
-            : "{$count} kat için görevli ataması kaldırıldı.";
+        $users = $category->users()
+            ->where('users.company_id', $companyId)
+            ->orderBy('users.name_surname')
+            ->get(['users.id', 'users.name_surname', 'users.email']);
 
         return response()->json([
             'success' => true,
-            'message' => $message,
+            'users' => $users,
         ]);
     }
 }

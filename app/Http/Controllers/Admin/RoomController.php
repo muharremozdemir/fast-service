@@ -202,7 +202,7 @@ class RoomController extends Controller
         }
 
         return redirect()
-            ->route('admin.rooms.edit', $room->id)
+            ->route('admin.rooms.index')
             ->with('success', 'Oda başarıyla güncellendi.');
     }
 
@@ -511,16 +511,11 @@ class RoomController extends Controller
             return $onboardingCheck;
         }
 
-        $companyId = Auth::user()->company_id;
-        $floors = Floor::where('company_id', $companyId)
-            ->where('is_active', true)
-            ->orderBy('floor_number')
-            ->get();
-
         // Örnek veri
         $sampleData = [
             [
-                'floor_name' => $floors->first() ? $floors->first()->name : 'Örnek Kat',
+                'block_name' => '1.Blok',
+                'floor_name' => '1.Kat',
                 'room_number' => '101',
                 'name' => 'Örnek Oda 1',
                 'description' => 'Örnek açıklama',
@@ -528,12 +523,22 @@ class RoomController extends Controller
                 'sort_order' => '1',
             ],
             [
-                'floor_name' => $floors->first() ? $floors->first()->name : 'Örnek Kat',
+                'block_name' => '1.Blok',
+                'floor_name' => '1.Kat',
                 'room_number' => '102',
                 'name' => 'Örnek Oda 2',
                 'description' => '',
                 'is_active' => '1',
                 'sort_order' => '2',
+            ],
+            [
+                'block_name' => '2.Blok',
+                'floor_name' => '2.Kat',
+                'room_number' => '201',
+                'name' => 'Örnek Oda 3',
+                'description' => '',
+                'is_active' => '1',
+                'sort_order' => '1',
             ],
         ];
 
@@ -553,6 +558,7 @@ class RoomController extends Controller
             public function headings(): array
             {
                 return [
+                    'Blok Adı',
                     'Kat Adı',
                     'Oda Numarası',
                     'Oda Adı (Opsiyonel)',
@@ -614,28 +620,58 @@ class RoomController extends Controller
                 }
 
                 // Veriyi parse et
-                $floorName = $row[0] ?? null;
-                $roomNumber = $row[1] ?? null;
-                $name = $row[2] ?? null;
-                $description = $row[3] ?? null;
-                $isActive = isset($row[4]) ? (($row[4] == '1' || $row[4] == 1 || strtolower($row[4]) == 'true') ? 1 : 0) : 1;
-                $sortOrder = isset($row[5]) && is_numeric($row[5]) ? (int)$row[5] : 0;
+                $blockName = $row[0] ?? null;
+                $floorName = $row[1] ?? null;
+                $roomNumber = $row[2] ?? null;
+                $name = $row[3] ?? null;
+                $description = $row[4] ?? null;
+                $isActive = isset($row[5]) ? (($row[5] == '1' || $row[5] == 1 || strtolower($row[5]) == 'true') ? 1 : 0) : 1;
+                $sortOrder = isset($row[6]) && is_numeric($row[6]) ? (int)$row[6] : 0;
 
                 // Validasyon
-                if (empty($floorName) || empty($roomNumber)) {
-                    $errors[] = "Satır {$rowNumber}: Kat adı ve oda numarası zorunludur.";
+                if (empty($blockName) || empty($floorName) || empty($roomNumber)) {
+                    $errors[] = "Satır {$rowNumber}: Blok adı, kat adı ve oda numarası zorunludur.";
                     continue;
                 }
 
-                // Katı bul
+                // Bloğu bul veya oluştur
+                $block = Block::where('company_id', $companyId)
+                    ->where('name', $blockName)
+                    ->first();
+
+                if (!$block) {
+                    // Blok yoksa oluştur (company_id kontrolü ile aynı company içinde unique)
+                    $block = Block::create([
+                        'company_id' => $companyId,
+                        'name' => $blockName,
+                        'block_code' => $blockName,
+                        'is_active' => true,
+                        'sort_order' => 0,
+                    ]);
+                }
+
+                // Katı bul veya oluştur (blok ve kat adına göre)
                 $floor = Floor::where('company_id', $companyId)
+                    ->where('block_id', $block->id)
                     ->where('name', $floorName)
-                    ->where('is_active', true)
                     ->first();
 
                 if (!$floor) {
-                    $errors[] = "Satır {$rowNumber}: '{$floorName}' adında aktif bir kat bulunamadı.";
-                    continue;
+                    // Kat yoksa oluştur
+                    // Kat numarasını isimden çıkarmaya çalış (örn: "1.Kat" -> 1)
+                    $floorNumber = 0;
+                    if (preg_match('/(\d+)/', $floorName, $matches)) {
+                        $floorNumber = (int)$matches[1];
+                    }
+
+                    $floor = Floor::create([
+                        'company_id' => $companyId,
+                        'block_id' => $block->id,
+                        'name' => $floorName,
+                        'floor_number' => $floorNumber,
+                        'is_active' => true,
+                        'sort_order' => 0,
+                    ]);
                 }
 
                 // Aynı katta aynı oda numarası kontrolü

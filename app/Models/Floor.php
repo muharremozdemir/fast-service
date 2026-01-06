@@ -15,7 +15,6 @@ class Floor extends Model
         'description',
         'is_active',
         'sort_order',
-        'user_id',
         'block_id',
         'company_id',
     ];
@@ -31,11 +30,6 @@ class Floor extends Model
         return $this->hasMany(Room::class);
     }
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
     public function block()
     {
         return $this->belongsTo(Block::class);
@@ -44,5 +38,19 @@ class Floor extends Model
     public function company()
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'floor_user')
+            ->withPivot('category_id')
+            ->withTimestamps();
+    }
+
+    public function usersByCategory($categoryId)
+    {
+        return $this->belongsToMany(User::class, 'floor_user')
+            ->wherePivot('category_id', $categoryId)
+            ->withTimestamps();
     }
 }

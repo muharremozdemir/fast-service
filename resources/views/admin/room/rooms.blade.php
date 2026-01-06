@@ -210,7 +210,7 @@
                                 <td>
                                     @if($room->users && $room->users->count() > 0)
                                         @foreach($room->users as $user)
-                                            <span class="badge badge-light-info me-1">{{ $user->name }}</span>
+                                            <span class="badge badge-light-info me-1">{{ $user->name_surname }}</span>
                                         @endforeach
                                     @else
                                         <span class="text-muted">Atanmamış</span>
@@ -327,7 +327,7 @@
                         </i>
                         <div class="d-flex flex-column">
                             <h4 class="mb-1 text-dark">Bilgi</h4>
-                            <span>Excel dosyasında aynı katta aynı oda numarası varsa oda güncellenir, yoksa yeni oda oluşturulur.</span>
+                            <span>Excel dosyasında blok, kat ve oda bilgileri bulunmalıdır. Blok ve kat yoksa otomatik olarak oluşturulur. Aynı katta aynı oda numarası varsa oda güncellenir, yoksa yeni oda oluşturulur.</span>
                         </div>
                     </div>
                 </div>

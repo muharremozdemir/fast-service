@@ -143,7 +143,7 @@
                     </tbody>
                 </table>
                 </div>
-                
+
                 @if ($blocks->hasPages())
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-5 gap-3">
                     <div>
@@ -164,3 +164,29 @@
 <!--end::Content-->
 @endsection
 
+@push('scripts')
+    <script>
+        @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Başarılı!',
+            text: '{{ session('success') }}',
+            confirmButtonText: 'Tamam',
+            confirmButtonColor: '#50cd89',
+            timer: 3000,
+            timerProgressBar: true
+        });
+        @endif
+
+        // SweetAlert for error messages
+        @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Hata!',
+            text: '{{ session('error') }}',
+            confirmButtonText: 'Tamam',
+            confirmButtonColor: '#f1416c'
+        });
+        @endif
+    </script>
+@endpush

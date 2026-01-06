@@ -45,31 +45,6 @@
                     </form>
                 </div>
             </div>
-            <div class="m-0" id="bulkActionsContainer" style="display: none;">
-                <a href="#" class="btn btn-sm btn-flex btn-info fw-bold" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
-                    <i class="ki-duotone ki-check fs-6 text-white me-1">
-                        <span class="path1"></span>
-                        <span class="path2"></span>
-                    </i>Toplu İşlem</a>
-                <div class="menu menu-sub menu-sub-dropdown w-300px" data-kt-menu="true" id="kt_menu_bulk_actions">
-                    <div class="px-7 py-5">
-                        <div class="fs-5 text-gray-900 fw-bold mb-7">Toplu Görevli Atama</div>
-                        <div class="mb-10">
-                            <label class="form-label fw-semibold">Görevli Seç:</label>
-                            <select class="form-select form-select-solid" id="bulkStaffSelect" data-kt-select2="true" data-placeholder="Görevli seçin">
-                                <option value="">Görevli Seçin</option>
-                                @foreach(\App\Models\User::orderBy('name_surname')->get() as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                @endforeach
-                            </select>
-                            <div class="form-text">Görevli seçmeyerek atamayı kaldırabilirsiniz.</div>
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <button type="button" class="btn btn-sm btn-primary" id="bulkAssignBtn">Uygula</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <a href="{{ route('admin.floors.create') }}" class="btn btn-sm fw-bold btn-primary">Kat Ekle</a>
         </div>
     </div>
@@ -145,8 +120,13 @@
                                     <span class="text-gray-600">{{ $floor->rooms_count }} oda</span>
                                 </td>
                                 <td>
-                                    @if($floor->user)
-                                        <span class="badge badge-light-info">{{ $floor->user->name }}</span>
+                                    @if($floor->users && $floor->users->count() > 0)
+                                        @foreach($floor->users->take(3) as $user)
+                                            <span class="badge badge-light-info me-1">{{ $user->name_surname }}</span>
+                                        @endforeach
+                                        @if($floor->users->count() > 3)
+                                            <span class="text-muted">+{{ $floor->users->count() - 3 }} daha</span>
+                                        @endif
                                     @else
                                         <span class="text-muted">Atanmamış</span>
                                     @endif
@@ -210,91 +190,5 @@
 </div>
 <!--end::Content-->
 
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const selectAllCheckbox = document.getElementById('selectAllFloors');
-        const floorCheckboxes = document.querySelectorAll('.floor-checkbox');
-        const bulkActionsContainer = document.getElementById('bulkActionsContainer');
-        const bulkAssignBtn = document.getElementById('bulkAssignBtn');
-        const bulkStaffSelect = document.getElementById('bulkStaffSelect');
-
-        // Tümünü seç/kaldır
-        if (selectAllCheckbox) {
-            selectAllCheckbox.addEventListener('change', function() {
-                floorCheckboxes.forEach(checkbox => {
-                    checkbox.checked = this.checked;
-                });
-                updateBulkActionsVisibility();
-            });
-        }
-
-        // Tekil checkbox değişiklikleri
-        floorCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                updateSelectAllState();
-                updateBulkActionsVisibility();
-            });
-        });
-
-        function updateSelectAllState() {
-            const allChecked = Array.from(floorCheckboxes).every(cb => cb.checked);
-            const someChecked = Array.from(floorCheckboxes).some(cb => cb.checked);
-            if (selectAllCheckbox) {
-                selectAllCheckbox.checked = allChecked;
-                selectAllCheckbox.indeterminate = someChecked && !allChecked;
-            }
-        }
-
-        function updateBulkActionsVisibility() {
-            const checkedCount = Array.from(floorCheckboxes).filter(cb => cb.checked).length;
-            bulkActionsContainer.style.display = checkedCount > 0 ? 'block' : 'none';
-        }
-
-        // Toplu atama
-        if (bulkAssignBtn) {
-            bulkAssignBtn.addEventListener('click', function() {
-                const selectedIds = Array.from(floorCheckboxes)
-                    .filter(cb => cb.checked)
-                    .map(cb => cb.value);
-
-                if (selectedIds.length === 0) {
-                    alert('Lütfen en az bir kat seçin.');
-                    return;
-                }
-
-                const userId = bulkStaffSelect.value;
-
-                if (confirm(`${selectedIds.length} kat için görevli ataması yapılacak. Devam etmek istiyor musunuz?`)) {
-                    fetch('{{ route("admin.floors.bulkAssignStaff") }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({
-                            floor_ids: selectedIds,
-                            user_id: userId || null
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert(data.message);
-                            location.reload();
-                        } else {
-                            alert('Bir hata oluştu.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Bir hata oluştu.');
-                    });
-                }
-            });
-        }
-    });
-</script>
-@endpush
 @endsection
 

@@ -135,7 +135,7 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAut
     Route::get('/floors/edit/{id}', [AdminFloorController::class, 'edit'])->name('floors.edit');
     Route::post('/floors/update/{id}', [AdminFloorController::class, 'update'])->name('floors.update');
     Route::delete('/floors/{floor}', [AdminFloorController::class, 'destroy'])->name('floors.destroy');
-    Route::post('/floors/bulk-assign-staff', [AdminFloorController::class, 'bulkAssignStaff'])->name('floors.bulkAssignStaff');
+    Route::get('/floors/users-by-category', [AdminFloorController::class, 'getUsersByCategory'])->name('floors.usersByCategory');
 
     // Rooms (Odalar)
     Route::get('/rooms', [AdminRoomController::class, 'index'])->name('rooms.index');

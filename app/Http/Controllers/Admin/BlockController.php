@@ -37,7 +37,7 @@ class BlockController extends Controller
 
         $q = $request->input('q');
         $status = $request->input('status');
-    
+
         $blocks = Block::query()
             ->where('company_id', Auth::user()->company_id)
             ->withCount('floors')
@@ -54,7 +54,7 @@ class BlockController extends Controller
             ->orderBy('name')
             ->paginate(10)
             ->withQueryString();
-    
+
         return view('admin.block.blocks', compact('blocks', 'q', 'status'));
     }
 
@@ -104,7 +104,7 @@ class BlockController extends Controller
         $block->save();
 
         return redirect()
-            ->route('admin.blocks.edit', $block->id)
+            ->route('admin.blocks.index')
             ->with('success', 'Blok başarıyla güncellendi.');
     }
 
@@ -147,7 +147,7 @@ class BlockController extends Controller
             abort(403, 'Bu bloka erişim yetkiniz yok.');
         }
         $block->delete();
-    
+
         return redirect()
             ->back()
             ->with('success', 'Blok başarıyla silindi.');
