@@ -38,7 +38,7 @@ class FloorController extends Controller
 
         $q = $request->input('q');
         $status = $request->input('status');
-    
+
         $floors = Floor::query()
             ->where('company_id', Auth::user()->company_id)
             ->with(['user', 'block'])
@@ -56,7 +56,7 @@ class FloorController extends Controller
             ->orderBy('sort_order')
             ->paginate(10)
             ->withQueryString();
-    
+
         return view('admin.floor.floors', compact('floors', 'q', 'status'));
     }
 
@@ -68,7 +68,7 @@ class FloorController extends Controller
         }
 
         $companyId = Auth::user()->company_id;
-        $staff = User::where('company_id', $companyId)->orderBy('name')->get();
+        $staff = User::where('company_id', $companyId)->orderBy('name_surname')->get();
         $blocks = Block::where('company_id', $companyId)->where('is_active', true)->orderBy('sort_order')->orderBy('name')->get();
         return view('admin.floor.add-floor', compact('staff', 'blocks'));
     }
@@ -82,7 +82,7 @@ class FloorController extends Controller
 
         $companyId = Auth::user()->company_id;
         $floor = Floor::where('company_id', $companyId)->findOrFail($id);
-        $staff = User::where('company_id', $companyId)->orderBy('name')->get();
+        $staff = User::where('company_id', $companyId)->orderBy('name_surname')->get();
         $blocks = Block::where('company_id', $companyId)->where('is_active', true)->orderBy('sort_order')->orderBy('name')->get();
         return view('admin.floor.edit-floor', compact('floor', 'staff', 'blocks'));
     }
@@ -187,7 +187,7 @@ class FloorController extends Controller
             abort(403, 'Bu kata erişim yetkiniz yok.');
         }
         $floor->delete();
-    
+
         return redirect()
             ->back()
             ->with('success', 'Kat başarıyla silindi.');
@@ -213,8 +213,8 @@ class FloorController extends Controller
         Floor::where('company_id', $companyId)->whereIn('id', $floorIds)->update(['user_id' => $userId]);
 
         $count = count($floorIds);
-        $message = $userId 
-            ? "{$count} kat için görevli atandı." 
+        $message = $userId
+            ? "{$count} kat için görevli atandı."
             : "{$count} kat için görevli ataması kaldırıldı.";
 
         return response()->json([
