@@ -90,7 +90,7 @@ class AuthController extends Controller
                 'message' => 'Başarıyla giriş yaptınız.',
                 'token' => $token,
                 'token_type' => 'bearer',
-                'expires_in' => 604800 * 30, // saniye cinsinden
+                'expires_in' => 604800 * 4, // saniye cinsinden
                 'user' => [
                     'id' => $user->id,
                     'name_surname' => $user->name_surname,
