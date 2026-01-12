@@ -211,7 +211,7 @@
             <div class="col-6 col-md-3">
                 <a href="{{ route('site.category', ['parent' => $cat->slug]) }}" class="category-card">
                     <!-- <img class="category-card-icon" src="{{ asset('site/assets/img/' . $iconFile) }}" alt="{{ $cat->name }}"> -->
-                    <img class="category-card-icon" src="{{ asset('storage/' . $cat->image_path) }}" alt="{{ $cat->name }}">
+                    <img class="category-card-icon" style="width: 100px; height: 100px" src="{{ asset('storage/' . $cat->image_path) }}" alt="{{ $cat->name }}">
                     <h2 class="category-card-title">{{ $cat->name }}</h2>
                     <p class="category-card-text">{!! nl2br(e($cat->description)) !!}</p>
                 </a>
