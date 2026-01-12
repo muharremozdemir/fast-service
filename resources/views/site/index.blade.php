@@ -70,8 +70,8 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="#">Türkçe</a></li>
                             <li><a class="dropdown-item" href="#">English</a></li>
-                            <li><a class="dropdown-item" href="#">Lorem</a></li>
-                            <li><a class="dropdown-item" href="#">Ipsum</a></li>
+                            <li><a class="dropdown-item" href="#">Almanca</a></li>
+                            <li><a class="dropdown-item" href="#">Rusça</a></li>
                         </ul>
                     </div>
                     @if($company && $company->hotel_info)

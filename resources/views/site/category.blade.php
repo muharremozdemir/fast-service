@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    
+
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
@@ -55,8 +55,8 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="#">Türkçe</a></li>
                             <li><a class="dropdown-item" href="#">English</a></li>
-                            <li><a class="dropdown-item" href="#">Lorem</a></li>
-                            <li><a class="dropdown-item" href="#">Ipsum</a></li>
+                            <li><a class="dropdown-item" href="#">Almanca</a></li>
+                            <li><a class="dropdown-item" href="#">Rusça</a></li>
                         </ul>
                     </div>
                     @if($company && $company->hotel_info)
@@ -152,7 +152,7 @@
                         <a class="product-card" href="{{ route('site.product.show', $product->slug) }}">
                             @if($isInCart)
                                 @if($product->type === 'service')
-                                <div class="product-card-service-added" 
+                                <div class="product-card-service-added"
                                      data-product-id="{{ $product->id }}"
                                      data-cart-item-id="{{ $cartItem->id }}"
                                      onclick="event.preventDefault(); event.stopPropagation(); removeProductFromCart({{ $cartItem->id }}, this);"
@@ -160,11 +160,11 @@
                                     <i class="fas fa-check-circle" style="font-size: 24px; color: #28a745;"></i>
                                 </div>
                                 @else
-                                <div class="product-card-quantity-controls" 
+                                <div class="product-card-quantity-controls"
                                      data-product-id="{{ $product->id }}"
                                      data-cart-item-id="{{ $cartItem->id }}"
                                      onclick="event.preventDefault(); event.stopPropagation();">
-                                    <button class="btn product-card-quantity-btn product-card-quantity-decrease" 
+                                    <button class="btn product-card-quantity-btn product-card-quantity-decrease"
                                             onclick="event.preventDefault(); event.stopPropagation(); updateProductQuantity({{ $cartItem->id }}, {{ $cartItem->quantity - 1 }}, this);">
                                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <g clip-path="url(#clip0_15_1556)">
@@ -178,7 +178,7 @@
                                         </svg>
                                     </button>
                                     <span class="product-card-quantity-number">{{ $cartItem->quantity }}</span>
-                                    <button class="btn product-card-quantity-btn product-card-quantity-increase" 
+                                    <button class="btn product-card-quantity-btn product-card-quantity-increase"
                                             onclick="event.preventDefault(); event.stopPropagation(); updateProductQuantity({{ $cartItem->id }}, {{ $cartItem->quantity + 1 }}, this);">
                                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <g clip-path="url(#clip0_15_1569)">
@@ -195,14 +195,14 @@
                                 @endif
                             @else
                                 @if($product->type === 'service')
-                                <span class="btn product-card-add-to-cart product-card-request-service" 
+                                <span class="btn product-card-add-to-cart product-card-request-service"
                                       data-product-id="{{ $product->id }}"
                                       onclick="event.preventDefault(); event.stopPropagation(); addToCart({{ $product->id }}, this);"
                                       title="Hizmet Talep Et">
                                     <i class="fas fa-clipboard-list" style="font-size: 20px;"></i>
                                 </span>
                                 @else
-                                <span class="btn product-card-add-to-cart" 
+                                <span class="btn product-card-add-to-cart"
                                       data-product-id="{{ $product->id }}"
                                       onclick="event.preventDefault(); event.stopPropagation(); addToCart({{ $product->id }}, this);">
                                     <img width="24" height="24" src="{{ asset('site/assets/img/plus-icon.svg') }}" alt="">
@@ -278,11 +278,11 @@
                 cartCountElements.forEach(el => {
                     el.textContent = data.cart_count || 0;
                 });
-                
+
                 // For service type, show check icon instead of quantity controls
                 if (isService) {
                     const serviceAddedHTML = `
-                        <div class="product-card-service-added" 
+                        <div class="product-card-service-added"
                              data-product-id="${productId}"
                              data-cart-item-id="${data.cart_item_id}"
                              onclick="event.preventDefault(); event.stopPropagation(); removeProductFromCart(${data.cart_item_id}, this);"
@@ -291,7 +291,7 @@
                         </div>
                     `;
                     button.outerHTML = serviceAddedHTML;
-                    
+
                     // Show SweetAlert notification for service type
                     if (typeof Swal !== 'undefined') {
                         Swal.fire({
@@ -318,11 +318,11 @@
                     const primaryColor = '#FE531F';
                     @endif
                     const quantityControlsHTML = `
-                        <div class="product-card-quantity-controls" 
+                        <div class="product-card-quantity-controls"
                              data-product-id="${productId}"
                              data-cart-item-id="${data.cart_item_id}"
                              onclick="event.preventDefault(); event.stopPropagation();">
-                            <button class="btn product-card-quantity-btn product-card-quantity-decrease" 
+                            <button class="btn product-card-quantity-btn product-card-quantity-decrease"
                                     onclick="event.preventDefault(); event.stopPropagation(); updateProductQuantity(${data.cart_item_id}, ${data.quantity - 1}, this);">
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <g clip-path="url(#clip0_15_1556)">
@@ -336,7 +336,7 @@
                                 </svg>
                             </button>
                             <span class="product-card-quantity-number">${data.quantity}</span>
-                            <button class="btn product-card-quantity-btn product-card-quantity-increase" 
+                            <button class="btn product-card-quantity-btn product-card-quantity-increase"
                                     onclick="event.preventDefault(); event.stopPropagation(); updateProductQuantity(${data.cart_item_id}, ${data.quantity + 1}, this);">
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <g clip-path="url(#clip0_15_1569)">
@@ -387,13 +387,13 @@
                 const controls = button.closest('.product-card-quantity-controls');
                 const quantityDisplay = controls.querySelector('.product-card-quantity-number');
                 quantityDisplay.textContent = newQuantity;
-                
+
                 // Update buttons
                 const decreaseBtn = controls.querySelector('.product-card-quantity-decrease');
                 const increaseBtn = controls.querySelector('.product-card-quantity-increase');
                 decreaseBtn.setAttribute('onclick', `event.preventDefault(); event.stopPropagation(); updateProductQuantity(${cartItemId}, ${newQuantity - 1}, this);`);
                 increaseBtn.setAttribute('onclick', `event.preventDefault(); event.stopPropagation(); updateProductQuantity(${cartItemId}, ${newQuantity + 1}, this);`);
-                
+
                 // Update cart count
                 updateCartCount();
             } else {
@@ -411,7 +411,7 @@
         const title = isService ? 'Hizmet Talebini Kaldır' : 'Ürünü Sepetten Çıkar';
         const text = isService ? 'Bu hizmet talebini kaldırmak istediğinize emin misiniz?' : 'Bu ürünü sepetten çıkarmak istediğinize emin misiniz?';
         const confirmButtonText = isService ? 'Evet, Kaldır' : 'Evet, Çıkar';
-        
+
         if (typeof Swal !== 'undefined') {
             Swal.fire({
                 title: title,
@@ -448,11 +448,11 @@
         .then(data => {
             if (data.success) {
                 const productId = button.getAttribute('data-product-id');
-                
+
                 if (isService) {
                     // Replace service added icon with request button
                     const requestButtonHTML = `
-                        <span class="btn product-card-add-to-cart product-card-request-service" 
+                        <span class="btn product-card-add-to-cart product-card-request-service"
                               data-product-id="${productId}"
                               onclick="event.preventDefault(); event.stopPropagation(); addToCart(${productId}, this);"
                               title="Hizmet Talep Et">
@@ -460,7 +460,7 @@
                         </span>
                     `;
                     button.outerHTML = requestButtonHTML;
-                    
+
                     // Show success message
                     if (typeof Swal !== 'undefined') {
                         Swal.fire({
@@ -477,7 +477,7 @@
                     const controls = button.closest('.product-card-quantity-controls');
                     // Replace quantity controls with + button
                     const addButtonHTML = `
-                        <span class="btn product-card-add-to-cart" 
+                        <span class="btn product-card-add-to-cart"
                               data-product-id="${productId}"
                               onclick="event.preventDefault(); event.stopPropagation(); addToCart(${productId}, this);">
                             <img width="24" height="24" src="{{ asset('site/assets/img/plus-icon.svg') }}" alt="">
@@ -485,7 +485,7 @@
                     `;
                     controls.outerHTML = addButtonHTML;
                 }
-                
+
                 // Update cart count
                 updateCartCount();
             } else {
@@ -532,7 +532,7 @@
     // Update cart count on page load
     document.addEventListener('DOMContentLoaded', function() {
         updateCartCount();
-        
+
         // Update SVG fill colors with primary color
         @if($company && $company->primary_color)
         const primaryColor = '{{ $company->primary_color }}';
@@ -554,7 +554,7 @@
     function loadAnnouncements() {
         const announcementsList = document.getElementById('announcements-list');
         if (!announcementsList) return;
-        
+
         announcementsList.innerHTML = `
             <div class="loading-state">
                 <div class="spinner-custom"></div>
@@ -863,7 +863,7 @@
 <!-- Float Action Buttons -->
 <div class="float-action-buttons">
     @if($company && $company->wifi_password)
-    <button class="fab-btn fab-btn-wifi" 
+    <button class="fab-btn fab-btn-wifi"
             data-wifi-password="{{ $company->wifi_password }}"
             onclick="copyWifiPassword(this)"
             title="WiFi şifresini kopyalamak için tıklayın">
@@ -881,7 +881,7 @@
     // Copy WiFi password to clipboard
     function copyWifiPassword(element) {
         const wifiPassword = element.getAttribute('data-wifi-password');
-        
+
         if (!wifiPassword) {
             return;
         }
@@ -910,7 +910,7 @@
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        
+
         try {
             const successful = document.execCommand('copy');
             if (successful) {
@@ -919,7 +919,7 @@
         } catch (err) {
             console.error('Fallback: Oops, unable to copy', err);
         }
-        
+
         document.body.removeChild(textArea);
     }
 
@@ -928,15 +928,15 @@
         const originalIcon = element.innerHTML;
         const originalBg = element.style.backgroundColor;
         const originalColor = element.style.color;
-        
+
         // Change icon to check mark and update colors
         element.innerHTML = '<i class="fas fa-check"></i>';
         element.style.backgroundColor = '#28a745';
         element.style.color = '#ffffff';
-        
+
         // Show toast notification
         showToastNotification('WiFi şifresi kopyalandı', 'success');
-        
+
         setTimeout(function() {
             element.innerHTML = originalIcon;
             element.style.backgroundColor = originalBg;
@@ -964,7 +964,7 @@
         toast.setAttribute('role', 'alert');
         toast.setAttribute('aria-live', 'assertive');
         toast.setAttribute('aria-atomic', 'true');
-        
+
         const bgColor = type === 'success' ? '#28a745' : '#dc3545';
         toast.innerHTML = `
             <div class="toast-header" style="background-color: ${bgColor}; color: #ffffff;">
@@ -976,16 +976,16 @@
                 ${message}
             </div>
         `;
-        
+
         toastContainer.appendChild(toast);
-        
+
         // Initialize and show toast
         const bsToast = new bootstrap.Toast(toast, {
             autohide: true,
             delay: 3000
         });
         bsToast.show();
-        
+
         // Remove toast element after it's hidden
         toast.addEventListener('hidden.bs.toast', function() {
             toast.remove();

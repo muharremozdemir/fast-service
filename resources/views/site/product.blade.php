@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    
+
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
@@ -55,8 +55,8 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="#">Türkçe</a></li>
                             <li><a class="dropdown-item" href="#">English</a></li>
-                            <li><a class="dropdown-item" href="#">Lorem</a></li>
-                            <li><a class="dropdown-item" href="#">Ipsum</a></li>
+                            <li><a class="dropdown-item" href="#">Almanca</a></li>
+                            <li><a class="dropdown-item" href="#">Rusça</a></li>
                         </ul>
                     </div>
                     @if($company && $company->hotel_info)
@@ -170,7 +170,7 @@
             .then(data => {
                 if (data.success) {
                     this.innerHTML = 'Sepete Eklendi ✓';
-                    
+
                     // Update cart count in header
                     const cartCountElements = document.querySelectorAll('.header-right .btn-fastservice span');
                     cartCountElements.forEach(el => {
@@ -221,7 +221,7 @@
     function loadAnnouncements() {
         const announcementsList = document.getElementById('announcements-list');
         if (!announcementsList) return;
-        
+
         announcementsList.innerHTML = `
             <div class="loading-state">
                 <div class="spinner-custom"></div>
@@ -530,7 +530,7 @@
 <!-- Float Action Buttons -->
 <div class="float-action-buttons">
     @if($company && $company->wifi_password)
-    <button class="fab-btn fab-btn-wifi" 
+    <button class="fab-btn fab-btn-wifi"
             data-wifi-password="{{ $company->wifi_password }}"
             onclick="copyWifiPassword(this)"
             title="WiFi şifresini kopyalamak için tıklayın">
@@ -548,7 +548,7 @@
     // Copy WiFi password to clipboard
     function copyWifiPassword(element) {
         const wifiPassword = element.getAttribute('data-wifi-password');
-        
+
         if (!wifiPassword) {
             return;
         }
@@ -577,7 +577,7 @@
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        
+
         try {
             const successful = document.execCommand('copy');
             if (successful) {
@@ -586,7 +586,7 @@
         } catch (err) {
             console.error('Fallback: Oops, unable to copy', err);
         }
-        
+
         document.body.removeChild(textArea);
     }
 
@@ -595,15 +595,15 @@
         const originalIcon = element.innerHTML;
         const originalBg = element.style.backgroundColor;
         const originalColor = element.style.color;
-        
+
         // Change icon to check mark and update colors
         element.innerHTML = '<i class="fas fa-check"></i>';
         element.style.backgroundColor = '#28a745';
         element.style.color = '#ffffff';
-        
+
         // Show toast notification
         showToastNotification('WiFi şifresi kopyalandı', 'success');
-        
+
         setTimeout(function() {
             element.innerHTML = originalIcon;
             element.style.backgroundColor = originalBg;
@@ -631,7 +631,7 @@
         toast.setAttribute('role', 'alert');
         toast.setAttribute('aria-live', 'assertive');
         toast.setAttribute('aria-atomic', 'true');
-        
+
         const bgColor = type === 'success' ? '#28a745' : '#dc3545';
         toast.innerHTML = `
             <div class="toast-header" style="background-color: ${bgColor}; color: #ffffff;">
@@ -643,16 +643,16 @@
                 ${message}
             </div>
         `;
-        
+
         toastContainer.appendChild(toast);
-        
+
         // Initialize and show toast
         const bsToast = new bootstrap.Toast(toast, {
             autohide: true,
             delay: 3000
         });
         bsToast.show();
-        
+
         // Remove toast element after it's hidden
         toast.addEventListener('hidden.bs.toast', function() {
             toast.remove();

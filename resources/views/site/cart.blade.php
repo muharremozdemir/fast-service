@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    
+
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
@@ -56,8 +56,8 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="#">Türkçe</a></li>
                             <li><a class="dropdown-item" href="#">English</a></li>
-                            <li><a class="dropdown-item" href="#">Lorem</a></li>
-                            <li><a class="dropdown-item" href="#">Ipsum</a></li>
+                            <li><a class="dropdown-item" href="#">Almanca</a></li>
+                            <li><a class="dropdown-item" href="#">Rusça</a></li>
                         </ul>
                     </div>
                 </div>
@@ -210,21 +210,21 @@
                 const cartItem = document.querySelector(`[data-cart-id="${cartItemId}"]`);
                 const quantityDisplay = cartItem.querySelector('.quantity-display');
                 const priceDisplay = cartItem.querySelector('.cart-item-price');
-                
+
                 quantityDisplay.textContent = newQuantity;
                 if (priceDisplay) {
                     priceDisplay.textContent = data.item_total.toFixed(2) + '₺';
                 }
-                
+
                 // Update buttons
                 const decreaseBtn = cartItem.querySelector('.cart-item-number-btn-left');
                 const increaseBtn = cartItem.querySelector('.cart-item-number-btn-right');
                 decreaseBtn.setAttribute('onclick', `updateQuantity(${cartItemId}, ${newQuantity - 1})`);
                 increaseBtn.setAttribute('onclick', `updateQuantity(${cartItemId}, ${newQuantity + 1})`);
-                
+
                 // Update total
                 document.getElementById('mobile-total-price').textContent = data.total.toFixed(2) + '₺';
-                
+
                 // Update cart count
                 updateCartCount();
             } else {
@@ -254,17 +254,17 @@
             if (data.success) {
                 const cartItem = document.querySelector(`[data-cart-id="${cartItemId}"]`);
                 cartItem.remove();
-                
+
                 // Update total
                 document.getElementById('mobile-total-price').textContent = data.total.toFixed(2) + '₺';
-                
+
                 // Update cart count
                 updateCartCount();
-                
+
                 // Check if cart is empty
                 const cartItems = document.querySelectorAll('.cart-item');
                 if (cartItems.length === 0) {
-                    document.getElementById('cart-items-container').innerHTML = 
+                    document.getElementById('cart-items-container').innerHTML =
                         '<div class="text-center py-5"><p>Sepetiniz boş.</p><a href="{{ route("site.home") }}" class="btn btn-primary">Alışverişe Başla</a></div>';
                 }
             } else {
@@ -293,7 +293,7 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                document.getElementById('cart-items-container').innerHTML = 
+                document.getElementById('cart-items-container').innerHTML =
                     '<div class="text-center py-5"><p>Sepetiniz boş.</p><a href="{{ route("site.home") }}" class="btn btn-primary">Alışverişe Başla</a></div>';
                 document.getElementById('mobile-total-price').textContent = '0.00₺';
                 updateCartCount();
@@ -319,7 +319,7 @@
     document.getElementById('place-order-btn').addEventListener('click', function() {
         const button = this;
         const originalText = button.textContent;
-        
+
         // Disable button
         button.disabled = true;
         button.textContent = 'Sipariş Oluşturuluyor...';
@@ -350,7 +350,7 @@
             button.disabled = false;
         });
     });
-    
+
     // Update SVG fill colors with primary color on page load
     document.addEventListener('DOMContentLoaded', function() {
         @if($company && $company->primary_color)
