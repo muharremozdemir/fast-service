@@ -21,14 +21,9 @@ class SiteHomeController extends Controller
     {
         return view('site.landing');
     }
-   
+
     public function index()
     {
-        $categories = Category::whereNull('parent_id')
-            ->where('is_active', 1)
-            ->orderBy('sort_order')
-            ->get();
-
         // Company bilgisini al (room_number'dan)
         $company = null;
         $sliders = collect();
@@ -45,6 +40,12 @@ class SiteHomeController extends Controller
                     ->get();
             }
         }
+
+        $categories = Category::whereNull('parent_id')
+            ->where('is_active', 1)
+            ->where('company_id', $company->id)
+            ->orderBy('sort_order')
+            ->get();
 
         return view('site.index', compact('categories', 'company', 'sliders'));
     }
@@ -103,12 +104,12 @@ class SiteHomeController extends Controller
             ]);
         } catch (\Exception $e) {
             \Log::error('Demo request mail error: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.'
             ], 500);
         }
     }
-    
+
 }
