@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>FastService - Otel Hizmetleri</title>
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('site/assets/img/logo.png') }}">
-    
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url('/') }}">
@@ -17,7 +17,7 @@
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:type" content="image/png">
-    
+
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="{{ url('/') }}">
@@ -28,7 +28,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    
+
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
@@ -210,9 +210,8 @@
 
             <div class="col-6 col-md-3">
                 <a href="{{ route('site.category', ['parent' => $cat->slug]) }}" class="category-card">
-                    <img class="category-card-icon"
-                        src="{{ asset('site/assets/img/' . $iconFile) }}"
-                        alt="{{ $cat->name }}">
+                    <!-- <img class="category-card-icon" src="{{ asset('site/assets/img/' . $iconFile) }}" alt="{{ $cat->name }}"> -->
+                    <img class="category-card-icon" src="{{ asset('storage/' . $cat->image_path) }}" alt="{{ $cat->name }}">
                     <h2 class="category-card-title">{{ $cat->name }}</h2>
                     <p class="category-card-text">{!! nl2br(e($cat->description)) !!}</p>
                 </a>
@@ -490,7 +489,7 @@
     // Copy WiFi password to clipboard
     function copyWifiPassword(element) {
         const wifiPassword = element.getAttribute('data-wifi-password');
-        
+
         if (!wifiPassword) {
             return;
         }
@@ -519,7 +518,7 @@
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        
+
         try {
             const successful = document.execCommand('copy');
             if (successful) {
@@ -528,7 +527,7 @@
         } catch (err) {
             console.error('Fallback: Oops, unable to copy', err);
         }
-        
+
         document.body.removeChild(textArea);
     }
 
@@ -537,15 +536,15 @@
         const originalIcon = element.innerHTML;
         const originalBg = element.style.backgroundColor;
         const originalColor = element.style.color;
-        
+
         // Change icon to check mark and update colors
         element.innerHTML = '<i class="fas fa-check"></i>';
         element.style.backgroundColor = '#28a745';
         element.style.color = '#ffffff';
-        
+
         // Show toast notification
         showToastNotification('WiFi şifresi kopyalandı', 'success');
-        
+
         setTimeout(function() {
             element.innerHTML = originalIcon;
             element.style.backgroundColor = originalBg;
@@ -573,7 +572,7 @@
         toast.setAttribute('role', 'alert');
         toast.setAttribute('aria-live', 'assertive');
         toast.setAttribute('aria-atomic', 'true');
-        
+
         const bgColor = type === 'success' ? '#28a745' : '#dc3545';
         toast.innerHTML = `
             <div class="toast-header" style="background-color: ${bgColor}; color: #ffffff;">
@@ -585,16 +584,16 @@
                 ${message}
             </div>
         `;
-        
+
         toastContainer.appendChild(toast);
-        
+
         // Initialize and show toast
         const bsToast = new bootstrap.Toast(toast, {
             autohide: true,
             delay: 3000
         });
         bsToast.show();
-        
+
         // Remove toast element after it's hidden
         toast.addEventListener('hidden.bs.toast', function() {
             toast.remove();
@@ -604,7 +603,7 @@
     // Update cart count on page load
     document.addEventListener('DOMContentLoaded', function() {
         updateCartCount();
-        
+
         // Check if room number is set, if not show warning
         const roomNumber = '{{ Session::get('room_number', '') }}';
         if (!roomNumber) {
@@ -683,7 +682,7 @@
 <!-- Float Action Buttons -->
 <div class="float-action-buttons">
     @if($company && $company->wifi_password)
-    <button class="fab-btn fab-btn-wifi" 
+    <button class="fab-btn fab-btn-wifi"
             data-wifi-password="{{ $company->wifi_password }}"
             onclick="copyWifiPassword(this)"
             title="WiFi şifresini kopyalamak için tıklayın">
