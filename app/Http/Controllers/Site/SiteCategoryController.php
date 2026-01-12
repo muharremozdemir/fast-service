@@ -20,7 +20,7 @@ class SiteCategoryController extends Controller
       $parentCategory = Category::query()
           ->where('company_id', $room->company_id)
           ->where('slug', $parentCategory)
-          ->get();
+          ->first();
 
       $parents = Category::whereNull('parent_id')
           ->where('is_active', 1)
@@ -30,7 +30,6 @@ class SiteCategoryController extends Controller
 
       // Seçili üst kategori
       $currentParent = $parentCategory->load('children');
-      dd($currentParent);
 
       // Alt kategori seçimi
       if (!$child) {
