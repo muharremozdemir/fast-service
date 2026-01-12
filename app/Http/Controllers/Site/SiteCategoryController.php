@@ -11,11 +11,16 @@ use Illuminate\Support\Facades\Session;
 
 class SiteCategoryController extends Controller
 {
-  public function show(Category $parent, ?Category $child = null)
+  public function show($parentCategory, ?Category $child = null)
   {
       $roomNumber = Session::get('room_number');
 
       $room = Room::where('room_number', $roomNumber)->first();
+
+      $parentCategory = Category::query()
+          ->where('company_id', $room->company_id)
+          ->where('slug', $parentCategory)
+          ->get();
 
       $parents = Category::whereNull('parent_id')
           ->where('is_active', 1)
@@ -24,7 +29,7 @@ class SiteCategoryController extends Controller
           ->get();
 
       // Seçili üst kategori
-      $currentParent = $parent->load('children');
+      $currentParent = $parentCategory->load('children');
 
       // Alt kategori seçimi
       if (!$child) {
