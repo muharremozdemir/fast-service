@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="tr">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -68,10 +68,10 @@
                             </svg>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Türkçe</a></li>
-                            <li><a class="dropdown-item" href="#">English</a></li>
-                            <li><a class="dropdown-item" href="#">Almanca</a></li>
-                            <li><a class="dropdown-item" href="#">Rusça</a></li>
+                            <li><a class="dropdown-item" href="{{ route('site.language.change', 'tr') }}">{{ __('site.languages.tr') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ route('site.language.change', 'en') }}">{{ __('site.languages.en') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ route('site.language.change', 'de') }}">{{ __('site.languages.de') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ route('site.language.change', 'ru') }}">{{ __('site.languages.ru') }}</a></li>
                         </ul>
                     </div>
                     @if($company && $company->hotel_info)
@@ -120,15 +120,15 @@
     <div class="row">
         <div class="col-8 col-md-6">
             <div class="h-100 d-flex align-items-center justify-content-start">
-                <p class="welcome-text">Fast Hotel'e Hoş geldiniz!</p>
+                <p class="welcome-text">{{ __('site.welcome') }}</p>
             </div>
         </div>
         <div class="col-4 col-md-6">
             <div class="d-flex align-items-center justify-content-end gap-3">
                 <div class="room-number-container d-flex align-items-center">
-                    <div class="room-number-text d-flex align-items-center justify-content-center">Oda Numaranız</div>
+                    <div class="room-number-text d-flex align-items-center justify-content-center">{{ __('site.room_number') }}</div>
                     <div class="room-number d-flex align-items-center justify-content-center" id="room-number-display">
-                        {{ Session::get('room_number', 'Belirtilmedi') }}
+                        {{ Session::get('room_number', __('site.not_specified')) }}
                     </div>
                 </div>
             </div>
@@ -156,8 +156,8 @@
 
 @if(!Session::has('room_number'))
     <div class="container mt-3">
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <strong>Uyarı:</strong> Oda numaranız seçilmedi. Lütfen odanızdaki QR kodu okutun.
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>{{ __('site.warning') }}:</strong> {{ __('site.room_number_not_selected') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     </div>
@@ -230,7 +230,7 @@
                     <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
                         <i class="fas fa-hotel" style="font-size: 18px;"></i>
                     </div>
-                    <span>Otel Bilgileri</span>
+                    <span>{{ __('site.hotel_info') }}</span>
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="opacity: 0.9;"></button>
             </div>
@@ -268,7 +268,7 @@
             </div>
             <div class="modal-footer" style="border-top: 1px solid #e9ecef; padding: 20px 28px; background: #ffffff;">
                 <button type="button" class="btn btn-primary" data-bs-dismiss="modal" style="border-radius: 10px; padding: 10px 28px; font-weight: 600; background: var(--primary-color, #4F46E5); border: none;">
-                    <i class="fas fa-times me-2"></i>Kapat
+                    <i class="fas fa-times me-2"></i>{{ __('site.close') }}
                 </button>
             </div>
         </div>
@@ -285,7 +285,7 @@
                     <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
                         <i class="fas fa-bullhorn" style="font-size: 18px;"></i>
                     </div>
-                    <span>Duyurular</span>
+                    <span>{{ __('site.announcements') }}</span>
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="opacity: 0.9;"></button>
             </div>
@@ -457,13 +457,13 @@
                 <div id="announcements-list">
                     <div class="loading-state">
                         <div class="spinner-custom"></div>
-                        <p style="color: #6c757d; margin: 0; font-size: 14px;">Duyurular yükleniyor...</p>
+                        <p style="color: #6c757d; margin: 0; font-size: 14px;">{{ __('site.loading_announcements') }}</p>
                     </div>
                 </div>
             </div>
             <div class="modal-footer" style="border-top: 1px solid #e9ecef; padding: 20px 28px; background: #ffffff;">
                 <button type="button" class="btn btn-primary" data-bs-dismiss="modal" style="border-radius: 10px; padding: 10px 28px; font-weight: 600; background: var(--primary-color, #4F46E5); border: none;">
-                    <i class="fas fa-times me-2"></i>Kapat
+                    <i class="fas fa-times me-2"></i>{{ __('site.close') }}
                 </button>
             </div>
         </div>
@@ -543,7 +543,7 @@
         element.style.color = '#ffffff';
 
         // Show toast notification
-        showToastNotification('WiFi şifresi kopyalandı', 'success');
+        showToastNotification('{{ __('site.wifi_password_copied') }}', 'success');
 
         setTimeout(function() {
             element.innerHTML = originalIcon;
@@ -577,7 +577,7 @@
         toast.innerHTML = `
             <div class="toast-header" style="background-color: ${bgColor}; color: #ffffff;">
                 <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
-                <strong class="me-auto">Bildirim</strong>
+                <strong class="me-auto">{{ __('site.notification') }}</strong>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body" style="background-color: #ffffff;">
@@ -608,7 +608,7 @@
         const roomNumber = '{{ Session::get('room_number', '') }}';
         if (!roomNumber) {
             // Show a subtle warning that QR code should be scanned
-            console.warn('Oda numarası seçilmedi. Lütfen QR kodu okutun.');
+            console.warn('{{ __('site.room_number_not_selected') }}');
         }
 
         // Load announcements when modal is shown
@@ -660,7 +660,7 @@
                             <div class="empty-state-icon">
                                 <i class="fas fa-bullhorn"></i>
                             </div>
-                            <p class="empty-state-text">Henüz duyuru bulunmamaktadır.</p>
+                            <p class="empty-state-text">{{ __('site.no_announcements') }}</p>
                         </div>
                     `;
                 }
@@ -672,7 +672,7 @@
                         <div class="empty-state-icon" style="background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%); color: #dc3545;">
                             <i class="fas fa-exclamation-triangle"></i>
                         </div>
-                        <p class="empty-state-text" style="color: #dc3545;">Duyurular yüklenirken bir hata oluştu.</p>
+                        <p class="empty-state-text" style="color: #dc3545;">{{ __('site.error_loading_announcements') }}</p>
                     </div>
                 `;
             });

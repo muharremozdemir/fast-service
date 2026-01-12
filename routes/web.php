@@ -28,6 +28,7 @@ use App\Http\Controllers\Site\ProductController;
 use App\Http\Controllers\Site\CartController;
 use App\Http\Controllers\Site\OrderController;
 use App\Http\Controllers\Site\AnnouncementController as SiteAnnouncementController;
+use App\Http\Controllers\Site\LanguageController;
 use App\Http\Controllers\Auth\LoginController;
 
 /*
@@ -51,6 +52,9 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('auth.logout');
 | SITE
 |--------------------------------------------------------------------------
 */
+
+// Language change
+Route::get('/lang/{locale}', [LanguageController::class, 'change'])->name('site.language.change');
 
 // Landing page - Ana sayfa
 Route::get('/', [SiteHomeController::class, 'landing'])->name('site.landing');

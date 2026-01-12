@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="tr">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>FastService - Sipariş Tamamlandı</title>
+    <title>FastService - {{ __('site.order_complete') }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,10 +43,10 @@
                             </svg>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Türkçe</a></li>
-                            <li><a class="dropdown-item" href="#">English</a></li>
-                            <li><a class="dropdown-item" href="#">Almanca</a></li>
-                            <li><a class="dropdown-item" href="#">Rusça</a></li>
+                            <li><a class="dropdown-item" href="{{ route('site.language.change', 'tr') }}">{{ __('site.languages.tr') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ route('site.language.change', 'en') }}">{{ __('site.languages.en') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ route('site.language.change', 'de') }}">{{ __('site.languages.de') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ route('site.language.change', 'ru') }}">{{ __('site.languages.ru') }}</a></li>
                         </ul>
                     </div>
                 </div>
@@ -100,7 +100,7 @@
                 <h2 class="m-0">Siparişiniz Alındı!</h2>
                 @if(isset($order))
                     <p class="text-muted mb-3">Sipariş Numaranız: <strong>{{ $order->order_number }}</strong></p>
-                    <p class="text-muted mb-3">Oda Numaranız: <strong>{{ $order->room_number }}</strong></p>
+                    <p class="text-muted mb-3">{{ __('site.room_number') }}: <strong>{{ $order->room_number }}</strong></p>
                     <p class="text-muted mb-3">Toplam Tutar: <strong>{{ number_format($order->total, 2) }}₺</strong></p>
                     <p class="text-muted mb-4">Siparişiniz başarıyla tamamlandı. Ödemeniz otel çıkışında adisyona eklenecektir.</p>
                 @else

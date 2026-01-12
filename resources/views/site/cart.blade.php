@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="tr">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>FastService - Sepetim</title>
+    <title>FastService - {{ __('site.cart') }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -54,10 +54,10 @@
                             </svg>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Türkçe</a></li>
-                            <li><a class="dropdown-item" href="#">English</a></li>
-                            <li><a class="dropdown-item" href="#">Almanca</a></li>
-                            <li><a class="dropdown-item" href="#">Rusça</a></li>
+                            <li><a class="dropdown-item" href="{{ route('site.language.change', 'tr') }}">{{ __('site.languages.tr') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ route('site.language.change', 'en') }}">{{ __('site.languages.en') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ route('site.language.change', 'de') }}">{{ __('site.languages.de') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ route('site.language.change', 'ru') }}">{{ __('site.languages.ru') }}</a></li>
                         </ul>
                     </div>
                 </div>
@@ -97,7 +97,7 @@
         <div class="row h-100">
             <div class="col">
                 <div class="h-100 d-flex align-items-center justify-content-start">
-                    <h1 class="cart-header-title">Sepetim</h1>
+                    <h1 class="cart-header-title">{{ __('site.cart') }}</h1>
                 </div>
             </div>
             <div class="col">
@@ -169,8 +169,8 @@
                     </div>
                 @empty
                     <div class="text-center py-5">
-                        <p>Sepetiniz boş.</p>
-                        <a href="{{ route('site.home') }}" class="btn btn-primary">Alışverişe Başla</a>
+                        <p>{{ __('site.empty_cart_message') }}</p>
+                        <a href="{{ route('site.home') }}" class="btn btn-primary">{{ __('site.continue_shopping') }}</a>
                     </div>
                 @endforelse
             </div>
@@ -183,7 +183,7 @@
         {{ number_format($total ?? 0, 2) }}₺
     </div>
     <button class="btn btn-primary mobile-add-to-cart-button" id="place-order-btn">
-        Sipariş Ver
+        {{ __('site.place_order') }}
     </button>
 </div>
 

@@ -61,14 +61,14 @@ class SiteHomeController extends Controller
 
         if (!$qrSticker || !$qrSticker->room) {
             return redirect()->route('site.home')
-                ->with('error', 'Geçersiz QR kod. Lütfen tekrar deneyin.');
+                ->with('error', __('site.invalid_qr_code'));
         }
 
         // Set room number in session
         Session::put('room_number', $qrSticker->room->room_number);
 
         return redirect()->route('site.home')
-            ->with('success', 'Oda numaranız seçildi: ' . $qrSticker->room->room_number);
+            ->with('success', __('site.room_number_selected', ['room_number' => $qrSticker->room->room_number]));
     }
 
     /**

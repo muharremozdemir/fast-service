@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="tr">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -53,10 +53,10 @@
                             </svg>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Türkçe</a></li>
-                            <li><a class="dropdown-item" href="#">English</a></li>
-                            <li><a class="dropdown-item" href="#">Almanca</a></li>
-                            <li><a class="dropdown-item" href="#">Rusça</a></li>
+                            <li><a class="dropdown-item" href="{{ route('site.language.change', 'tr') }}">{{ __('site.languages.tr') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ route('site.language.change', 'en') }}">{{ __('site.languages.en') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ route('site.language.change', 'de') }}">{{ __('site.languages.de') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ route('site.language.change', 'ru') }}">{{ __('site.languages.ru') }}</a></li>
                         </ul>
                     </div>
                     @if($company && $company->hotel_info)
