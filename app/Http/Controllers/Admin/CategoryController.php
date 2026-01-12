@@ -65,8 +65,16 @@ class CategoryController extends Controller
     {
         $request->validate([
             'parent_id' => 'nullable|exists:categories,id',
-            'category_name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'name_tr' => 'required_without:category_name|string|max:255',
+            'name_en' => 'nullable|string|max:255',
+            'name_de' => 'nullable|string|max:255',
+            'name_ru' => 'nullable|string|max:255',
+            'category_name' => 'required_without:name_tr|string|max:255', // Geriye dönük uyumluluk
+            'description_tr' => 'nullable|string',
+            'description_en' => 'nullable|string',
+            'description_de' => 'nullable|string',
+            'description_ru' => 'nullable|string',
+            'description' => 'nullable|string', // Geriye dönük uyumluluk
             'sort_order' => 'nullable|integer',
             'is_active' => 'required|in:0,1',
             'user_ids' => 'nullable|array',
@@ -104,10 +112,30 @@ class CategoryController extends Controller
             }
         }
 
-        $category->name = $request->input('category_name');
-        $category->slug = \Str::slug($category->name);
+        // Çoklu dil desteği için name ve description alanlarını JSON formatına dönüştür
+        $nameTranslations = [
+            'tr' => $request->input('name_tr', ''),
+            'en' => $request->input('name_en', ''),
+            'de' => $request->input('name_de', ''),
+            'ru' => $request->input('name_ru', ''),
+        ];
+        $descriptionTranslations = [
+            'tr' => $request->input('description_tr', ''),
+            'en' => $request->input('description_en', ''),
+            'de' => $request->input('description_de', ''),
+            'ru' => $request->input('description_ru', ''),
+        ];
+        
+        // Eğer eski format kullanılıyorsa (geriye dönük uyumluluk)
+        if ($request->has('category_name') && !$request->has('name_tr')) {
+            $nameTranslations['tr'] = $request->input('category_name');
+            $descriptionTranslations['tr'] = $request->input('description', '');
+        }
+        
+        $category->name = $nameTranslations;
+        $category->slug = \Str::slug($nameTranslations['tr'] ?: $nameTranslations['en'] ?: 'category');
         $category->parent_id = $parentId;
-        $category->description = $request->input('description');
+        $category->description = $descriptionTranslations;
         $category->is_active = (int) $request->input('is_active', 0);
         $category->sort_order = (int) $request->input('sort_order', 0);
 
@@ -134,8 +162,16 @@ class CategoryController extends Controller
     {
         $request->validate([
             'parent_id' => 'nullable|exists:categories,id',
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'name_tr' => 'required_without:name|string|max:255',
+            'name_en' => 'nullable|string|max:255',
+            'name_de' => 'nullable|string|max:255',
+            'name_ru' => 'nullable|string|max:255',
+            'name' => 'required_without:name_tr|string|max:255', // Geriye dönük uyumluluk
+            'description_tr' => 'nullable|string',
+            'description_en' => 'nullable|string',
+            'description_de' => 'nullable|string',
+            'description_ru' => 'nullable|string',
+            'description' => 'nullable|string', // Geriye dönük uyumluluk
             'sort_order' => 'nullable|integer',
             'is_active' => 'required|in:0,1',
             'user_ids' => 'nullable|array',
@@ -171,11 +207,31 @@ class CategoryController extends Controller
             }
         }
 
+        // Çoklu dil desteği için name ve description alanlarını JSON formatına dönüştür
+        $nameTranslations = [
+            'tr' => $request->input('name_tr', ''),
+            'en' => $request->input('name_en', ''),
+            'de' => $request->input('name_de', ''),
+            'ru' => $request->input('name_ru', ''),
+        ];
+        $descriptionTranslations = [
+            'tr' => $request->input('description_tr', ''),
+            'en' => $request->input('description_en', ''),
+            'de' => $request->input('description_de', ''),
+            'ru' => $request->input('description_ru', ''),
+        ];
+        
+        // Eğer eski format kullanılıyorsa (geriye dönük uyumluluk)
+        if ($request->has('name') && !$request->has('name_tr')) {
+            $nameTranslations['tr'] = $request->input('name');
+            $descriptionTranslations['tr'] = $request->input('description', '');
+        }
+        
         $category = new Category();
-        $category->name = $request->input('name');
-        $category->slug = \Str::slug($category->name);
+        $category->name = $nameTranslations;
+        $category->slug = \Str::slug($nameTranslations['tr'] ?: $nameTranslations['en'] ?: 'category');
         $category->parent_id = $parentId;
-        $category->description = $request->input('description');
+        $category->description = $descriptionTranslations;
         $category->sort_order = (int) $request->input('sort_order', 0);
         $category->is_active = (int) $request->input('is_active');
         $category->company_id = Auth::user()->company_id;

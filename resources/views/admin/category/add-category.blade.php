@@ -95,14 +95,50 @@
                             </div>
                             <!--end::Üst Kategori-->
 
-                            <!--begin::Kategori Adı-->
+                            <!--begin::Kategori Adı (Çoklu Dil)-->
                             <div class="col-md-6 fv-row mb-7">
                                 <label class="required form-label fw-semibold fs-6 mb-2">Kategori Adı</label>
-                                <input type="text" name="name" class="form-control form-control-solid @error('name') is-invalid @enderror" placeholder="Kategori adını girin" value="{{ old('name') }}" required />
-                                @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <div class="form-text">Kategori adı müşteriler tarafından görüntülenecektir.</div>
+                                <ul class="nav nav-tabs nav-line-tabs nav-line-tabs-2x mb-5 fs-6" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link active" data-bs-toggle="tab" href="#name_tr_tab" aria-selected="true" role="tab">Türkçe</a>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#name_en_tab" aria-selected="false" role="tab">English</a>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#name_de_tab" aria-selected="false" role="tab">Deutsch</a>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#name_ru_tab" aria-selected="false" role="tab">Русский</a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content" id="name_tabs_content">
+                                    <div class="tab-pane fade show active" id="name_tr_tab" role="tabpanel">
+                                        <input type="text" name="name_tr" class="form-control form-control-solid @error('name_tr') is-invalid @enderror" placeholder="Kategori adını girin (Türkçe)" value="{{ old('name_tr') }}" required />
+                                        @error('name_tr')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="tab-pane fade" id="name_en_tab" role="tabpanel">
+                                        <input type="text" name="name_en" class="form-control form-control-solid @error('name_en') is-invalid @enderror" placeholder="Category name (English)" value="{{ old('name_en') }}" />
+                                        @error('name_en')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="tab-pane fade" id="name_de_tab" role="tabpanel">
+                                        <input type="text" name="name_de" class="form-control form-control-solid @error('name_de') is-invalid @enderror" placeholder="Kategoriename (Deutsch)" value="{{ old('name_de') }}" />
+                                        @error('name_de')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="tab-pane fade" id="name_ru_tab" role="tabpanel">
+                                        <input type="text" name="name_ru" class="form-control form-control-solid @error('name_ru') is-invalid @enderror" placeholder="Название категории (Русский)" value="{{ old('name_ru') }}" />
+                                        @error('name_ru')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="form-text">Kategori adı müşteriler tarafından görüntülenecektir. En azından Türkçe alanı zorunludur.</div>
                             </div>
                             <!--end::Kategori Adı-->
                         </div>
@@ -120,13 +156,49 @@
                             <!--end::Sıralama-->
                         </div>
 
-                        <!--begin::Açıklama-->
+                        <!--begin::Açıklama (Çoklu Dil)-->
                         <div class="fv-row mb-7">
                             <label class="form-label fw-semibold fs-6 mb-2">Açıklama</label>
-                            <textarea name="description" class="form-control form-control-solid @error('description') is-invalid @enderror" rows="4" placeholder="Kategori açıklamasını girin">{{ old('description') }}</textarea>
-                            @error('description')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <ul class="nav nav-tabs nav-line-tabs nav-line-tabs-2x mb-5 fs-6" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link active" data-bs-toggle="tab" href="#description_tr_tab" aria-selected="true" role="tab">Türkçe</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#description_en_tab" aria-selected="false" role="tab">English</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#description_de_tab" aria-selected="false" role="tab">Deutsch</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#description_ru_tab" aria-selected="false" role="tab">Русский</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="description_tabs_content">
+                                <div class="tab-pane fade show active" id="description_tr_tab" role="tabpanel">
+                                    <textarea name="description_tr" class="form-control form-control-solid @error('description_tr') is-invalid @enderror" rows="4" placeholder="Kategori açıklamasını girin (Türkçe)">{{ old('description_tr') }}</textarea>
+                                    @error('description_tr')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="tab-pane fade" id="description_en_tab" role="tabpanel">
+                                    <textarea name="description_en" class="form-control form-control-solid @error('description_en') is-invalid @enderror" rows="4" placeholder="Category description (English)">{{ old('description_en') }}</textarea>
+                                    @error('description_en')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="tab-pane fade" id="description_de_tab" role="tabpanel">
+                                    <textarea name="description_de" class="form-control form-control-solid @error('description_de') is-invalid @enderror" rows="4" placeholder="Kategoriebeschreibung (Deutsch)">{{ old('description_de') }}</textarea>
+                                    @error('description_de')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="tab-pane fade" id="description_ru_tab" role="tabpanel">
+                                    <textarea name="description_ru" class="form-control form-control-solid @error('description_ru') is-invalid @enderror" rows="4" placeholder="Описание категории (Русский)">{{ old('description_ru') }}</textarea>
+                                    @error('description_ru')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
                         </div>
                         <!--end::Açıklama-->
 

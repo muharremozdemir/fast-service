@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Support\Str; 
+use Illuminate\Support\Str;
+use Spatie\Translatable\HasTranslations;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
 
     protected $fillable = [
         'category_id',
@@ -21,6 +22,8 @@ class Product extends Model
         'company_id',
         'type',
     ];
+
+    public $translatable = ['name', 'description'];
 
     public function category()
     {

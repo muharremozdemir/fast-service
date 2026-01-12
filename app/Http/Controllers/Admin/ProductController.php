@@ -62,9 +62,17 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name_tr' => 'required_without:name|string|max:255',
+            'name_en' => 'nullable|string|max:255',
+            'name_de' => 'nullable|string|max:255',
+            'name_ru' => 'nullable|string|max:255',
+            'name' => 'required_without:name_tr|string|max:255', // Geriye dönük uyumluluk
             'category_id' => 'required|exists:categories,id',
-            'description' => 'nullable|string',
+            'description_tr' => 'nullable|string',
+            'description_en' => 'nullable|string',
+            'description_de' => 'nullable|string',
+            'description_ru' => 'nullable|string',
+            'description' => 'nullable|string', // Geriye dönük uyumluluk
             'price' => 'required|numeric|min:0',
             'type' => 'required|in:sale,service',
             'is_active' => 'required|in:0,1',
@@ -75,11 +83,31 @@ class ProductController extends Controller
         $category = Category::where('company_id', Auth::user()->company_id)
             ->findOrFail($request->input('category_id'));
 
+        // Çoklu dil desteği için name ve description alanlarını JSON formatına dönüştür
+        $nameTranslations = [
+            'tr' => $request->input('name_tr', ''),
+            'en' => $request->input('name_en', ''),
+            'de' => $request->input('name_de', ''),
+            'ru' => $request->input('name_ru', ''),
+        ];
+        $descriptionTranslations = [
+            'tr' => $request->input('description_tr', ''),
+            'en' => $request->input('description_en', ''),
+            'de' => $request->input('description_de', ''),
+            'ru' => $request->input('description_ru', ''),
+        ];
+        
+        // Eğer eski format kullanılıyorsa (geriye dönük uyumluluk)
+        if ($request->has('name') && !$request->has('name_tr')) {
+            $nameTranslations['tr'] = $request->input('name');
+            $descriptionTranslations['tr'] = $request->input('description', '');
+        }
+        
         $product = new Product();
-        $product->name = $request->input('name');
-        $product->slug = Str::slug($product->name);
+        $product->name = $nameTranslations;
+        $product->slug = Str::slug($nameTranslations['tr'] ?: $nameTranslations['en'] ?: 'product');
         $product->category_id = $request->input('category_id');
-        $product->description = $request->input('description');
+        $product->description = $descriptionTranslations;
         $product->price = $request->input('price');
         $product->type = $request->input('type');
         $product->is_active = (int) $request->input('is_active');
@@ -112,9 +140,17 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name_tr' => 'required_without:name|string|max:255',
+            'name_en' => 'nullable|string|max:255',
+            'name_de' => 'nullable|string|max:255',
+            'name_ru' => 'nullable|string|max:255',
+            'name' => 'required_without:name_tr|string|max:255', // Geriye dönük uyumluluk
             'category_id' => 'required|exists:categories,id',
-            'description' => 'nullable|string',
+            'description_tr' => 'nullable|string',
+            'description_en' => 'nullable|string',
+            'description_de' => 'nullable|string',
+            'description_ru' => 'nullable|string',
+            'description' => 'nullable|string', // Geriye dönük uyumluluk
             'price' => 'required|numeric|min:0',
             'type' => 'required|in:sale,service',
             'is_active' => 'required|in:0,1',
@@ -127,10 +163,30 @@ class ProductController extends Controller
         $category = Category::where('company_id', Auth::user()->company_id)
             ->findOrFail($request->input('category_id'));
 
-        $product->name = $request->input('name');
-        $product->slug = Str::slug($product->name);
+        // Çoklu dil desteği için name ve description alanlarını JSON formatına dönüştür
+        $nameTranslations = [
+            'tr' => $request->input('name_tr', ''),
+            'en' => $request->input('name_en', ''),
+            'de' => $request->input('name_de', ''),
+            'ru' => $request->input('name_ru', ''),
+        ];
+        $descriptionTranslations = [
+            'tr' => $request->input('description_tr', ''),
+            'en' => $request->input('description_en', ''),
+            'de' => $request->input('description_de', ''),
+            'ru' => $request->input('description_ru', ''),
+        ];
+        
+        // Eğer eski format kullanılıyorsa (geriye dönük uyumluluk)
+        if ($request->has('name') && !$request->has('name_tr')) {
+            $nameTranslations['tr'] = $request->input('name');
+            $descriptionTranslations['tr'] = $request->input('description', '');
+        }
+        
+        $product->name = $nameTranslations;
+        $product->slug = Str::slug($nameTranslations['tr'] ?: $nameTranslations['en'] ?: 'product');
         $product->category_id = $request->input('category_id');
-        $product->description = $request->input('description');
+        $product->description = $descriptionTranslations;
         $product->price = $request->input('price');
         $product->type = $request->input('type');
         $product->is_active = (int) $request->input('is_active');

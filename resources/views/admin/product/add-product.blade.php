@@ -82,7 +82,46 @@
                             <label class="required form-label">Ürün Adı</label>
                             <!--end::Label-->
                             <!--begin::Input-->
-                            <input type="text" name="name" class="form-control mb-2 @error('name') is-invalid @enderror" placeholder="Ürün adını girin" value="{{ old('name') }}" required />
+                            <ul class="nav nav-tabs nav-line-tabs nav-line-tabs-2x mb-5 fs-6" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link active" data-bs-toggle="tab" href="#name_tr_tab" aria-selected="true" role="tab">Türkçe</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#name_en_tab" aria-selected="false" role="tab">English</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#name_de_tab" aria-selected="false" role="tab">Deutsch</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#name_ru_tab" aria-selected="false" role="tab">Русский</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="name_tabs_content">
+                                <div class="tab-pane fade show active" id="name_tr_tab" role="tabpanel">
+                                    <input type="text" name="name_tr" class="form-control mb-2 @error('name_tr') is-invalid @enderror" placeholder="Ürün adını girin (Türkçe)" value="{{ old('name_tr') }}" required />
+                                    @error('name_tr')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="tab-pane fade" id="name_en_tab" role="tabpanel">
+                                    <input type="text" name="name_en" class="form-control mb-2 @error('name_en') is-invalid @enderror" placeholder="Product name (English)" value="{{ old('name_en') }}" />
+                                    @error('name_en')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="tab-pane fade" id="name_de_tab" role="tabpanel">
+                                    <input type="text" name="name_de" class="form-control mb-2 @error('name_de') is-invalid @enderror" placeholder="Produktname (Deutsch)" value="{{ old('name_de') }}" />
+                                    @error('name_de')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="tab-pane fade" id="name_ru_tab" role="tabpanel">
+                                    <input type="text" name="name_ru" class="form-control mb-2 @error('name_ru') is-invalid @enderror" placeholder="Название продукта (Русский)" value="{{ old('name_ru') }}" />
+                                    @error('name_ru')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
                             <!--end::Input-->
                             @error('name')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -138,7 +177,46 @@
                             <label class="form-label">Açıklama</label>
                             <!--end::Label-->
                             <!--begin::Input-->
-                            <textarea name="description" class="form-control @error('description') is-invalid @enderror" rows="4" placeholder="Ürün açıklamasını girin">{{ old('description') }}</textarea>
+                            <ul class="nav nav-tabs nav-line-tabs nav-line-tabs-2x mb-5 fs-6" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link active" data-bs-toggle="tab" href="#description_tr_tab" aria-selected="true" role="tab">Türkçe</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#description_en_tab" aria-selected="false" role="tab">English</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#description_de_tab" aria-selected="false" role="tab">Deutsch</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#description_ru_tab" aria-selected="false" role="tab">Русский</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="description_tabs_content">
+                                <div class="tab-pane fade show active" id="description_tr_tab" role="tabpanel">
+                                    <textarea name="description_tr" class="form-control @error('description_tr') is-invalid @enderror" rows="4" placeholder="Ürün açıklamasını girin (Türkçe)">{{ old('description_tr') }}</textarea>
+                                    @error('description_tr')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="tab-pane fade" id="description_en_tab" role="tabpanel">
+                                    <textarea name="description_en" class="form-control @error('description_en') is-invalid @enderror" rows="4" placeholder="Product description (English)">{{ old('description_en') }}</textarea>
+                                    @error('description_en')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="tab-pane fade" id="description_de_tab" role="tabpanel">
+                                    <textarea name="description_de" class="form-control @error('description_de') is-invalid @enderror" rows="4" placeholder="Produktbeschreibung (Deutsch)">{{ old('description_de') }}</textarea>
+                                    @error('description_de')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="tab-pane fade" id="description_ru_tab" role="tabpanel">
+                                    <textarea name="description_ru" class="form-control @error('description_ru') is-invalid @enderror" rows="4" placeholder="Описание продукта (Русский)">{{ old('description_ru') }}</textarea>
+                                    @error('description_ru')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
                             <!--end::Input-->
                             @error('description')
                                 <div class="invalid-feedback">{{ $message }}</div>
