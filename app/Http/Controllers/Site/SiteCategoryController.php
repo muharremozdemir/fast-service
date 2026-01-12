@@ -30,6 +30,7 @@ class SiteCategoryController extends Controller
 
       // Seçili üst kategori
       $currentParent = $parentCategory->load('children');
+      dd($currentParent);
 
       // Alt kategori seçimi
       if (!$child) {
