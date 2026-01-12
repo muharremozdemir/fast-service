@@ -13,8 +13,13 @@ class SiteCategoryController extends Controller
 {
   public function show(Category $parent, ?Category $child = null)
   {
+      $roomNumber = Session::get('room_number');
+
+      $room = Room::where('room_number', $roomNumber)->first();
+
       $parents = Category::whereNull('parent_id')
           ->where('is_active', 1)
+          ->where('company_id', $room->company_id)
           ->orderBy('sort_order')
           ->get();
 
@@ -35,22 +40,14 @@ class SiteCategoryController extends Controller
       // Sepetteki ürünleri ve miktarlarını çek
       $cartItems = collect();
       $company = null;
-      $roomNumber = Session::get('room_number');
-      
-      if ($roomNumber) {
-          $room = Room::where('room_number', $roomNumber)->first();
-          if ($room && $room->company) {
-              $company = $room->company;
-          }
-          
-          $cart = Cart::where('room_number', $roomNumber)->first();
-          if ($cart) {
-              $cartItems = $cart->items()
-                  ->whereIn('product_id', $products->pluck('id'))
-                  ->with('product')
-                  ->get()
-                  ->keyBy('product_id');
-          }
+
+      $cart = Cart::where('room_number', $roomNumber)->first();
+      if ($cart) {
+          $cartItems = $cart->items()
+              ->whereIn('product_id', $products->pluck('id'))
+              ->with('product')
+              ->get()
+              ->keyBy('product_id');
       }
 
       return view('site.category', compact(
