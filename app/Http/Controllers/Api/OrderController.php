@@ -55,11 +55,12 @@ class OrderController extends Controller
                 'notes' => $order->notes,
                 'created_at' => $order->created_at->format('Y-m-d H:i:s'),
                 'items' => $items->map(function ($item) {
+                    dd($item);
                     return [
                         'id' => $item->id,
                         'product' => [
                             'id' => $item->product->id,
-                            'name' => $item->product->name->name->tr,
+                            'name' => $item->product->name,
                             'category' => $item->product->category ? [
                                 'id' => $item->product->category->id,
                                 'name' => $item->product->category->name,
