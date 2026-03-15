@@ -55,7 +55,7 @@ class OrderController extends Controller
                 'notes' => $order->notes,
                 'created_at' => $order->created_at->format('Y-m-d H:i:s'),
                 'items' => $items->map(function ($item) {
-                    dd($item);
+                    dd($item->product);
                     return [
                         'id' => $item->id,
                         'product' => [
