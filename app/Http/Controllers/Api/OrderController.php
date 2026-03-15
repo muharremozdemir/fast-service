@@ -59,7 +59,7 @@ class OrderController extends Controller
                         'id' => $item->id,
                         'product' => [
                             'id' => $item->product->id,
-                            'name' => $item->product->name->translate('tr'),
+                            'name' => $item->product->name->tr,
                             'category' => $item->product->category ? [
                                 'id' => $item->product->category->id,
                                 'name' => $item->product->category->name,
